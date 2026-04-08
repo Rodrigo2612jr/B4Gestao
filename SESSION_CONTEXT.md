@@ -9,9 +9,22 @@
 - **Status:** Em desenvolvimento
 
 ## Estado Atual
-Projeto publicado no GitHub e deploy de producao ativo no Vercel.
+Projeto publicado no GitHub e deploy de producao ativo no Vercel, com ajuste para evitar distorcao/achatamento de imagens.
 
 ## Historico de Sessoes
+
+### Sessao 3 - 2026-04-07
+- **O que foi feito:**
+  - Mapeamento dos componentes com imagens para validar proporcao e classes responsivas
+  - Migracao das logos do Header e Footer de `img` para `next/image`
+  - Build de producao executado com sucesso (`next build`)
+  - Novo deploy de producao realizado na Vercel com alias ativo
+- **Decisoes tomadas:**
+  - Padronizar uso de `next/image` tambem em logos para otimizar carregamento e manter consistencia
+  - Manter o alias de producao existente para evitar troca de URL publica
+- **Links gerados/atualizados:**
+  - Vercel inspect: https://vercel.com/rodrigos-projects-6dde47ab/site/H9U3XmzUiMsAccMZC7TJKa48w5rY
+  - Vercel (producao): https://site-murex-mu-79.vercel.app
 
 ### Sessao 2 - 2026-04-07
 - **O que foi feito:**

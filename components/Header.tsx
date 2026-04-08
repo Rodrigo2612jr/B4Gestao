@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import Image from "next/image";
 import { FaWhatsapp } from "react-icons/fa";
 import { HiMenu, HiX } from "react-icons/hi";
 import { WHATSAPP_URL, NAV_LINKS } from "@/lib/constants";
@@ -64,14 +65,16 @@ export default function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 lg:px-8">
         {/* Logo */}
         <a href="#inicio" className="flex items-center gap-2" aria-label="B4 Gestão Ocupacional - Voltar ao início">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src="/images/logo-white.png"
             alt="B4 Gestão Ocupacional"
-            width={48}
-            height={48}
-            className="h-10 w-10 object-contain lg:h-12 lg:w-12 transition-all duration-300"
+            width={500}
+            height={500}
+            sizes="(max-width: 1024px) 40px, 48px"
+            className="h-10 w-10 lg:h-12 lg:w-12 object-contain transition-all duration-300"
             style={scrolled ? { filter: "brightness(0) saturate(100%)" } : undefined}
+            quality={85}
+            priority
           />
           <span
             className={`hidden text-lg font-bold tracking-tight transition-colors sm:block ${

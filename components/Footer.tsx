@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {
   FaWhatsapp,
   FaInstagram,
@@ -55,13 +56,14 @@ export default function Footer() {
           {/* Brand with real logo */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src="/images/logo-white.png"
                 alt="B4 Gestão Ocupacional"
-                width={48}
-                height={48}
+                width={500}
+                height={500}
+                sizes="48px"
                 className="h-12 w-12 object-contain"
+                quality={85}
               />
               <span className="text-lg font-bold text-white">
                 Gestão Ocupacional
