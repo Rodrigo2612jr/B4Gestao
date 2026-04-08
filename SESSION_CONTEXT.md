@@ -9,9 +9,23 @@
 - **Status:** Em desenvolvimento
 
 ## Estado Atual
-Projeto publicado no GitHub e deploy de producao ativo no Vercel, com ajuste para evitar distorcao/achatamento de imagens.
+Projeto publicado no GitHub e deploy de producao ativo no Vercel, com ajuste de framework para eliminar erro 404 NOT_FOUND.
 
 ## Historico de Sessoes
+
+### Sessao 5 - 2026-04-07
+- **O que foi feito:**
+  - Diagnostico do erro `404 NOT_FOUND` no alias de producao
+  - Identificada configuracao de projeto na Vercel com `Framework Preset: Other`
+  - Criado `vercel.json` com `framework: nextjs` para forcar build correto
+  - Novo deploy de producao executado e alias revalidado
+- **Arquivos modificados:**
+  - `vercel.json`
+- **Resultado:**
+  - URL de producao respondendo `HTTP 200 OK`
+- **Links gerados/atualizados:**
+  - Vercel inspect: https://vercel.com/rodrigos-projects-6dde47ab/site/BQTic7HMaCC5N1b2yWgbUyLvaaun
+  - Vercel (producao): https://site-murex-mu-79.vercel.app
 
 ### Sessao 4 - 2026-04-07
 - **O que foi feito:**
