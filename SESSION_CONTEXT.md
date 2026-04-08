@@ -9,9 +9,22 @@
 - **Status:** Em desenvolvimento
 
 ## Estado Atual
-Fase de pesquisa competitiva. Analise do site SOC (soc.com.br) concluida como benchmark do setor de SST.
+Projeto publicado no GitHub e deploy de producao ativo no Vercel.
 
 ## Historico de Sessoes
+
+### Sessao 2 - 2026-04-07
+- **O que foi feito:**
+  - Commit consolidado do estado atual do projeto (`feat: restructure landing page project and assets`)
+  - Repositorio criado e publicado no GitHub: `Rodrigo2612jr/B4Gestao`
+  - Projeto vinculado na Vercel via CLI e deploy de producao realizado com sucesso
+  - URL de producao ativa criada com alias
+- **Decisoes tomadas:**
+  - Repositorio publico para facilitar compartilhamento e validacao externa
+  - Deploy direto por CLI para reduzir tempo de setup no painel
+- **Links gerados:**
+  - GitHub: https://github.com/Rodrigo2612jr/B4Gestao
+  - Vercel (producao): https://site-murex-mu-79.vercel.app
 
 ### Sessao 1 - 2026-04-07
 - **O que foi feito:**
@@ -27,10 +40,10 @@ Fase de pesquisa competitiva. Analise do site SOC (soc.com.br) concluida como be
   - WebFetch - para analise de paginas do SOC
 
 ## Proximos Passos
-1. [ ] Definir estrutura da LP da B4 baseada nos insights do benchmark
-2. [ ] Criar copy da LP
-3. [ ] Implementar componentes Next.js
-4. [ ] Configurar CTA WhatsApp + diagnostico gratuito
+1. [ ] Validar dominio customizado no Vercel (se houver)
+2. [ ] Revisar conteudo final com cliente e substituir placeholders
+3. [ ] Configurar analytics/conversao (GA4 e eventos de CTA)
+4. [ ] Rodar checklist final de SEO tecnico e performance
 
 ## Notas Tecnicas
 - SOC: WordPress + Elementor + Smart Slider 3 + Yoast SEO
