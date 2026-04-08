@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import FadeIn from "@/components/FadeIn";
 import AnimatedCounter from "./AnimatedCounter";
 import { HiOutlinePlay } from "react-icons/hi";
@@ -83,7 +83,7 @@ export default function Stats() {
                     alt="B4 Gestão Ocupacional"
                     fill
                     sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
                     quality={85}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-secondary/60 via-secondary/20 to-transparent" />

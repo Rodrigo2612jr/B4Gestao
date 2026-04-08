@@ -38,13 +38,13 @@ export default function About() {
         <div className="grid items-center gap-12 lg:grid-cols-2">
           {/* Left — Image */}
           <FadeIn direction="left" className="relative">
-            <div className="relative overflow-hidden rounded-3xl">
+            <div className="relative overflow-hidden rounded-3xl aspect-[4/3] bg-secondary/5">
               <Image
                 src="/images/team-strategy.png"
                 alt="Equipe multidisciplinar da B4 Gestão em reunião estratégica"
-                width={1200}
-                height={800}
-                className="w-full aspect-[3/2] object-cover rounded-3xl"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-contain object-center rounded-3xl p-2"
                 quality={85}
               />
               {/* Overlay card */}

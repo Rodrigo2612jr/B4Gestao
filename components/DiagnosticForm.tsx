@@ -115,13 +115,13 @@ export default function DiagnosticForm() {
             </div>
 
             {/* Image */}
-            <div className="mt-8 overflow-hidden rounded-2xl hidden lg:block">
+            <div className="relative mt-8 overflow-hidden rounded-2xl hidden lg:block aspect-[3/2]">
               <Image
                 src="/images/consultation.jpg"
                 alt="Consulta especializada em saúde e segurança do trabalho"
-                width={600}
-                height={400}
-                className="w-full aspect-[3/2] object-cover rounded-2xl"
+                fill
+                sizes="50vw"
+                className="object-cover object-center rounded-2xl"
                 quality={80}
               />
             </div>

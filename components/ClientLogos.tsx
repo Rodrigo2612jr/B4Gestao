@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import FadeIn from "@/components/FadeIn";
 import TiltCard from "@/components/TiltCard";
@@ -48,6 +48,18 @@ const segments = [
 export default function ClientLogos() {
   const [activeModal, setActiveModal] = useState<number | null>(null);
 
+  const closeModal = useCallback(() => setActiveModal(null), []);
+
+  // Close modal on Escape
+  useEffect(() => {
+    if (activeModal === null) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeModal();
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [activeModal, closeModal]);
+
   return (
     <section className="bg-secondary py-20 lg:py-28" aria-label="Segmentos atendidos">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
@@ -80,7 +92,7 @@ export default function ClientLogos() {
                   alt={seg.name}
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 33vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="object-cover object-center transition-transform duration-500 group-hover:scale-110"
                   quality={75}
                 />
                 {/* Gradient overlay */}
@@ -128,7 +140,7 @@ export default function ClientLogos() {
                 alt={segments[activeModal].name}
                 fill
                 sizes="500px"
-                className="object-cover"
+                className="object-cover object-center"
                 quality={85}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 to-transparent" />

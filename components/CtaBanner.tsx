@@ -16,7 +16,7 @@ export default function CtaBanner() {
         alt="Parceria B4 Gestão"
         fill
         sizes="100vw"
-        className="object-cover"
+        className="object-cover object-center"
         quality={80}
       />
       <div className="absolute inset-0 bg-gradient-to-r from-secondary/95 via-primary/70 to-secondary/90" />

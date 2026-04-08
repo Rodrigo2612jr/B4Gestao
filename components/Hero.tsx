@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { FaWhatsapp } from "react-icons/fa";
-import { HiArrowDown, HiOutlineShieldCheck, HiOutlineClock, HiOutlineGlobeAlt, HiOutlineUserGroup } from "react-icons/hi";
+import { HiOutlineShieldCheck, HiOutlineClock, HiOutlineGlobeAlt, HiOutlineUserGroup } from "react-icons/hi";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { WHATSAPP_URL } from "@/lib/constants";
 
@@ -34,16 +34,16 @@ export default function Hero() {
           alt="Escritório moderno com profissionais de SST"
           fill
           sizes="100vw"
-          className="object-cover"
+          className="object-cover object-center"
           priority
           quality={85}
         />
       </motion.div>
       <div className="absolute inset-0 bg-gradient-to-b from-secondary/90 via-secondary/80 to-secondary/90" />
 
-      {/* Floating animated elements */}
+      {/* Floating animated elements - hidden on mobile for performance */}
       <motion.div
-        className="absolute top-[20%] left-[10%] flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 backdrop-blur-sm border border-accent/20"
+        className="hidden md:flex absolute top-[20%] left-[10%] h-10 w-10 items-center justify-center rounded-xl bg-accent/10 backdrop-blur-sm border border-accent/20"
         animate={{ y: [0, -15, 0], rotate: [0, 5, 0] }}
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
         aria-hidden="true"
@@ -51,7 +51,7 @@ export default function Hero() {
         <HiOutlineShieldCheck className="text-lg text-accent" />
       </motion.div>
       <motion.div
-        className="absolute top-[30%] right-[12%] flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 backdrop-blur-sm border border-primary/20"
+        className="hidden md:flex absolute top-[30%] right-[12%] h-8 w-8 items-center justify-center rounded-lg bg-primary/10 backdrop-blur-sm border border-primary/20"
         animate={{ y: [0, -20, 0], rotate: [0, -8, 0] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
         aria-hidden="true"
@@ -59,25 +59,16 @@ export default function Hero() {
         <HiOutlineClock className="text-sm text-primary-light" />
       </motion.div>
       <motion.div
-        className="absolute bottom-[25%] left-[15%] flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10"
-        animate={{ y: [0, -12, 0], rotate: [0, 6, 0] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-        aria-hidden="true"
-      >
-        <HiOutlineUserGroup className="text-sm text-white/50" />
-      </motion.div>
-      <motion.div
-        className="absolute top-[45%] right-[8%] flex h-7 w-7 items-center justify-center rounded-full bg-accent/10 backdrop-blur-sm border border-accent/10"
+        className="hidden md:flex absolute top-[45%] right-[8%] h-7 w-7 items-center justify-center rounded-full bg-accent/10 backdrop-blur-sm border border-accent/10"
         animate={{ y: [0, -18, 0], scale: [1, 1.1, 1] }}
         transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         aria-hidden="true"
       >
         <HiOutlineGlobeAlt className="text-xs text-accent/70" />
       </motion.div>
-      {/* Small floating dots */}
-      <motion.div className="absolute top-[15%] right-[30%] h-2 w-2 rounded-full bg-accent/30" animate={{ y: [0, -25, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.8 }} aria-hidden="true" />
-      <motion.div className="absolute bottom-[35%] right-[25%] h-1.5 w-1.5 rounded-full bg-primary-light/40" animate={{ y: [0, -20, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1.2 }} aria-hidden="true" />
-      <motion.div className="absolute top-[55%] left-[8%] h-2.5 w-2.5 rounded-full bg-white/20" animate={{ y: [0, -15, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 3 }} aria-hidden="true" />
+      {/* Small floating dots - desktop only */}
+      <motion.div className="hidden md:block absolute top-[15%] right-[30%] h-2 w-2 rounded-full bg-accent/30" animate={{ y: [0, -25, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.8 }} aria-hidden="true" />
+      <motion.div className="hidden md:block absolute bottom-[35%] right-[25%] h-1.5 w-1.5 rounded-full bg-primary-light/40" animate={{ y: [0, -20, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1.2 }} aria-hidden="true" />
 
       <div className="relative z-10 mx-auto w-full max-w-4xl px-4 py-32 lg:px-8 text-center">
         {/* Urgency badge */}
@@ -122,34 +113,25 @@ export default function Hero() {
           <strong className="text-white">SST que funciona</strong> na prática.
         </motion.p>
 
-        {/* CTAs */}
+        {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
+          className="mt-10 flex flex-col items-center"
         >
-          <div className="text-center sm:text-left">
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center justify-center gap-3 rounded-full bg-accent px-8 py-4 text-base font-bold text-secondary shadow-lg shadow-accent/25 transition-all hover:bg-accent-dark hover:shadow-xl hover:shadow-accent/30 hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <FaWhatsapp className="text-xl transition-transform group-hover:scale-110" aria-hidden="true" />
-              Falar com especialista
-            </a>
-            <p className="mt-2 text-xs text-white/70">
-              Atendimento direto. Sem chatbot.
-            </p>
-          </div>
           <a
-            href="#diagnostico"
-            className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-white/20 px-8 py-4 text-base font-semibold text-white transition-all hover:border-accent hover:bg-accent/10"
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center justify-center gap-3 rounded-full bg-accent px-10 py-4 text-lg font-bold text-secondary shadow-lg shadow-accent/25 transition-all hover:bg-accent-dark hover:shadow-xl hover:shadow-accent/30 hover:scale-[1.02] active:scale-[0.98]"
           >
-            Descobrir meus riscos grátis
-            <HiArrowDown className="text-lg animate-bounce" aria-hidden="true" />
+            <FaWhatsapp className="text-2xl transition-transform group-hover:scale-110" aria-hidden="true" />
+            Falar com especialista
           </a>
+          <p className="mt-3 text-sm text-white/70">
+            Atendimento direto. Sem chatbot. Sem compromisso.
+          </p>
         </motion.div>
 
         {/* Trust badges */}

@@ -12,6 +12,8 @@ const services = [
     title: "Gestão Legal e Técnica",
     shortDesc: "PGR, PCMSO, laudos técnicos e eSocial",
     image: "/images/team-strategy.png",
+    imageFit: "contain",
+    imageBg: "bg-secondary/5",
     features: [
       "PGR pronto em até 7 dias úteis, já alinhado com a NR-01",
       "PCMSO com rede de clínicas em todo o Brasil",
@@ -25,6 +27,8 @@ const services = [
     title: "Gestão Ocupacional e Operacional",
     shortDesc: "Terceiros, clínicas e operação do SESMT",
     image: "/images/team-meeting.jpg",
+    imageFit: "cover",
+    imageBg: "bg-transparent",
     features: [
       "Controle centralizado de terceiros com rastreabilidade",
       "Clínicas credenciadas em todos os estados",
@@ -38,6 +42,8 @@ const services = [
     title: "Riscos Psicossociais (NR-01)",
     shortDesc: "Avaliação e gestão com metodologia em 5 passos",
     image: "/images/reports-review.jpg",
+    imageFit: "cover",
+    imageBg: "bg-transparent",
     features: [
       "Diagnóstico por área, função e GHE com metodologias reconhecidas",
       "Integração ao PGR/GRO com matriz de probabilidade x severidade",
@@ -51,6 +57,8 @@ const services = [
     title: "Saúde Mental Corporativa",
     shortDesc: "SOS 24h, teleconsultas e brigadas de saúde",
     image: "/images/consultation.jpg",
+    imageFit: "cover",
+    imageBg: "bg-transparent",
     features: [
       "SOS Psicológico 24/7 para situações de urgência",
       "Teleconsultas com psicólogos sob demanda",
@@ -64,6 +72,8 @@ const services = [
     title: "Gestão de Afastamentos",
     shortDesc: "CID F, nexo causal, FAP e retorno ao trabalho",
     image: "/images/handshake.jpg",
+    imageFit: "cover",
+    imageBg: "bg-transparent",
     features: [
       "Gerenciamento de afastamentos por transtornos mentais (CID F)",
       "Determinação técnica se o afastamento é laboral ou não",
@@ -181,13 +191,13 @@ export default function Services() {
                         </div>
 
                         {/* Image */}
-                        <div className="hidden lg:block overflow-hidden rounded-2xl aspect-[4/3]">
+                        <div className={`relative hidden lg:block overflow-hidden rounded-2xl aspect-[4/3] ${service.imageBg}`}>
                           <Image
                             src={service.image}
                             alt={service.title}
-                            width={400}
-                            height={300}
-                            className="h-full w-full object-cover rounded-2xl"
+                            fill
+                            sizes="350px"
+                            className={`${service.imageFit === "contain" ? "object-contain p-2" : "object-cover"} object-center rounded-2xl`}
                             quality={80}
                           />
                         </div>

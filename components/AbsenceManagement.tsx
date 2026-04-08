@@ -51,13 +51,13 @@ export default function AbsenceManagement() {
               A B4 te ajuda a entender esses números e agir em cima deles.
             </p>
 
-            <div className="mt-6 overflow-hidden rounded-2xl">
+            <div className="relative mt-6 overflow-hidden rounded-2xl aspect-[3/2]">
               <Image
                 src="/images/reports-review.jpg"
                 alt="Análise de relatórios de afastamento"
-                width={600}
-                height={400}
-                className="w-full h-auto object-cover rounded-2xl"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover object-center rounded-2xl"
                 quality={80}
               />
             </div>

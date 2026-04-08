@@ -95,7 +95,7 @@ export default function VideoPresentation() {
                       alt="B4 Gestão Ocupacional - Equipe em ação"
                       fill
                       sizes="(max-width: 1024px) 100vw, 55vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
                       quality={85}
                     />
 

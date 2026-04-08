@@ -13,6 +13,29 @@ Projeto publicado no GitHub e deploy de producao ativo no Vercel, com ajuste de 
 
 ## Historico de Sessoes
 
+### Sessao 6 - 2026-04-07
+- **O que foi feito:**
+  - Auditoria dos componentes com `next/image` para eliminar aparencia de imagem esticada/achatada
+  - Padronizacao de `object-center` nos blocos com `object-cover`
+  - Ajuste da imagem vertical da secao About para `object-contain` com fundo neutro
+  - Ajuste da secao Services para controlar encaixe por imagem (`contain` no card vertical e `cover` nas demais)
+  - Build validado sem erros e novo deploy de producao publicado
+- **Arquivos modificados:**
+  - `components/About.tsx`
+  - `components/Services.tsx`
+  - `components/Hero.tsx`
+  - `components/CtaBanner.tsx`
+  - `components/ClientLogos.tsx`
+  - `components/Stats.tsx`
+  - `components/AbsenceManagement.tsx`
+  - `components/DiagnosticForm.tsx`
+  - `components/FAQ.tsx`
+  - `components/VideoPresentation.tsx`
+  - `components/Testimonials.tsx`
+- **Links gerados/atualizados:**
+  - Vercel inspect: https://vercel.com/rodrigos-projects-6dde47ab/site/7F8ucAHgQAtPmoXZeE4pDvgKguc7
+  - Vercel (producao): https://site-murex-mu-79.vercel.app
+
 ### Sessao 5 - 2026-04-07
 - **O que foi feito:**
   - Diagnostico do erro `404 NOT_FOUND` no alias de producao

@@ -102,7 +102,7 @@ export default function Testimonials() {
                   alt={t.name}
                   width={48}
                   height={48}
-                  className="h-12 w-12 rounded-full object-cover shadow-lg transition-transform group-hover:scale-110"
+                  className="h-12 w-12 rounded-full object-cover object-center shadow-lg transition-transform group-hover:scale-110"
                   quality={85}
                 />
                 <div>
