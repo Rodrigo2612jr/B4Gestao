@@ -1,0 +1,165 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import { HiChevronDown } from "react-icons/hi";
+import { FaWhatsapp } from "react-icons/fa";
+import FadeIn from "@/components/FadeIn";
+import { WHATSAPP_URL } from "@/lib/constants";
+
+const faqs = [
+  {
+    question: "O que muda com a NR-01 em relação aos riscos psicossociais?",
+    answer:
+      "A NR-01 agora exige que toda empresa mapeie e trate riscos psicossociais no PGR/GRO. Estresse, assédio, sobrecarga, clima organizacional... tudo isso passou a ter o mesmo peso dos riscos físicos e químicos. Quem não fez, está vulnerável à fiscalização.",
+  },
+  {
+    question: "Minha empresa é pequena. Preciso me preocupar com a NR-01?",
+    answer:
+      "Sim. A regra se aplica a qualquer empresa com pelo menos 1 funcionário registrado. A partir de 15 colaboradores, a complexidade aumenta e uma gestão estruturada faz diferença. A B4 atende empresas de todos os portes.",
+  },
+  {
+    question: "Qual a diferença entre a B4 e plataformas automatizadas de SST?",
+    answer:
+      "Plataformas geram documentos padronizados automaticamente. A B4 tem uma equipe experiente que analisa a situação de verdade, entende o contexto e monta um plano que funciona na prática.",
+  },
+  {
+    question: "Em quanto tempo vocês entregam o PGR e PCMSO?",
+    answer:
+      "Em até 7 dias úteis. Trabalhamos com agilidade, sem comprometer a qualidade técnica.",
+  },
+  {
+    question: "Vocês atendem em todo o Brasil?",
+    answer:
+      "Sim. Temos cobertura nacional com clínicas credenciadas em todo o território brasileiro. Para São Paulo e Grande São Paulo, também realizamos exames in-company diretamente na sua empresa.",
+  },
+  {
+    question: "O que está incluso na gestão de riscos psicossociais da B4?",
+    answer:
+      "Seguimos 5 etapas: diagnóstico por área e função, integração ao PGR com classificação de severidade, plano de ação prático com responsáveis e prazos, capacitação de líderes e monitoramento contínuo. Tudo com metodologias reconhecidas e documentação.",
+  },
+  {
+    question: "Vocês oferecem suporte psicológico para colaboradores?",
+    answer:
+      "Sim. Oferecemos teleconsultas com psicólogos, SOS Psicológico 24/7 para urgências, brigadas de saúde mental e capacitação de líderes. Tudo acompanhado de relatórios com indicadores de engajamento e redução de custos.",
+  },
+  {
+    question: "Quanto custa contratar a B4?",
+    answer:
+      "Varia conforme o porte e a necessidade da empresa. Trabalhamos com propostas sob medida. Solicite um diagnóstico gratuito e receba os valores sem compromisso.",
+  },
+];
+
+export default function FAQ() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  return (
+    <section className="relative overflow-hidden bg-gradient-to-b from-white via-light to-white py-20 lg:py-28">
+      {/* Decorative elements */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-0 h-96 w-[600px] rounded-full bg-primary/[0.03] blur-3xl" aria-hidden="true" />
+
+      <div className="relative z-10 mx-auto max-w-7xl px-4 lg:px-8">
+        <div className="grid gap-12 lg:grid-cols-[1fr_1.5fr] items-start">
+          {/* Left — Header + CTA */}
+          <FadeIn direction="left" className="lg:sticky lg:top-28">
+            <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+              Tire suas dúvidas
+            </span>
+            <h2 className="mt-4 text-3xl font-bold text-secondary lg:text-4xl">
+              Perguntas Frequentes
+            </h2>
+            <p className="mt-3 text-gray leading-relaxed">
+              Tudo que você precisa saber sobre a NR-01, nossos serviços e como
+              podemos ajudar sua empresa.
+            </p>
+
+            <div className="mt-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+              <p className="text-lg font-medium text-secondary">
+                Ainda tem dúvidas?
+              </p>
+              <p className="mt-1 text-sm text-gray">
+                Fale direto com um especialista. Sem compromisso.
+              </p>
+              <a
+                href={WHATSAPP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-primary-dark hover:shadow-lg"
+              >
+                <FaWhatsapp className="text-lg" aria-hidden="true" />
+                Falar com especialista
+              </a>
+            </div>
+
+            {/* Image */}
+            <div className="mt-8 overflow-hidden rounded-2xl hidden lg:block">
+              <Image
+                src="/images/team-meeting.jpg"
+                alt="Equipe B4 em reunião estratégica"
+                width={600}
+                height={400}
+                className="w-full aspect-[3/2] object-cover rounded-2xl"
+                quality={80}
+              />
+            </div>
+          </FadeIn>
+
+          {/* Right — Accordion */}
+          <FadeIn direction="right">
+            <div className="space-y-3" role="region" aria-label="Perguntas frequentes">
+              {faqs.map((faq, i) => {
+                const isOpen = openIndex === i;
+                const headingId = `faq-heading-${i}`;
+                const panelId = `faq-panel-${i}`;
+
+                return (
+                  <div
+                    key={i}
+                    className={`rounded-xl border overflow-hidden transition-colors ${
+                      isOpen
+                        ? "border-primary/30 bg-white shadow-md"
+                        : "border-gray-100 bg-white/80"
+                    }`}
+                  >
+                    <h3>
+                      <button
+                        id={headingId}
+                        aria-expanded={isOpen}
+                        aria-controls={panelId}
+                        onClick={() => setOpenIndex(isOpen ? null : i)}
+                        className="flex w-full items-center justify-between px-6 py-5 text-left"
+                      >
+                        <span className="pr-4 text-sm font-semibold text-secondary lg:text-base">
+                          {faq.question}
+                        </span>
+                        <HiChevronDown
+                          className={`flex-shrink-0 text-lg text-primary transition-transform duration-300 ${
+                            isOpen ? "rotate-180" : ""
+                          }`}
+                          aria-hidden="true"
+                        />
+                      </button>
+                    </h3>
+                    <div
+                      id={panelId}
+                      role="region"
+                      aria-labelledby={headingId}
+                      className="accordion-panel"
+                      data-open={isOpen}
+                    >
+                      <div>
+                        <div className="px-6 pb-5 text-sm leading-relaxed text-gray">
+                          {faq.answer}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </FadeIn>
+        </div>
+      </div>
+    </section>
+  );
+}
