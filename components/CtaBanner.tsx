@@ -23,7 +23,7 @@ export default function CtaBanner() {
 
       {/* Floating micro-icons */}
       <motion.div
-        className="absolute top-[20%] left-[8%] flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm"
+        className="hidden md:flex absolute top-[20%] left-[8%] h-8 w-8 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm"
         animate={{ y: [0, -12, 0], rotate: [0, 5, 0] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         aria-hidden="true"
@@ -31,7 +31,7 @@ export default function CtaBanner() {
         <HiOutlineShieldCheck className="text-sm text-white/50" />
       </motion.div>
       <motion.div
-        className="absolute bottom-[25%] right-[10%] flex h-7 w-7 items-center justify-center rounded-full bg-accent/10 backdrop-blur-sm"
+        className="hidden md:flex absolute bottom-[25%] right-[10%] h-7 w-7 items-center justify-center rounded-full bg-accent/10 backdrop-blur-sm"
         animate={{ y: [0, -15, 0], rotate: [0, -6, 0] }}
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
         aria-hidden="true"
@@ -39,7 +39,7 @@ export default function CtaBanner() {
         <HiOutlineLightningBolt className="text-xs text-accent/60" />
       </motion.div>
       <motion.div
-        className="absolute top-[40%] right-[20%] h-2 w-2 rounded-full bg-accent/30"
+        className="hidden md:block absolute top-[40%] right-[20%] h-2 w-2 rounded-full bg-accent/30"
         animate={{ y: [0, -20, 0] }}
         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         aria-hidden="true"
@@ -75,7 +75,7 @@ export default function CtaBanner() {
             </motion.a>
           </div>
           <p className="mt-4 text-sm text-white/90">
-            Resposta em até 2h úteis. Sem compromisso.
+            Resposta em até 24h. Sem compromisso.
           </p>
         </FadeIn>
       </div>

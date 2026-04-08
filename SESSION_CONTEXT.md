@@ -13,6 +13,19 @@ Projeto publicado no GitHub e deploy de producao ativo no Vercel, com ajuste par
 
 ## Historico de Sessoes
 
+### Sessao 4 - 2026-04-07
+- **O que foi feito:**
+  - Varredura dos textos da LP para encontrar divergencias de prazo de resposta
+  - Padronizacao para "Resposta em ate 24h" nas secoes de CTA e comparacao
+  - Build de producao executado com sucesso
+  - Novo deploy de producao publicado na Vercel
+- **Arquivos modificados:**
+  - `components/CtaBanner.tsx`
+  - `components/Comparison.tsx`
+- **Links gerados/atualizados:**
+  - Vercel inspect: https://vercel.com/rodrigos-projects-6dde47ab/site/8gsXZX7ZV9jyGSA4tzfYV59HZSsx
+  - Vercel (producao): https://site-murex-mu-79.vercel.app
+
 ### Sessao 3 - 2026-04-07
 - **O que foi feito:**
   - Mapeamento dos componentes com imagens para validar proporcao e classes responsivas

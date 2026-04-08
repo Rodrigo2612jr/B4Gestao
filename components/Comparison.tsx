@@ -101,7 +101,7 @@ export default function Comparison() {
             >
               Quero essa entrega para minha empresa
             </a>
-            <p className="mt-2 text-xs text-gray">Resposta em até 2h úteis.</p>
+            <p className="mt-2 text-xs text-gray">Resposta em até 24h.</p>
           </FadeIn>
         </div>
       </div>
