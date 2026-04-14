@@ -70,8 +70,8 @@ export default function Header() {
             alt="B4 Gestão Ocupacional"
             width={500}
             height={500}
-            sizes="(max-width: 1024px) 40px, 48px"
-            className="h-10 w-10 lg:h-12 lg:w-12 object-contain transition-all duration-300"
+            sizes="(max-width: 1024px) 48px, 56px"
+            className="h-14 w-14 lg:h-16 lg:w-16 object-contain transition-all duration-300"
             style={scrolled ? { filter: "brightness(0) saturate(100%)" } : undefined}
             quality={85}
             priority

@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import FadeIn from "@/components/FadeIn";
-import TiltCard from "@/components/TiltCard";
-import { HiX } from "react-icons/hi";
+import { HiX, HiChevronLeft, HiChevronRight } from "react-icons/hi";
 
 const segments = [
   {
@@ -43,12 +42,43 @@ const segments = [
     desc: "Alta rotatividade, jornadas variadas, ergonomia e riscos operacionais.",
     examples: "Redes de lojas, supermercados, e-commerce, franquias",
   },
+  {
+    name: "Agropecuário",
+    image: "/images/sectors/agropecuario.jpg",
+    desc: "NR-31, exposição a agrotóxicos, ergonomia rural e segurança em máquinas agrícolas.",
+    examples: "Fazendas, cooperativas, agroindústrias, frigoríficos",
+  },
 ];
 
 export default function ClientLogos() {
   const [activeModal, setActiveModal] = useState<number | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
   const closeModal = useCallback(() => setActiveModal(null), []);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 10);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    checkScroll();
+    return () => el.removeEventListener("scroll", checkScroll);
+  }, [checkScroll]);
+
+  const scroll = (dir: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardWidth = el.querySelector("button")?.offsetWidth ?? 300;
+    el.scrollBy({ left: dir === "left" ? -cardWidth - 16 : cardWidth + 16, behavior: "smooth" });
+  };
 
   // Close modal on Escape
   useEffect(() => {
@@ -61,13 +91,13 @@ export default function ClientLogos() {
   }, [activeModal, closeModal]);
 
   return (
-    <section className="bg-secondary py-20 lg:py-28" aria-label="Segmentos atendidos">
+    <section className="bg-secondary py-12 lg:py-20" aria-label="Segmentos atendidos">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        <FadeIn className="text-center mb-14">
+        <FadeIn className="text-center mb-10">
           <span className="inline-block rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary-light">
             Segmentos
           </span>
-          <h2 className="mt-4 text-3xl font-bold text-white lg:text-4xl">
+          <h2 className="mt-4 text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
             Setores onde a B4{" "}
             <span className="text-primary-light">já atuou</span>
           </h2>
@@ -77,43 +107,88 @@ export default function ClientLogos() {
           </p>
         </FadeIn>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3 lg:gap-6">
-          {segments.map((seg, i) => (
-            <FadeIn key={seg.name} delay={i * 0.08} animation="slide-up">
-              <TiltCard>
-              <button
-                onClick={() => setActiveModal(i)}
-                className="group relative block w-full overflow-hidden rounded-2xl aspect-[4/3] text-left"
-                aria-label={`Ver detalhes do setor ${seg.name}`}
-              >
-                {/* Background image */}
-                <Image
-                  src={seg.image}
-                  alt={seg.name}
-                  fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 33vw"
-                  className="object-cover object-center transition-transform duration-500 group-hover:scale-110"
-                  quality={75}
-                />
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-secondary/90 via-secondary/40 to-transparent transition-all group-hover:from-primary/80 group-hover:via-primary/30" />
+        {/* Carousel container */}
+        <div className="relative">
+          {/* Arrow left */}
+          {canScrollLeft && (
+            <button
+              onClick={() => scroll("left")}
+              className="absolute -left-2 top-1/2 z-10 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-secondary shadow-lg transition-all hover:bg-white hover:scale-110 lg:-left-5"
+              aria-label="Anterior"
+            >
+              <HiChevronLeft className="text-xl" />
+            </button>
+          )}
 
-                {/* Content */}
-                <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-6">
-                  <h3 className="text-lg font-bold text-white sm:text-xl">
-                    {seg.name}
-                  </h3>
-                  <p className="mt-1 text-xs text-white/70 line-clamp-2 sm:text-sm">
-                    {seg.desc}
-                  </p>
-                  <span className="mt-3 inline-flex items-center text-xs font-medium text-primary-light opacity-0 translate-y-2 transition-all group-hover:opacity-100 group-hover:translate-y-0">
-                    Ver detalhes →
-                  </span>
-                </div>
-              </button>
-              </TiltCard>
-            </FadeIn>
-          ))}
+          {/* Arrow right */}
+          {canScrollRight && (
+            <button
+              onClick={() => scroll("right")}
+              className="absolute -right-2 top-1/2 z-10 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-secondary shadow-lg transition-all hover:bg-white hover:scale-110 lg:-right-5"
+              aria-label="Próximo"
+            >
+              <HiChevronRight className="text-xl" />
+            </button>
+          )}
+
+          {/* Scrollable row */}
+          <div
+            ref={scrollRef}
+            className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide lg:gap-5"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {segments.map((seg, i) => (
+              <FadeIn key={seg.name} delay={i * 0.06} animation="slide-up" className="flex-shrink-0 snap-start">
+                <button
+                  onClick={() => setActiveModal(i)}
+                  className="group relative block w-[260px] overflow-hidden rounded-2xl aspect-[4/3] text-left sm:w-[300px] lg:w-[320px]"
+                  aria-label={`Ver detalhes do setor ${seg.name}`}
+                >
+                  {/* Background image */}
+                  <Image
+                    src={seg.image}
+                    alt={seg.name}
+                    fill
+                    sizes="320px"
+                    className="object-cover object-center transition-transform duration-500 group-hover:scale-110"
+                    quality={80}
+                  />
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-secondary/90 via-secondary/40 to-transparent transition-all group-hover:from-primary/80 group-hover:via-primary/30" />
+
+                  {/* Content */}
+                  <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-5">
+                    <h3 className="text-lg font-bold text-white sm:text-xl">
+                      {seg.name}
+                    </h3>
+                    <p className="mt-1 text-xs text-white/70 line-clamp-2 sm:text-sm">
+                      {seg.desc}
+                    </p>
+                    <span className="mt-3 inline-flex items-center text-xs font-medium text-primary-light opacity-0 translate-y-2 transition-all group-hover:opacity-100 group-hover:translate-y-0">
+                      Ver detalhes →
+                    </span>
+                  </div>
+                </button>
+              </FadeIn>
+            ))}
+          </div>
+
+          {/* Scroll indicators */}
+          <div className="mt-4 flex justify-center gap-1.5">
+            {segments.map((seg, i) => (
+              <button
+                key={seg.name}
+                onClick={() => {
+                  const el = scrollRef.current;
+                  if (!el) return;
+                  const card = el.children[i] as HTMLElement;
+                  card?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+                }}
+                className="h-1.5 w-6 rounded-full bg-white/20 transition-all hover:bg-primary-light"
+                aria-label={`Ir para ${seg.name}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
 

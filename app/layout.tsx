@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     apple: "/images/logo-icon.png",
   },
   other: {
-    "theme-color": "#0097A7",
+    "theme-color": "#0e427b",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "default",
   },
@@ -95,7 +95,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${body.variable} ${display.variable} h-full antialiased`}>
+    <html lang="pt-BR" translate="no" className={`${body.variable} ${display.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

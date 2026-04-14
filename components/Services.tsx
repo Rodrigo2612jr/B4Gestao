@@ -11,14 +11,15 @@ const services = [
     id: "legal",
     title: "Gestão Legal e Técnica",
     shortDesc: "PGR, PCMSO, laudos técnicos e eSocial",
-    image: "/images/team-strategy.png",
-    imageFit: "contain",
-    imageBg: "bg-secondary/5",
+    image: "/images/team-strategy.jpg",
+    imageFit: "cover",
+    imageBg: "bg-transparent",
     features: [
       "PGR pronto em até 7 dias úteis, já alinhado com a NR-01",
       "PCMSO com rede de clínicas em todo o Brasil",
       "Laudos técnicos com respaldo pericial, preparados para sustentação judicial",
       "eSocial SST (S-2210, S-2220, S-2240) sem atraso",
+      "AEP e AET conforme NR-17",
       "Exames in-company em SP e Grande SP",
     ],
   },
@@ -88,7 +89,7 @@ export default function Services() {
   const [openId, setOpenId] = useState<string | null>("legal");
 
   return (
-    <section id="servicos" className="relative overflow-hidden bg-gradient-to-br from-light via-white to-primary/[0.04] py-20 lg:py-28">
+    <section id="servicos" className="relative overflow-hidden bg-white py-12 lg:py-20">
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 -z-0 h-96 w-96 rounded-full bg-primary/5 blur-3xl" aria-hidden="true" />
       <div className="absolute bottom-0 left-0 -z-0 h-72 w-72 rounded-full bg-accent/5 blur-3xl" aria-hidden="true" />
@@ -99,7 +100,7 @@ export default function Services() {
           <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
             Soluções Completas
           </span>
-          <h2 className="mt-4 text-3xl font-bold text-secondary lg:text-4xl">
+          <h2 className="mt-4 text-2xl font-bold text-secondary sm:text-3xl lg:text-4xl">
             SST de ponta a ponta, do{" "}
             <span className="text-primary">PGR à saúde mental</span>
           </h2>
@@ -110,7 +111,7 @@ export default function Services() {
         </FadeIn>
 
         {/* Accordion services */}
-        <div className="mt-14 space-y-4">
+        <div className="mt-10 space-y-3">
           {services.map((service, i) => {
             const isOpen = openId === service.id;
 
@@ -191,7 +192,7 @@ export default function Services() {
                         </div>
 
                         {/* Image */}
-                        <div className={`relative hidden lg:block overflow-hidden rounded-2xl aspect-[4/3] ${service.imageBg}`}>
+                        <div className={`relative hidden lg:block overflow-hidden rounded-2xl aspect-[3/2] ${service.imageBg}`}>
                           <Image
                             src={service.image}
                             alt={service.title}

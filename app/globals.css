@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-primary: #0097A7;
-  --color-primary-dark: #00727F;
-  --color-primary-light: #26A69A;
-  --color-secondary: #0A2E4D;
+  --color-primary: #0e427b;
+  --color-primary-dark: #021a52;
+  --color-primary-light: #3b7dd8;
+  --color-secondary: #021a52;
   --color-accent: #7ed957;
   --color-accent-dark: #5cb840;
   --color-dark: #1C1C1C;
@@ -48,10 +48,10 @@ h1, h2, h3, h4 {
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(0, 151, 167, 0.4);
+    box-shadow: 0 0 0 0 rgba(14, 66, 123, 0.4);
   }
   50% {
-    box-shadow: 0 0 0 12px rgba(0, 151, 167, 0);
+    box-shadow: 0 0 0 12px rgba(14, 66, 123, 0);
   }
 }
 
@@ -235,32 +235,11 @@ h1, h2, h3, h4 {
    ============================================================ */
 
 :focus-visible {
-  outline: 2px solid #0097A7;
+  outline: 2px solid #0e427b;
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* ============================================================
-   COUNTDOWN FLIP
-   ============================================================ */
-
-@keyframes countdownFlip {
-  0% {
-    transform: perspective(200px) rotateX(0deg);
-  }
-  50% {
-    transform: perspective(200px) rotateX(-10deg) scale(1.05);
-    opacity: 0.7;
-  }
-  100% {
-    transform: perspective(200px) rotateX(0deg) scale(1);
-    opacity: 1;
-  }
-}
-
-.countdown-flip {
-  animation: countdownFlip 0.3s ease-out;
-}
 
 /* ============================================================
    MICRO-INTERACTION ANIMATIONS
@@ -337,8 +316,8 @@ h1, h2, h3, h4 {
    ============================================================ */
 
 ::selection {
-  background: rgba(0, 151, 167, 0.2);
-  color: #0A2E4D;
+  background: rgba(14, 66, 123, 0.2);
+  color: #021a52;
 }
 
 /* ============================================================
@@ -365,23 +344,23 @@ h1, h2, h3, h4 {
 
 .gradient-mesh {
   background:
-    radial-gradient(ellipse at 20% 50%, rgba(0, 151, 167, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 50%, rgba(14, 66, 123, 0.15) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 20%, rgba(126, 217, 87, 0.12) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 80%, rgba(0, 151, 167, 0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(14, 66, 123, 0.10) 0%, transparent 50%),
     radial-gradient(ellipse at 10% 90%, rgba(126, 217, 87, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 90% 70%, rgba(10, 46, 77, 0.06) 0%, transparent 50%);
+    radial-gradient(ellipse at 90% 70%, rgba(2, 26, 82, 0.06) 0%, transparent 50%);
   background-size: 200% 200%;
   animation: meshMove 20s ease-in-out infinite;
 }
 
 .gradient-mesh-dark {
   background:
-    radial-gradient(ellipse at 20% 50%, rgba(0, 151, 167, 0.20) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 50%, rgba(14, 66, 123, 0.20) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 20%, rgba(126, 217, 87, 0.10) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 80%, rgba(0, 151, 167, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(14, 66, 123, 0.15) 0%, transparent 50%),
     radial-gradient(ellipse at 10% 90%, rgba(126, 217, 87, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 90% 70%, rgba(10, 46, 77, 0.25) 0%, transparent 50%);
+    radial-gradient(ellipse at 90% 70%, rgba(2, 26, 82, 0.25) 0%, transparent 50%);
   background-size: 200% 200%;
   animation: meshMove 20s ease-in-out infinite;
-  background-color: #0A2E4D;
+  background-color: #021a52;
 }

@@ -33,22 +33,22 @@ const highlights = [
 
 export default function About() {
   return (
-    <section id="quem-somos" className="bg-light py-20 lg:py-28">
+    <section id="quem-somos" className="bg-white py-12 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        <div className="grid items-center gap-12 lg:grid-cols-2">
+        <div className="grid items-center gap-8 lg:gap-12 lg:grid-cols-2">
           {/* Left — Image */}
           <FadeIn direction="left" className="relative">
-            <div className="relative overflow-hidden rounded-3xl aspect-[4/3] bg-secondary/5">
+            <div className="relative overflow-hidden rounded-3xl aspect-[3/2] bg-primary/5">
               <Image
-                src="/images/team-strategy.png"
+                src="/images/about-team.png"
                 alt="Equipe multidisciplinar da B4 Gestão em reunião estratégica"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-contain object-center rounded-3xl p-2"
-                quality={85}
+                className="object-cover object-center rounded-3xl"
+                quality={90}
               />
               {/* Overlay card */}
-              <div className="absolute bottom-4 left-4 right-4 rounded-2xl bg-secondary/90 backdrop-blur-sm p-5 sm:bottom-6 sm:left-6 sm:right-auto sm:max-w-xs">
+              <div className="absolute bottom-4 left-4 right-4 rounded-2xl bg-primary-dark/90 backdrop-blur-sm p-5 sm:bottom-6 sm:left-6 sm:right-auto sm:max-w-xs">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-primary-light">
@@ -76,7 +76,7 @@ export default function About() {
             <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
               Quem Somos
             </span>
-            <TextReveal className="mt-4 text-3xl font-bold text-secondary lg:text-4xl">
+            <TextReveal className="mt-4 text-2xl font-bold text-secondary sm:text-3xl lg:text-4xl">
               Consultoria especializada em Saúde e Segurança do Trabalho
             </TextReveal>
             <p className="mt-6 text-lg leading-relaxed text-gray">
@@ -85,14 +85,18 @@ export default function About() {
               projeto é pensado para a realidade da sua operação, com
               profissionais que entendem do assunto de verdade.
             </p>
-            <p className="mt-4 text-lg leading-relaxed text-gray">
-              Nossa equipe tem{" "}
-              <strong className="text-dark">
-                bagagem previdenciária de verdade
-              </strong>.
-              Na hora de decidir sobre nexo causal, FAP ou afastamento,
-              você sabe exatamente o que pode e o que não pode fazer.
-            </p>
+
+            {/* Highlighted callout */}
+            <div className="mt-6 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 border-l-4 border-primary p-5">
+              <p className="text-base font-medium text-secondary leading-relaxed">
+                Nossa equipe tem{" "}
+                <span className="bg-primary/10 px-1.5 py-0.5 rounded font-bold text-primary">
+                  bagagem previdenciária de verdade
+                </span>.
+                Na hora de decidir sobre nexo causal, FAP ou afastamento,
+                você sabe exatamente o que pode e o que não pode fazer.
+              </p>
+            </div>
 
             <div className="mt-8 space-y-4">
               {highlights.map((item) => (

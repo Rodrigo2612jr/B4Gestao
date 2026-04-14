@@ -18,7 +18,7 @@ export default async function Image() {
           justifyContent: "center",
           alignItems: "flex-start",
           padding: "80px",
-          background: "linear-gradient(135deg, #011e2e 0%, #0A2E4D 50%, #014460 100%)",
+          background: "linear-gradient(135deg, #010d1e 0%, #021a52 50%, #0e427b 100%)",
           fontFamily: "Inter, system-ui, sans-serif",
         }}
       >
@@ -31,7 +31,7 @@ export default async function Image() {
             width: 400,
             height: 400,
             borderRadius: "50%",
-            background: "rgba(0, 151, 167, 0.15)",
+            background: "rgba(14, 66, 123, 0.15)",
             display: "flex",
           }}
         />
@@ -61,7 +61,7 @@ export default async function Image() {
             style={{
               fontSize: "42px",
               fontWeight: 800,
-              color: "#26A69A",
+              color: "#3b7dd8",
             }}
           >
             B4
@@ -94,7 +94,7 @@ export default async function Image() {
             jurídica e{" "}
             <span style={{ color: "#F3AF00" }}>inteligência</span>
           </span>
-          <span style={{ color: "#26A69A" }}>estratégica.</span>
+          <span style={{ color: "#3b7dd8" }}>estratégica.</span>
         </div>
 
         {/* Subtitle */}

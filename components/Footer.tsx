@@ -148,7 +148,7 @@ export default function Footer() {
         <div className="mx-auto max-w-7xl px-4 py-6 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
             <p className="text-xs text-white/80">
-              &copy; {new Date().getFullYear()} {COMPANY.name}. Todos os
+              &copy; 2026 {COMPANY.name}. Todos os
               direitos reservados.
             </p>
             <p className="text-xs text-white/80">

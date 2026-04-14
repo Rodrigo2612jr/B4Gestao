@@ -9,7 +9,7 @@ import { WHATSAPP_URL } from "@/lib/constants";
 
 export default function CtaBanner() {
   return (
-    <section className="relative overflow-hidden py-16 lg:py-20">
+    <section className="relative overflow-hidden py-12 lg:py-16">
       {/* Background image */}
       <Image
         src="/images/handshake.jpg"
@@ -47,7 +47,7 @@ export default function CtaBanner() {
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 text-center lg:px-8">
         <FadeIn>
-          <h2 className="text-3xl font-bold text-white lg:text-4xl">
+          <h2 className="text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
             Não espere a fiscalização para descobrir o que está faltando.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-white/90">

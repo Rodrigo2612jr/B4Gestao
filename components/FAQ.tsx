@@ -3,9 +3,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import { HiChevronDown } from "react-icons/hi";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaWhatsapp, FaInstagram, FaLinkedinIn } from "react-icons/fa";
 import FadeIn from "@/components/FadeIn";
-import { WHATSAPP_URL } from "@/lib/constants";
+import { WHATSAPP_URL, CONTACT } from "@/lib/constants";
 
 const faqs = [
   {
@@ -31,7 +31,7 @@ const faqs = [
   {
     question: "Vocês atendem em todo o Brasil?",
     answer:
-      "Sim. Temos cobertura nacional com clínicas credenciadas em todo o território brasileiro. Para São Paulo e Grande São Paulo, também realizamos exames in-company diretamente na sua empresa.",
+      "Sim. Temos cobertura nacional com clínicas credenciadas em todo o território brasileiro. Realizamos PGR, PCMSO, AEP e AET conforme NR-17. Para São Paulo e Grande São Paulo, também realizamos exames in-company diretamente na sua empresa.",
   },
   {
     question: "O que está incluso na gestão de riscos psicossociais da B4?",
@@ -54,18 +54,18 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-white via-light to-white py-20 lg:py-28">
+    <section className="relative overflow-hidden bg-white py-12 lg:py-20">
       {/* Decorative elements */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-0 h-96 w-[600px] rounded-full bg-primary/[0.03] blur-3xl" aria-hidden="true" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 lg:px-8">
-        <div className="grid gap-12 lg:grid-cols-[1fr_1.5fr] items-start">
+        <div className="grid gap-10 lg:grid-cols-[1fr_1.5fr] items-start">
           {/* Left — Header + CTA */}
           <FadeIn direction="left" className="lg:sticky lg:top-28">
             <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
               Tire suas dúvidas
             </span>
-            <h2 className="mt-4 text-3xl font-bold text-secondary lg:text-4xl">
+            <h2 className="mt-4 text-2xl font-bold text-secondary sm:text-3xl lg:text-4xl">
               Perguntas Frequentes
             </h2>
             <p className="mt-3 text-gray leading-relaxed">
@@ -73,22 +73,44 @@ export default function FAQ() {
               podemos ajudar sua empresa.
             </p>
 
-            <div className="mt-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-              <p className="text-lg font-medium text-secondary">
+            <div className="mt-8 rounded-2xl bg-gradient-to-br from-primary-dark to-primary p-6 shadow-lg">
+              <p className="text-lg font-medium text-white">
                 Ainda tem dúvidas?
               </p>
-              <p className="mt-1 text-sm text-gray">
+              <p className="mt-1 text-sm text-white/70">
                 Fale direto com um especialista. Sem compromisso.
               </p>
               <a
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-primary-dark hover:shadow-lg"
+                className="mt-4 flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-secondary transition-all hover:bg-accent-dark hover:shadow-lg"
               >
                 <FaWhatsapp className="text-lg" aria-hidden="true" />
                 Falar com especialista
               </a>
+              <div className="mt-4 flex gap-3">
+                <a
+                  href={CONTACT.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 rounded-full border border-white/20 px-4 py-2.5 text-xs font-medium text-white transition-all hover:bg-white/10 hover:border-white/40"
+                  aria-label="Instagram da B4 Gestão"
+                >
+                  <FaInstagram className="text-base" aria-hidden="true" />
+                  Instagram
+                </a>
+                <a
+                  href={CONTACT.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 rounded-full border border-white/20 px-4 py-2.5 text-xs font-medium text-white transition-all hover:bg-white/10 hover:border-white/40"
+                  aria-label="LinkedIn da B4 Gestão"
+                >
+                  <FaLinkedinIn className="text-base" aria-hidden="true" />
+                  LinkedIn
+                </a>
+              </div>
             </div>
 
             {/* Image */}

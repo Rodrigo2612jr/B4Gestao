@@ -46,9 +46,9 @@ export default function DiagnosticForm() {
 
   if (submitted) {
     return (
-      <section id="diagnostico" className="bg-light py-20 lg:py-28">
+      <section id="diagnostico" className="bg-white py-12 lg:py-20">
         <div className="mx-auto max-w-2xl px-4 text-center">
-          <div role="status" aria-live="polite" className="hero-enter hero-delay-0 rounded-2xl bg-white p-12 shadow-lg">
+          <div role="status" aria-live="polite" className="hero-enter hero-delay-0 rounded-2xl bg-primary/5 p-12 shadow-lg border border-primary/10">
             <HiOutlineCheckCircle className="mx-auto text-6xl text-primary" aria-hidden="true" />
             <h3 className="mt-4 text-2xl font-bold text-secondary">
               Diagnóstico Enviado!
@@ -71,15 +71,15 @@ export default function DiagnosticForm() {
   }
 
   return (
-    <section id="diagnostico" className="bg-light py-20 lg:py-28">
+    <section id="diagnostico" className="bg-white py-12 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        <div className="grid gap-12 lg:grid-cols-2 items-center">
+        <div className="grid gap-10 lg:grid-cols-2 items-center">
           {/* Left info */}
           <FadeIn direction="left">
             <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
               100% Gratuito
             </span>
-            <h2 className="mt-4 text-3xl font-bold text-secondary lg:text-4xl">
+            <h2 className="mt-4 text-2xl font-bold text-secondary sm:text-3xl lg:text-4xl">
               Saiba onde você está{" "}
               <span className="text-primary">vulnerável</span> antes da fiscalização
             </h2>
@@ -106,7 +106,7 @@ export default function DiagnosticForm() {
             </div>
 
             {/* Urgency */}
-            <div className="mt-8 rounded-xl border-l-4 border-accent bg-accent/5 p-4">
+            <div className="mt-8 rounded-xl border-l-4 border-primary bg-primary/5 p-4">
               <p className="text-sm font-medium text-secondary">
                 A NR-01 já exige gestão de riscos psicossociais.
                 Empresas que se adequam agora evitam multas
@@ -131,14 +131,14 @@ export default function DiagnosticForm() {
           <FadeIn direction="right" animation="slide-up">
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="rounded-2xl bg-white p-8 shadow-xl"
+              className="rounded-2xl bg-gradient-to-br from-primary-dark to-primary p-8 shadow-xl"
               noValidate
               aria-labelledby="form-heading"
             >
-              <h3 id="form-heading" className="text-lg font-bold text-secondary">
+              <h3 id="form-heading" className="text-lg font-bold text-white">
                 Solicite seu diagnóstico gratuito
               </h3>
-              <p className="text-xs text-gray mt-1 mb-6">Leva menos de 1 minuto. Resposta em até 24h.</p>
+              <p className="text-xs text-white/70 mt-1 mb-6">Leva menos de 1 minuto. Resposta em até 24h.</p>
 
               <div className="space-y-4">
                 {/* Campos fáceis primeiro (dropdowns) */}
@@ -147,9 +147,9 @@ export default function DiagnosticForm() {
                   <div>
                     <label
                       htmlFor="funcionarios"
-                      className="mb-1.5 block text-sm font-medium text-dark"
+                      className="mb-1.5 block text-sm font-medium text-white"
                     >
-                      Nº de Funcionários <span className="text-red-500">*</span>
+                      Nº de Funcionários <span className="text-red-400">*</span>
                     </label>
                     <select
                       id="funcionarios"
@@ -157,11 +157,11 @@ export default function DiagnosticForm() {
                       aria-required="true"
                       aria-invalid={!!errors.funcionarios}
                       aria-describedby={errors.funcionarios ? "func-error" : undefined}
-                      className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-dark outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/30 placeholder:text-white/40"
                     >
-                      <option value="">Selecione...</option>
+                      <option value="" className="text-dark">Selecione...</option>
                       {EMPLOYEE_RANGES.map((range) => (
-                        <option key={range} value={range}>
+                        <option key={range} value={range} className="text-dark">
                           {range}
                         </option>
                       ))}
@@ -177,9 +177,9 @@ export default function DiagnosticForm() {
                   <div>
                     <label
                       htmlFor="necessidade"
-                      className="mb-1.5 block text-sm font-medium text-dark"
+                      className="mb-1.5 block text-sm font-medium text-white"
                     >
-                      O que mais preocupa hoje? <span className="text-red-500">*</span>
+                      O que mais preocupa hoje? <span className="text-red-400">*</span>
                     </label>
                     <select
                       id="necessidade"
@@ -187,11 +187,11 @@ export default function DiagnosticForm() {
                       aria-required="true"
                       aria-invalid={!!errors.necessidade}
                       aria-describedby={errors.necessidade ? "need-error" : undefined}
-                      className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-dark outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/30 placeholder:text-white/40"
                     >
-                      <option value="">Selecione...</option>
+                      <option value="" className="text-dark">Selecione...</option>
                       {SERVICE_NEEDS.map((need) => (
-                        <option key={need} value={need}>
+                        <option key={need} value={need} className="text-dark">
                           {need}
                         </option>
                       ))}
@@ -208,9 +208,9 @@ export default function DiagnosticForm() {
                 <div>
                   <label
                     htmlFor="regiao"
-                    className="mb-1.5 block text-sm font-medium text-dark"
+                    className="mb-1.5 block text-sm font-medium text-white"
                   >
-                    Região <span className="text-red-500">*</span>
+                    Região <span className="text-red-400">*</span>
                   </label>
                   <select
                     id="regiao"
@@ -218,18 +218,18 @@ export default function DiagnosticForm() {
                     aria-required="true"
                     aria-invalid={!!errors.regiao}
                     aria-describedby={errors.regiao ? "regiao-error" : undefined}
-                    className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-dark outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/30 placeholder:text-white/40"
                   >
-                    <option value="">Selecione...</option>
-                    <option value="São Paulo Capital">São Paulo Capital</option>
-                    <option value="São Paulo Interior">São Paulo Interior</option>
-                    <option value="Rio de Janeiro">Rio de Janeiro</option>
-                    <option value="Minas Gerais">Minas Gerais</option>
-                    <option value="Sul (PR, SC, RS)">Sul (PR, SC, RS)</option>
-                    <option value="Nordeste">Nordeste</option>
-                    <option value="Centro-Oeste">Centro-Oeste</option>
-                    <option value="Norte">Norte</option>
-                    <option value="Outro">Outro</option>
+                    <option value="" className="text-dark">Selecione...</option>
+                    <option value="São Paulo Capital" className="text-dark">São Paulo Capital</option>
+                    <option value="São Paulo Interior" className="text-dark">São Paulo Interior</option>
+                    <option value="Rio de Janeiro" className="text-dark">Rio de Janeiro</option>
+                    <option value="Minas Gerais" className="text-dark">Minas Gerais</option>
+                    <option value="Sul (PR, SC, RS)" className="text-dark">Sul (PR, SC, RS)</option>
+                    <option value="Nordeste" className="text-dark">Nordeste</option>
+                    <option value="Centro-Oeste" className="text-dark">Centro-Oeste</option>
+                    <option value="Norte" className="text-dark">Norte</option>
+                    <option value="Outro" className="text-dark">Outro</option>
                   </select>
                   {errors.regiao && (
                     <p id="regiao-error" className="mt-1 text-xs text-red-500" role="alert">
@@ -243,9 +243,9 @@ export default function DiagnosticForm() {
                   <div>
                     <label
                       htmlFor="empresa"
-                      className="mb-1.5 block text-sm font-medium text-dark"
+                      className="mb-1.5 block text-sm font-medium text-white"
                     >
-                      Nome da Empresa <span className="text-red-500">*</span>
+                      Nome da Empresa <span className="text-red-400">*</span>
                     </label>
                     <input
                       id="empresa"
@@ -253,7 +253,7 @@ export default function DiagnosticForm() {
                       aria-required="true"
                       aria-invalid={!!errors.empresa}
                       aria-describedby={errors.empresa ? "empresa-error" : undefined}
-                      className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-dark outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/30 placeholder:text-white/40"
                       placeholder="Ex: Empresa XYZ Ltda"
                     />
                     {errors.empresa && (
@@ -267,14 +267,14 @@ export default function DiagnosticForm() {
                   <div>
                     <label
                       htmlFor="cnpj"
-                      className="mb-1.5 block text-sm font-medium text-dark"
+                      className="mb-1.5 block text-sm font-medium text-white"
                     >
-                      CNPJ <span className="text-xs text-gray">(opcional)</span>
+                      CNPJ <span className="text-xs text-white/50">(opcional)</span>
                     </label>
                     <input
                       id="cnpj"
                       {...register("cnpj")}
-                      className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-dark outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/30 placeholder:text-white/40"
                       placeholder="00.000.000/0000-00"
                     />
                   </div>
@@ -284,9 +284,9 @@ export default function DiagnosticForm() {
                 <div>
                   <label
                     htmlFor="nome"
-                    className="mb-1.5 block text-sm font-medium text-dark"
+                    className="mb-1.5 block text-sm font-medium text-white"
                   >
-                    Seu Nome <span className="text-red-500">*</span>
+                    Seu Nome <span className="text-red-400">*</span>
                   </label>
                   <input
                     id="nome"
@@ -294,7 +294,7 @@ export default function DiagnosticForm() {
                     aria-required="true"
                     aria-invalid={!!errors.nome}
                     aria-describedby={errors.nome ? "nome-error" : undefined}
-                    className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-dark outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/30 placeholder:text-white/40"
                     placeholder="Ex: Maria Silva"
                   />
                   {errors.nome && (
@@ -308,9 +308,9 @@ export default function DiagnosticForm() {
                 <div>
                   <label
                     htmlFor="telefone"
-                    className="mb-1.5 block text-sm font-medium text-dark"
+                    className="mb-1.5 block text-sm font-medium text-white"
                   >
-                    WhatsApp <span className="text-red-500">*</span>
+                    WhatsApp <span className="text-red-400">*</span>
                   </label>
                   <input
                     id="telefone"
@@ -319,10 +319,10 @@ export default function DiagnosticForm() {
                     aria-required="true"
                     aria-invalid={!!errors.telefone}
                     aria-describedby={errors.telefone ? "telefone-error" : undefined}
-                    className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-dark outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/30 placeholder:text-white/40"
                     placeholder="(11) 99999-9999"
                   />
-                  <p className="mt-1 text-xs text-gray">Usado apenas para contato. Sem spam.</p>
+                  <p className="mt-1 text-xs text-white/50">Usado apenas para contato. Sem spam.</p>
                   {errors.telefone && (
                     <p id="telefone-error" className="mt-1 text-xs text-red-500" role="alert">
                       {errors.telefone.message}
@@ -334,12 +334,12 @@ export default function DiagnosticForm() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="mt-6 flex w-full items-center justify-center gap-3 rounded-xl bg-primary px-6 py-4 text-base font-bold text-white shadow-lg transition-all hover:bg-primary-dark hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
+                className="mt-6 flex w-full items-center justify-center gap-3 rounded-xl bg-accent px-6 py-4 text-base font-bold text-secondary shadow-lg transition-all hover:bg-accent-dark hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <FaWhatsapp className="text-xl" aria-hidden="true" />
                 {isSubmitting ? "Enviando..." : "Quero meu diagnóstico gratuito"}
               </button>
-              <p className="mt-3 text-center text-xs text-gray">
+              <p className="mt-3 text-center text-xs text-white/60">
                 Enviado direto via WhatsApp. Sem spam. Atendimento por profissionais reais.
               </p>
             </form>

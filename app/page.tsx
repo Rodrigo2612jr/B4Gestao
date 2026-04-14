@@ -5,7 +5,6 @@ import Stats from "@/components/Stats";
 import ClientLogos from "@/components/ClientLogos";
 import Services from "@/components/Services";
 
-const CustomCursor = dynamic(() => import("@/components/CustomCursor"));
 const ScrollProgress = dynamic(() => import("@/components/ScrollProgress"));
 
 // Lazy-loaded below-the-fold sections
@@ -18,11 +17,6 @@ const CtaBanner = dynamic(() => import("@/components/CtaBanner"), {
 const About = dynamic(() => import("@/components/About"), {
   loading: () => <div className="min-h-[400px]" />,
 });
-const VideoPresentation = dynamic(
-  () => import("@/components/VideoPresentation"),
-  { loading: () => <div className="min-h-[400px]" /> }
-);
-// Leadership removida a pedido do cliente
 const Comparison = dynamic(() => import("@/components/Comparison"), {
   loading: () => <div className="min-h-[400px]" />,
 });
@@ -243,7 +237,6 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <ScrollProgress />
-      <CustomCursor />
       <Header />
       <main>
         <Hero />

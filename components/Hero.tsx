@@ -25,12 +25,12 @@ export default function Hero() {
     <section
       ref={sectionRef}
       id="inicio"
-      className="relative min-h-screen flex items-center overflow-hidden"
+      className="relative min-h-[70vh] md:min-h-[80vh] lg:min-h-screen flex items-center overflow-hidden"
     >
       {/* Background image with parallax */}
-      <motion.div className="absolute inset-0" style={{ y: bgY }}>
+      <motion.div className="absolute inset-0 scale-110" style={{ y: bgY }}>
         <Image
-          src="/images/office-hero.png"
+          src="/images/office-hero.jpg"
           alt="Escritório moderno com profissionais de SST"
           fill
           sizes="100vw"
@@ -70,17 +70,17 @@ export default function Hero() {
       <motion.div className="hidden md:block absolute top-[15%] right-[30%] h-2 w-2 rounded-full bg-accent/30" animate={{ y: [0, -25, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.8 }} aria-hidden="true" />
       <motion.div className="hidden md:block absolute bottom-[35%] right-[25%] h-1.5 w-1.5 rounded-full bg-primary-light/40" animate={{ y: [0, -20, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1.2 }} aria-hidden="true" />
 
-      <div className="relative z-10 mx-auto w-full max-w-4xl px-4 py-32 lg:px-8 text-center">
+      <div className="relative z-10 mx-auto w-full max-w-4xl px-4 py-16 md:py-24 lg:py-32 lg:px-8 text-center">
         {/* Urgency badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-6 inline-flex items-center gap-2 rounded-full border border-red-400/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-300"
+          className="mb-6 inline-flex items-center gap-2 rounded-full border border-yellow-400/30 bg-yellow-500/10 px-4 py-2 text-sm font-medium text-yellow-300"
         >
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-red-400" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-yellow-400 opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-yellow-400" />
           </span>
           NR-01 em vigor | Sua empresa precisa se adequar
         </motion.div>
@@ -90,7 +90,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-4xl font-extrabold leading-[1.1] text-white sm:text-5xl lg:text-[3.8rem]"
+          className="text-3xl font-extrabold leading-[1.1] text-white sm:text-4xl lg:text-[3.8rem]"
         >
           NR-01 exige gestão de
           <br />
@@ -106,7 +106,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/90 sm:text-xl"
+          className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-white/90 sm:text-lg lg:text-xl"
         >
           Sua operação tem riscos que você ainda não mapeou. A B4 vai
           além do checklist. Entregamos{" "}
@@ -118,7 +118,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-10 flex flex-col items-center"
+          className="mt-8 flex flex-col items-center"
         >
           <a
             href={WHATSAPP_URL}
@@ -139,7 +139,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-10 flex flex-wrap justify-center gap-6"
+          className="mt-8 flex flex-wrap justify-center gap-4 lg:gap-6"
         >
           {trustBadges.map((badge, i) => (
             <motion.div

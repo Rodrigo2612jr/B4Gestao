@@ -49,7 +49,6 @@ export const NAV_LINKS = [
   { label: "Início", href: "#inicio" },
   { label: "Quem Somos", href: "#quem-somos" },
   { label: "Serviços", href: "#servicos" },
-  { label: "Diferenciais", href: "#diferenciais" },
   { label: "NR-01", href: "#nr01" },
   { label: "Diagnóstico", href: "#diagnostico" },
   { label: "Contato", href: "#contato" },
@@ -72,4 +71,5 @@ export const SERVICE_NEEDS = [
   "Gestão de Afastados",
   "eSocial SST",
   "Consultoria Completa",
+  "Outros",
 ] as const;

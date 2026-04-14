@@ -33,19 +33,19 @@ const capabilities = [
 
 export default function AbsenceManagement() {
   return (
-    <section className="relative overflow-hidden bg-secondary py-20 lg:py-28">
+    <section className="relative overflow-hidden bg-gradient-to-br from-primary/[0.04] via-white to-primary/[0.06] py-12 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        <div className="grid gap-12 lg:grid-cols-2 items-center">
+        <div className="grid gap-8 lg:gap-12 lg:grid-cols-2 items-center">
           {/* Content */}
           <FadeIn direction="left">
-            <span className="inline-block rounded-full bg-accent/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent">
+            <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
               Gestão Avançada
             </span>
-            <h2 className="mt-4 text-3xl font-bold text-white lg:text-4xl">
+            <h2 className="mt-4 text-2xl font-bold text-secondary sm:text-3xl lg:text-4xl">
               Gestão de{" "}
-              <span className="text-primary-light">Afastamentos</span>
+              <span className="text-primary">Afastamentos</span>
             </h2>
-            <p className="mt-4 text-lg text-white/80 leading-relaxed">
+            <p className="mt-4 text-lg text-gray leading-relaxed">
               Você sabe quanto custa cada dia de afastamento? Sabe quais
               são laborais e quais não são? Sabe como isso afeta o FAP?
               A B4 te ajuda a entender esses números e agir em cima deles.
@@ -70,7 +70,7 @@ export default function AbsenceManagement() {
             >
               Reduzir custos com afastamentos
             </a>
-            <p className="mt-2 text-xs text-white/90">Sem compromisso. Atendimento direto com especialista.</p>
+            <p className="mt-2 text-xs text-gray">Sem compromisso. Atendimento direto com especialista.</p>
           </FadeIn>
 
           {/* Cards */}
@@ -79,15 +79,15 @@ export default function AbsenceManagement() {
               <FadeIn
                 key={cap.title}
                 delay={i * 0.1}
-                className="group rounded-xl border border-white/10 bg-white/5 p-5 transition-all hover:shadow-lg hover:-translate-y-1 hover:bg-white/10"
+                className="group rounded-xl bg-primary-dark p-5 transition-all hover:shadow-lg hover:-translate-y-1"
               >
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20 text-primary-light group-hover:bg-primary group-hover:text-white transition-colors">
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-white/15 text-primary-light group-hover:bg-accent group-hover:text-secondary transition-colors">
                   <cap.icon className="text-xl" aria-hidden="true" />
                 </div>
                 <h4 className="font-semibold text-white text-sm">
                   {cap.title}
                 </h4>
-                <p className="mt-2 text-xs leading-relaxed text-white/90">
+                <p className="mt-2 text-xs leading-relaxed text-white/80">
                   {cap.desc}
                 </p>
               </FadeIn>

@@ -45,7 +45,7 @@ const steps = [
 
 export default function Methodology() {
   return (
-    <section id="nr01" className="relative overflow-hidden bg-secondary py-20 lg:py-28">
+    <section id="nr01" className="relative overflow-hidden bg-secondary py-12 lg:py-20">
       {/* Shape divider top */}
       <div className="shape-divider-top">
         <svg viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
@@ -66,7 +66,7 @@ export default function Methodology() {
             </span>
             NR-01 em vigor | Adeque-se antes da fiscalização
           </span>
-          <TextReveal className="mt-4 text-3xl font-bold text-white lg:text-4xl">
+          <TextReveal className="mt-4 text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
             Metodologia em 5 Passos para Riscos Psicossociais
           </TextReveal>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-white/90">
@@ -79,11 +79,11 @@ export default function Methodology() {
         </FadeIn>
 
         {/* Timeline */}
-        <div className="relative mt-16">
+        <div className="relative mt-10 lg:mt-14">
           {/* Vertical line */}
           <div className="absolute left-6 top-0 bottom-0 hidden w-0.5 bg-primary/30 lg:left-1/2 lg:block" />
 
-          <div className="space-y-8 lg:space-y-12">
+          <div className="space-y-6 lg:space-y-10">
             {steps.map((step, i) => (
               <FadeIn key={step.step} delay={i * 0.1} className={`relative flex flex-col lg:flex-row lg:items-center ${
                   i % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"
@@ -128,7 +128,7 @@ export default function Methodology() {
         </div>
 
         {/* CTA */}
-        <FadeIn className="mt-14 text-center">
+        <FadeIn className="mt-10 text-center">
           <a
             href={WHATSAPP_URL}
             target="_blank"
