@@ -9,17 +9,22 @@ import {
   HiOutlineLightningBolt,
   HiOutlineAcademicCap,
   HiOutlineShieldCheck,
+  HiOutlineClock,
 } from "react-icons/hi";
 import { COMPANY } from "@/lib/constants";
 
 const highlights = [
   {
     icon: HiOutlineAcademicCap,
-    text: `Engenheiros de Segurança, Psicólogos e Médicos do Trabalho com décadas de mercado`,
+    text: "Engenheiros de Segurança, Psicólogos e Médicos do Trabalho com mais de 20 anos de experiência",
   },
   {
     icon: HiOutlineLightningBolt,
-    text: `Entrega ágil de PGR e PCMSO em até ${COMPANY.pgrDeliveryDays} dias úteis`,
+    text: "PGR — entrega rápida sem pular etapas",
+  },
+  {
+    icon: HiOutlineClock,
+    text: "PCMSO — entrega em 1 dia após a conclusão do PGR",
   },
   {
     icon: HiOutlineCheckCircle,
