@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <linearGradient id="circleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7ed957"/>
+      <stop offset="35%" stop-color="#26A69A"/>
+      <stop offset="65%" stop-color="#0e427b"/>
+      <stop offset="100%" stop-color="#021a52"/>
+    </linearGradient>
+  </defs>
+  <!-- Circle stroke with gradient -->
+  <circle cx="250" cy="260" r="185" fill="none" stroke="url(#circleGrad)" stroke-width="5" stroke-linecap="round" transform="rotate(-30 250 260)"/>
+  <!-- B text -->
+  <text x="190" y="310" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900" font-size="195" fill="#0e427b" letter-spacing="-5">B</text>
+  <!-- 4 text (subscript) -->
+  <text x="305" y="330" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900" font-size="100" fill="#021a52">4</text>
+</svg>
