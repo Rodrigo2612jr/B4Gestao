@@ -20,11 +20,11 @@ const highlights = [
   },
   {
     icon: HiOutlineLightningBolt,
-    text: "PGR — entrega rápida sem pular etapas",
+    text: "PGR: entrega rápida sem pular etapas",
   },
   {
     icon: HiOutlineClock,
-    text: "PCMSO — entrega em 1 dia após a conclusão do PGR",
+    text: "PCMSO: entrega em 1 dia após a conclusão do PGR",
   },
   {
     icon: HiOutlineCheckCircle,

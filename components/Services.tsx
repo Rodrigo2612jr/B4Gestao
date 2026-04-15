@@ -15,11 +15,12 @@ const services = [
     imageFit: "cover",
     imageBg: "bg-transparent",
     features: [
-      "PGR pronto em até 7 dias úteis, já alinhado com a NR-01",
+      "PGR: entrega rápida sem pular etapas, alinhado com a NR-01",
+      "PCMSO: entrega em 1 dia após a conclusão do PGR",
       "PCMSO com rede de clínicas em todo o Brasil",
+      "AEP e AET conforme NR-17",
       "Laudos técnicos com respaldo pericial, preparados para sustentação judicial",
       "eSocial SST (S-2210, S-2220, S-2240) sem atraso",
-      "AEP e AET conforme NR-17",
       "Exames in-company em SP e Grande SP",
     ],
   },
@@ -161,7 +162,7 @@ export default function Services() {
                               <li
                                 key={feature}
                                 className="flex items-start gap-3"
-                                style={isOpen ? { animation: "tabFadeIn 0.3s ease-out forwards", animationDelay: `${j * 0.06}s`, opacity: 0 } : undefined}
+                                style={isOpen ? { animation: "tabFadeIn 0.35s ease-out forwards", animationDelay: `${j * 0.08}s`, opacity: 0 } : undefined}
                               >
                                 <div className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-primary" />
                                 <span className="text-dark leading-relaxed">
