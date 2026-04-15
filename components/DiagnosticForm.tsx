@@ -85,8 +85,7 @@ export default function DiagnosticForm() {
             </h2>
             <p className="mt-4 text-lg text-gray leading-relaxed">
               Preencha o formulário e receba uma análise personalizada.
-              Sem custo, sem contrato, sem cobrança. Se não fizer
-              sentido, sem problemas.
+              Sem custo, sem contrato, sem cobrança.
             </p>
 
             <div className="mt-8 space-y-4">

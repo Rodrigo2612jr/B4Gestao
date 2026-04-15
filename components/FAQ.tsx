@@ -26,7 +26,7 @@ const faqs = [
   {
     question: "Em quanto tempo vocês entregam o PGR e PCMSO?",
     answer:
-      "Em até 7 dias úteis. Trabalhamos com agilidade, sem comprometer a qualidade técnica.",
+      "O PGR é entregue de forma rápida, sem pular etapas. O PCMSO fica pronto em 1 dia após a conclusão do PGR. Trabalhamos com agilidade, sem comprometer a qualidade técnica.",
   },
   {
     question: "Vocês atendem em todo o Brasil?",
@@ -36,7 +36,7 @@ const faqs = [
   {
     question: "O que está incluso na gestão de riscos psicossociais da B4?",
     answer:
-      "Seguimos 5 etapas: diagnóstico por área e função, integração ao PGR com classificação de severidade, plano de ação prático com responsáveis e prazos, capacitação de líderes e monitoramento contínuo. Tudo com metodologias reconhecidas e documentação.",
+      "Seguimos 5 etapas: diagnóstico por área, GHE e função, integração ao PGR com classificação de severidade, plano de ação prático com responsáveis e prazos, capacitação de líderes e monitoramento contínuo. Tudo com metodologias reconhecidas e documentação.",
   },
   {
     question: "Vocês oferecem suporte psicológico para colaboradores?",
@@ -46,7 +46,7 @@ const faqs = [
   {
     question: "Quanto custa contratar a B4?",
     answer:
-      "Varia conforme o porte e a necessidade da empresa. Trabalhamos com propostas sob medida. Solicite um diagnóstico gratuito e receba os valores sem compromisso.",
+      "Trabalhamos com propostas sob medida. Solicite um diagnóstico gratuito.",
   },
 ];
 
