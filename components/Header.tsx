@@ -66,13 +66,12 @@ export default function Header() {
         {/* Logo */}
         <a href="#inicio" className="flex items-center gap-2" aria-label="B4 Gestão Ocupacional - Voltar ao início">
           <Image
-            src="/images/logo-white.png"
+            src={scrolled ? "/images/logo-dark.png" : "/images/logo-white.png"}
             alt="B4 Gestão Ocupacional"
             width={500}
             height={500}
             sizes="(max-width: 1024px) 48px, 56px"
             className="h-16 w-16 lg:h-20 lg:w-20 object-contain transition-all duration-300"
-            style={scrolled ? { filter: "brightness(0) saturate(100%)" } : undefined}
             quality={85}
             priority
           />
