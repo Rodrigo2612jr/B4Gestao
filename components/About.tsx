@@ -92,7 +92,7 @@ export default function About() {
             </p>
 
             {/* Highlighted callout */}
-            <div className="mt-6 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 border-l-4 border-primary p-5">
+            <div className="mt-6 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 border-l-4 border-primary p-4 sm:p-5">
               <p className="text-base font-medium text-secondary leading-relaxed">
                 Nossa equipe tem{" "}
                 <span className="bg-primary/10 px-1.5 py-0.5 rounded font-bold text-primary">

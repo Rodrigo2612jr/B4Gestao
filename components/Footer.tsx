@@ -23,7 +23,6 @@ const footerLinks = [
     title: "Empresa",
     links: [
       { label: "Quem Somos", href: "#quem-somos" },
-      { label: "Diferenciais", href: "#diferenciais" },
       { label: "Metodologia NR-01", href: "#nr01" },
       { label: "Diagnóstico Gratuito", href: "#diagnostico" },
     ],
