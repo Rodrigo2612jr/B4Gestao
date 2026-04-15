@@ -71,7 +71,7 @@ export default function Header() {
             width={500}
             height={500}
             sizes="(max-width: 1024px) 48px, 56px"
-            className="h-14 w-14 lg:h-16 lg:w-16 object-contain transition-all duration-300"
+            className="h-16 w-16 lg:h-20 lg:w-20 object-contain transition-all duration-300"
             style={scrolled ? { filter: "brightness(0) saturate(100%)" } : undefined}
             quality={85}
             priority

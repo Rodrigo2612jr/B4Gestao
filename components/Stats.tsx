@@ -24,7 +24,7 @@ const stats = [
   },
   {
     icon: HiOutlineLightningBolt,
-    value: null,
+    value: null as number | null,
     suffix: "",
     label: "Entrega rápida",
     detail: "Mesmo com exames complementares",
@@ -90,7 +90,7 @@ export default function Stats() {
             </div>
           </FadeIn>
 
-          {/* Right: 6 stat blocks */}
+          {/* Right: 4 stat blocks */}
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             {stats.map((stat, i) => (
               <motion.div
