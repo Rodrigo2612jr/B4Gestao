@@ -44,7 +44,7 @@ const segments = [
   },
   {
     name: "Agropecuário",
-    image: "/images/sectors/agropecuario-v2.jpg",
+    image: "/images/sectors/agropecuario-v3.jpg",
     desc: "NR-31, exposição a agrotóxicos, ergonomia rural e segurança em máquinas agrícolas.",
     examples: "Fazendas, cooperativas, agroindústrias, frigoríficos",
   },
