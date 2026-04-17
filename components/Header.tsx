@@ -66,7 +66,7 @@ export default function Header() {
         {/* Logo */}
         <a href="#inicio" className="flex items-center gap-2" aria-label="B4 Gestão Ocupacional - Voltar ao início">
           <Image
-            src={scrolled ? "/images/logo-dark.png" : "/images/logo-white.png"}
+            src="/images/logo-dark.png"
             alt="B4 Gestão Ocupacional"
             width={500}
             height={500}
