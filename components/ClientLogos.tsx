@@ -32,7 +32,7 @@ const segments = [
   },
   {
     name: "Tecnologia",
-    image: "/images/sectors/tecnologia.jpg",
+    image: "/images/sectors/tecnologia-v2.jpg",
     desc: "Ergonomia em escritório, riscos psicossociais e saúde mental.",
     examples: "Startups, software houses, empresas de TI",
   },
@@ -44,7 +44,7 @@ const segments = [
   },
   {
     name: "Agropecuário",
-    image: "/images/sectors/agropecuario.jpg",
+    image: "/images/sectors/agropecuario-v2.jpg",
     desc: "NR-31, exposição a agrotóxicos, ergonomia rural e segurança em máquinas agrícolas.",
     examples: "Fazendas, cooperativas, agroindústrias, frigoríficos",
   },
