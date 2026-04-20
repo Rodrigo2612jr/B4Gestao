@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
   }
 
   const expected = process.env.ADMIN_PASSWORD;
-  if (!expected || expected.length < 8) {
+  if (!expected) {
     return NextResponse.json(
       { ok: false, error: "Servidor não configurado" },
       { status: 500 }
