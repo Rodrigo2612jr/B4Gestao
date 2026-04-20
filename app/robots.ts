@@ -5,7 +5,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
+      disallow: ["/admin", "/admin/", "/api/"],
     },
-    sitemap: "https://b4gestao.com/sitemap.xml",
+    sitemap: "https://b4gestao.com.br/sitemap.xml",
   };
 }

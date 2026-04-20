@@ -33,12 +33,22 @@ export default function DiagnosticForm() {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (data: FormData) => {
-    const msg = `Olá! Gostaria de um diagnóstico gratuito de SST.\n\nEmpresa: ${data.empresa}${data.cnpj ? `\nCNPJ: ${data.cnpj}` : ""}\nRegião: ${data.regiao}\nNome: ${data.nome}\nTelefone: ${data.telefone}\nPorte: ${data.funcionarios}\nNecessidade: ${data.necessidade}`;
+  const onSubmit = async (data: FormData) => {
+    // Salvar no servidor para o painel admin
+    try {
+      await fetch("/api/submissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+    } catch {
+      // Não bloquear o envio via WhatsApp se a API falhar
+    }
+
+    const msg = `Olá! Gostaria de uma avaliação gratuita de SST.\n\nEmpresa: ${data.empresa}${data.cnpj ? `\nCNPJ: ${data.cnpj}` : ""}\nRegião: ${data.regiao}\nNome: ${data.nome}\nTelefone: ${data.telefone}\nPorte: ${data.funcionarios}\nNecessidade: ${data.necessidade}`;
     const url = `https://wa.me/${CONTACT.whatsapp.number}?text=${encodeURIComponent(msg)}`;
     const opened = window.open(url, "_blank");
     if (!opened) {
-      // Popup bloqueado - redirecionar na mesma janela
       window.location.href = url;
     }
     setSubmitted(true);
@@ -46,12 +56,12 @@ export default function DiagnosticForm() {
 
   if (submitted) {
     return (
-      <section id="diagnostico" className="bg-white py-12 lg:py-20">
+      <section id="avaliacao" className="bg-white py-12 lg:py-20">
         <div className="mx-auto max-w-2xl px-4 text-center">
           <div role="status" aria-live="polite" className="hero-enter hero-delay-0 rounded-2xl bg-primary/5 p-12 shadow-lg border border-primary/10">
             <HiOutlineCheckCircle className="mx-auto text-6xl text-primary" aria-hidden="true" />
             <h3 className="mt-4 text-2xl font-bold text-secondary">
-              Diagnóstico Enviado!
+              Avaliação Enviada!
             </h3>
             <p className="mt-2 text-gray">
               Pronto! Seus dados foram enviados via WhatsApp.
@@ -71,7 +81,7 @@ export default function DiagnosticForm() {
   }
 
   return (
-    <section id="diagnostico" className="bg-white py-12 lg:py-20">
+    <section id="avaliacao" className="bg-white py-12 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-2 items-center">
           {/* Left info */}
@@ -135,7 +145,7 @@ export default function DiagnosticForm() {
               aria-labelledby="form-heading"
             >
               <h3 id="form-heading" className="text-lg font-bold text-white">
-                Solicite seu diagnóstico gratuito
+                Solicite sua avaliação gratuita
               </h3>
               <p className="text-xs text-white/70 mt-1 mb-6">Leva menos de 1 minuto. Resposta em até 24h.</p>
 
@@ -336,7 +346,7 @@ export default function DiagnosticForm() {
                 className="mt-6 flex w-full items-center justify-center gap-3 rounded-xl bg-accent px-6 py-4 text-base font-bold text-secondary shadow-lg transition-all hover:bg-accent-dark hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <FaWhatsapp className="text-xl" aria-hidden="true" />
-                {isSubmitting ? "Enviando..." : "Quero meu diagnóstico gratuito"}
+                {isSubmitting ? "Enviando..." : "Quero minha avaliação gratuita"}
               </button>
               <p className="mt-3 text-center text-xs text-white/60">
                 Enviado direto via WhatsApp. Sem spam. Atendimento por profissionais reais.

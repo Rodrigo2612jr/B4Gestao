@@ -47,10 +47,10 @@ const services = [
     imageFit: "cover",
     imageBg: "bg-transparent",
     features: [
-      "Diagnóstico por área, função e GHE com metodologias reconhecidas",
+      "Avaliação por área, função e GHE com metodologias reconhecidas",
       "Integração ao PGR/GRO com matriz de probabilidade x severidade",
       "Plano de ação prático, priorizado e com responsáveis definidos",
-      "Assinatura técnica de Engenheiro de Segurança e Psicólogo",
+      "Responsabilidade técnica de Engenheiro de Segurança e Psicólogo",
       "Análise feita por especialistas, não por software",
     ],
   },
@@ -102,12 +102,11 @@ export default function Services() {
             Soluções Completas
           </span>
           <h2 className="mt-4 text-2xl font-bold text-secondary sm:text-3xl lg:text-4xl">
-            SST de ponta a ponta, do{" "}
-            <span className="text-primary">PGR à saúde mental</span>
+            SST de ponta a ponta.{" "}
+            <span className="text-primary">Soluções completas</span>
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-gray">
-            Do PGR ao SOS psicológico, cobrimos tudo.
-            Você não precisa coordenar nada.
+            Cobrimos tudo. Você não precisa coordenar nada.
           </p>
         </FadeIn>
 
@@ -184,10 +183,10 @@ export default function Services() {
                               Pedir proposta personalizada
                             </a>
                             <a
-                              href="#diagnostico"
+                              href="#avaliacao"
                               className="inline-flex items-center justify-center rounded-full border border-gray-200 px-6 py-3 text-sm font-medium text-secondary transition-all hover:border-primary hover:text-primary"
                             >
-                              Fazer diagnóstico gratuito
+                              Fazer avaliação gratuita
                             </a>
                           </div>
                         </div>

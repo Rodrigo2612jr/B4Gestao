@@ -247,11 +247,11 @@ export default function ClientLogos() {
                 </p>
               </div>
               <a
-                href="#diagnostico"
+                href="#avaliacao"
                 onClick={() => setActiveModal(null)}
                 className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-primary-dark"
               >
-                Solicitar diagnóstico para este setor
+                Solicitar avaliação para este setor
               </a>
             </div>
           </div>

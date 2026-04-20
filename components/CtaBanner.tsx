@@ -68,10 +68,10 @@ export default function CtaBanner() {
             <motion.a
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
-              href="#diagnostico"
+              href="#avaliacao"
               className="inline-flex items-center gap-2 rounded-full border-2 border-white/30 px-8 py-4 text-base font-semibold text-white transition-colors hover:border-white hover:bg-white/10"
             >
-              Prefiro um diagnóstico gratuito primeiro
+              Prefiro uma avaliação gratuita primeiro
             </motion.a>
           </div>
           <p className="mt-4 text-sm text-white/90">

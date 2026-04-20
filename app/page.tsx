@@ -166,7 +166,7 @@ const jsonLd = {
           name: "Qual a diferença da B4 para plataformas automatizadas de SST?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Plataformas automatizadas entregam resultados genéricos. A B4 possui equipe multidisciplinar com 20+ anos que entrega diagnósticos interpretados e planos de ação contextualizados. Nenhuma plataforma automatizada faz isso.",
+            text: "Plataformas automatizadas entregam resultados genéricos. A B4 possui equipe multidisciplinar com 20+ anos que entrega avaliações interpretadas e planos de ação contextualizados. Nenhuma plataforma automatizada faz isso.",
           },
         },
         {
@@ -190,7 +190,7 @@ const jsonLd = {
           name: "O que está incluso na gestão de riscos psicossociais da B4?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Nossa metodologia em 5 passos inclui: diagnóstico profissional por área/função/GHE, integração ao PGR/GRO com classificação de severidade, plano de ação personalizado, treinamento de lideranças e monitoramento contínuo com indicadores.",
+            text: "Nossa metodologia em 5 passos inclui: avaliação profissional por área/função/GHE, integração ao PGR/GRO com classificação de severidade, plano de ação personalizado, treinamento de lideranças e monitoramento contínuo com indicadores.",
           },
         },
         {
@@ -206,7 +206,7 @@ const jsonLd = {
           name: "Quanto custa contratar a B4?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Cada projeto é dimensionado de acordo com o porte, segmento e necessidades da empresa. Trabalhamos com propostas personalizadas. Solicite um diagnóstico gratuito e receba uma proposta sob medida Sem compromisso.",
+            text: "Cada projeto é dimensionado de acordo com o porte, segmento e necessidades da empresa. Trabalhamos com propostas personalizadas. Solicite uma avaliação gratuita e receba uma proposta sob medida. Sem compromisso.",
           },
         },
       ],

@@ -36,7 +36,7 @@ const faqs = [
   {
     question: "O que está incluso na gestão de riscos psicossociais da B4?",
     answer:
-      "Seguimos 5 etapas: diagnóstico por área, GHE e função, integração ao PGR com classificação de severidade, plano de ação prático com responsáveis e prazos, capacitação de líderes e monitoramento contínuo. Tudo com metodologias reconhecidas e documentação.",
+      "Seguimos 5 etapas: avaliação por área, GHE e função, integração ao PGR com classificação de severidade, plano de ação prático com responsáveis e prazos, capacitação de líderes e monitoramento contínuo. Tudo com metodologias reconhecidas e documentação.",
   },
   {
     question: "Vocês oferecem suporte psicológico para colaboradores?",
@@ -46,7 +46,7 @@ const faqs = [
   {
     question: "Quanto custa contratar a B4?",
     answer:
-      "Trabalhamos com propostas sob medida. Solicite um diagnóstico gratuito.",
+      "Trabalhamos com propostas sob medida. Solicite uma avaliação gratuita.",
   },
 ];
 
