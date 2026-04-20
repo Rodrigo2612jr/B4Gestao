@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { FaWhatsapp } from "react-icons/fa";
 import { HiMenu, HiX } from "react-icons/hi";
-import { WHATSAPP_URL, NAV_LINKS } from "@/lib/constants";
+import { NAV_LINKS } from "@/lib/constants";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -98,9 +98,7 @@ export default function Header() {
             </a>
           ))}
           <a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#avaliacao"
             className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:bg-primary-dark hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
           >
             <FaWhatsapp className="text-lg" aria-hidden="true" />
@@ -149,9 +147,8 @@ export default function Header() {
             </a>
           ))}
           <a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#avaliacao"
+            onClick={() => setMobileOpen(false)}
             className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white"
           >
             <FaWhatsapp className="text-lg" aria-hidden="true" />

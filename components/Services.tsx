@@ -4,7 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import FadeIn from "@/components/FadeIn";
 import { HiChevronDown } from "react-icons/hi";
-import { getWhatsAppUrl } from "@/lib/constants";
 
 const services = [
   {
@@ -173,11 +172,7 @@ export default function Services() {
 
                           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                             <a
-                              href={getWhatsAppUrl(
-                                `Olá, gostaria de saber mais sobre: ${service.title}`
-                              )}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                              href="#avaliacao"
                               className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-primary-dark hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
                             >
                               Pedir proposta personalizada

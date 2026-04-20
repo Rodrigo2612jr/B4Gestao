@@ -45,7 +45,7 @@ export default function DiagnosticForm() {
       // Não bloquear o envio via WhatsApp se a API falhar
     }
 
-    const msg = `Olá! Gostaria de uma avaliação gratuita de SST.\n\nEmpresa: ${data.empresa}${data.cnpj ? `\nCNPJ: ${data.cnpj}` : ""}\nRegião: ${data.regiao}\nNome: ${data.nome}\nTelefone: ${data.telefone}\nPorte: ${data.funcionarios}\nNecessidade: ${data.necessidade}`;
+    const msg = `Olá! Gostaria de falar com um especialista da B4.\n\nEmpresa: ${data.empresa}${data.cnpj ? `\nCNPJ: ${data.cnpj}` : ""}\nRegião: ${data.regiao}\nNome: ${data.nome}\nTelefone: ${data.telefone}\nPorte: ${data.funcionarios}\nNecessidade: ${data.necessidade}`;
     const url = `https://wa.me/${CONTACT.whatsapp.number}?text=${encodeURIComponent(msg)}`;
     const opened = window.open(url, "_blank");
     if (!opened) {

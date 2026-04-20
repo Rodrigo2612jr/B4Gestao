@@ -1,7 +1,6 @@
 import { FaWhatsapp } from "react-icons/fa";
 import FadeIn from "@/components/FadeIn";
 import TextReveal from "@/components/TextReveal";
-import { WHATSAPP_URL } from "@/lib/constants";
 import {
   HiOutlineSearchCircle,
   HiOutlineDocumentReport,
@@ -130,9 +129,7 @@ export default function Methodology() {
         {/* CTA */}
         <FadeIn className="mt-10 text-center">
           <a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#avaliacao"
             className="inline-flex items-center gap-3 rounded-full bg-accent px-8 py-4 text-base font-bold text-secondary shadow-lg transition-all hover:bg-accent-dark hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
           >
             <FaWhatsapp className="text-xl" aria-hidden="true" />

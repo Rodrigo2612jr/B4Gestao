@@ -5,7 +5,7 @@ import Image from "next/image";
 import { HiChevronDown } from "react-icons/hi";
 import { FaWhatsapp, FaInstagram, FaLinkedinIn } from "react-icons/fa";
 import FadeIn from "@/components/FadeIn";
-import { WHATSAPP_URL, CONTACT } from "@/lib/constants";
+import { CONTACT } from "@/lib/constants";
 
 const faqs = [
   {
@@ -81,9 +81,7 @@ export default function FAQ() {
                 Fale direto com um especialista. Sem compromisso.
               </p>
               <a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#avaliacao"
                 className="mt-4 flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-secondary transition-all hover:bg-accent-dark hover:shadow-lg"
               >
                 <FaWhatsapp className="text-lg" aria-hidden="true" />

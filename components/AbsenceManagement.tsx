@@ -6,8 +6,6 @@ import {
   HiOutlineRefresh,
   HiOutlineTrendingDown,
 } from "react-icons/hi";
-import { WHATSAPP_URL } from "@/lib/constants";
-
 const capabilities = [
   {
     icon: HiOutlineExclamationCircle,
@@ -63,9 +61,7 @@ export default function AbsenceManagement() {
             </div>
 
             <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#avaliacao"
               className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-primary-dark hover:shadow-lg"
             >
               Reduzir custos com afastamentos

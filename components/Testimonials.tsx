@@ -3,7 +3,6 @@
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import FadeIn from "@/components/FadeIn";
-import { WHATSAPP_URL } from "@/lib/constants";
 import { FaWhatsapp, FaStar } from "react-icons/fa";
 
 const testimonials = [
@@ -108,9 +107,7 @@ export default function Testimonials() {
         {/* CTA */}
         <FadeIn className="mt-12 text-center">
           <a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#avaliacao"
             className="inline-flex items-center gap-2 rounded-full bg-accent px-8 py-4 text-base font-bold text-secondary shadow-lg transition-all hover:bg-accent-dark hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
           >
             <FaWhatsapp className="text-xl" aria-hidden="true" />

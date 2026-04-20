@@ -5,7 +5,6 @@ import Image from "next/image";
 import { FaWhatsapp } from "react-icons/fa";
 import { HiOutlineShieldCheck, HiOutlineClock, HiOutlineGlobeAlt, HiOutlineUserGroup } from "react-icons/hi";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { WHATSAPP_URL } from "@/lib/constants";
 
 const trustBadges = [
   { icon: HiOutlineUserGroup, text: "Equipe multidisciplinar" },
@@ -121,9 +120,7 @@ export default function Hero() {
           className="mt-8 flex flex-col items-center"
         >
           <a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#avaliacao"
             className="group inline-flex items-center justify-center gap-3 rounded-full bg-accent px-10 py-4 text-lg font-bold text-secondary shadow-lg shadow-accent/25 transition-all hover:bg-accent-dark hover:shadow-xl hover:shadow-accent/30 hover:scale-[1.02] active:scale-[0.98]"
           >
             <FaWhatsapp className="text-2xl transition-transform group-hover:scale-110" aria-hidden="true" />

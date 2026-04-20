@@ -3,7 +3,6 @@
 import FadeIn from "@/components/FadeIn";
 import TiltCard from "@/components/TiltCard";
 import { HiX, HiCheck } from "react-icons/hi";
-import { WHATSAPP_URL } from "@/lib/constants";
 
 const dontDo = [
   "Plataformas que geram documentos genéricos automaticamente",
@@ -95,9 +94,7 @@ export default function Comparison() {
                 </ul>
 
                 <a
-                  href={WHATSAPP_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="#avaliacao"
                   className="mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-secondary transition-all hover:bg-accent-dark hover:shadow-lg"
                 >
                   Quero essa entrega para minha empresa

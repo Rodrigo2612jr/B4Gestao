@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import FadeIn from "@/components/FadeIn";
 import { FaWhatsapp } from "react-icons/fa";
 import { HiOutlineShieldCheck, HiOutlineLightningBolt, HiOutlineClipboardCheck } from "react-icons/hi";
-import { WHATSAPP_URL } from "@/lib/constants";
 
 export default function CtaBanner() {
   return (
@@ -57,9 +56,7 @@ export default function CtaBanner() {
             <motion.a
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#avaliacao"
               className="inline-flex items-center gap-3 rounded-full bg-white px-8 py-4 text-base font-bold text-secondary shadow-xl transition-shadow hover:shadow-2xl"
             >
               <FaWhatsapp className="text-xl text-green-600" aria-hidden="true" />
