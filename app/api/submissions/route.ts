@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "node:fs";
-import path from "node:path";
 import { z } from "zod";
 import {
   SESSION_COOKIE_NAME,
@@ -8,22 +6,9 @@ import {
   getClientIp,
   verifySessionToken,
 } from "@/lib/auth";
+import { insertSubmission, listSubmissions } from "@/lib/db";
 
 export const runtime = "nodejs";
-
-const DATA_FILE = path.join(process.cwd(), "data", "submissions.json");
-
-interface Submission {
-  id: string;
-  funcionarios: string;
-  necessidade: string;
-  regiao: string;
-  empresa: string;
-  cnpj?: string;
-  nome: string;
-  telefone: string;
-  criadoEm: string;
-}
 
 // Server-side validation schema with strict size limits
 const submissionSchema = z.object({
@@ -35,23 +20,6 @@ const submissionSchema = z.object({
   nome: z.string().min(2).max(100),
   telefone: z.string().min(10).max(20),
 });
-
-function readSubmissions(): Submission[] {
-  try {
-    if (!fs.existsSync(DATA_FILE)) return [];
-    const raw = fs.readFileSync(DATA_FILE, "utf-8");
-    return JSON.parse(raw);
-  } catch (err) {
-    console.error("[submissions] read error:", err);
-    return [];
-  }
-}
-
-function writeSubmissions(submissions: Submission[]) {
-  const dir = path.dirname(DATA_FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(DATA_FILE, JSON.stringify(submissions, null, 2), "utf-8");
-}
 
 function isAllowedOrigin(origin: string | null): boolean {
   if (!origin) return true; // Same-origin requests may not send Origin
@@ -99,26 +67,22 @@ export async function POST(request: NextRequest) {
 
   const parsed = submissionSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { ok: false, error: "Dados inválidos" },
-      { status: 400 }
-    );
+    return NextResponse.json({ ok: false, error: "Dados inválidos" }, { status: 400 });
   }
 
   try {
-    const submission: Submission = {
-      id: crypto.randomUUID(),
-      ...parsed.data,
-      criadoEm: new Date().toISOString(),
-    };
-
-    const submissions = readSubmissions();
-    submissions.unshift(submission);
-    writeSubmissions(submissions);
-
-    return NextResponse.json({ ok: true, id: submission.id });
+    const id = await insertSubmission({
+      funcionarios: parsed.data.funcionarios,
+      necessidade: parsed.data.necessidade,
+      regiao: parsed.data.regiao,
+      empresa: parsed.data.empresa,
+      cnpj: parsed.data.cnpj ?? null,
+      nome: parsed.data.nome,
+      telefone: parsed.data.telefone,
+    });
+    return NextResponse.json({ ok: true, id });
   } catch (err) {
-    console.error("[submissions] save error:", err);
+    console.error("[submissions] insert error:", err);
     return NextResponse.json({ ok: false, error: "Erro ao salvar" }, { status: 500 });
   }
 }
@@ -132,13 +96,29 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
-  // Audit log
   console.log(
     `[audit] admin access ip=${ip} at=${new Date().toISOString()} ua=${
       request.headers.get("user-agent") ?? "unknown"
     }`
   );
 
-  const submissions = readSubmissions();
-  return NextResponse.json(submissions);
+  try {
+    const submissions = await listSubmissions();
+    // Remap field name to match frontend expectation
+    const out = submissions.map((s) => ({
+      id: s.id,
+      funcionarios: s.funcionarios,
+      necessidade: s.necessidade,
+      regiao: s.regiao,
+      empresa: s.empresa,
+      cnpj: s.cnpj ?? undefined,
+      nome: s.nome,
+      telefone: s.telefone,
+      criadoEm: s.criado_em,
+    }));
+    return NextResponse.json(out);
+  } catch (err) {
+    console.error("[submissions] list error:", err);
+    return NextResponse.json({ error: "Erro ao listar" }, { status: 500 });
+  }
 }
