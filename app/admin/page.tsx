@@ -14,6 +14,7 @@ import FilterBar from "./_components/FilterBar";
 import LeadsTable from "./_components/LeadsTable";
 import LeadsCardList from "./_components/LeadsCardList";
 import LeadDrawer from "./_components/LeadDrawer";
+import DeleteDialog from "./_components/DeleteDialog";
 import EmptyState from "./_components/EmptyState";
 import { StatsSkeleton, TableSkeleton } from "./_components/TableSkeleton";
 import ToastProvider, { useToast } from "./_components/ToastProvider";
@@ -36,6 +37,7 @@ function AdminInner() {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Filters>(INITIAL_FILTERS);
   const [selected, setSelected] = useState<Submission | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Submission | null>(null);
   const { push } = useToast();
 
   const fetchSubmissions = useCallback(async () => {
@@ -218,7 +220,37 @@ function AdminInner() {
         </p>
       </main>
 
-      <LeadDrawer lead={selected} onClose={() => setSelected(null)} />
+      <LeadDrawer
+        lead={selected}
+        onClose={() => setSelected(null)}
+        onDelete={(lead) => setDeleteTarget(lead)}
+      />
+      <DeleteDialog
+        open={!!deleteTarget}
+        leadName={deleteTarget?.empresa ?? ""}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={async (senha) => {
+          if (!deleteTarget) return { ok: false, error: "Nenhum lead selecionado" };
+          try {
+            const res = await fetch(`/api/submissions/${deleteTarget.id}`, {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ senha }),
+            });
+            if (res.ok) {
+              push("Lead excluído");
+              setDeleteTarget(null);
+              setSelected(null);
+              setSubmissions((s) => s.filter((x) => x.id !== deleteTarget.id));
+              return { ok: true };
+            }
+            const data = await res.json().catch(() => ({}));
+            return { ok: false, error: data.error || "Erro ao excluir" };
+          } catch {
+            return { ok: false, error: "Erro de conexão" };
+          }
+        }}
+      />
     </div>
   );
 }

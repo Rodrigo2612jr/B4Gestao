@@ -77,3 +77,11 @@ export async function listSubmissions(): Promise<Submission[]> {
   `;
   return rows as unknown as Submission[];
 }
+
+export async function deleteSubmission(id: string): Promise<boolean> {
+  if (!sql) throw new Error("Database not configured");
+  await initDb();
+  const result = await sql`DELETE FROM submissions WHERE id = ${id} RETURNING id`;
+  return result.length > 0;
+}
+

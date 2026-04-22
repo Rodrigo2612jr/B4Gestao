@@ -11,6 +11,7 @@ import {
   HiOutlineUsers,
   HiOutlineCalendar,
   HiOutlineIdentification,
+  HiOutlineTrash,
 } from "react-icons/hi";
 import { FaWhatsapp } from "react-icons/fa";
 import type { Submission } from "../_lib/types";
@@ -21,9 +22,10 @@ import { useToast } from "./ToastProvider";
 interface Props {
   lead: Submission | null;
   onClose: () => void;
+  onDelete?: (lead: Submission) => void;
 }
 
-export default function LeadDrawer({ lead, onClose }: Props) {
+export default function LeadDrawer({ lead, onClose, onDelete }: Props) {
   const { push } = useToast();
 
   useEffect(() => {
@@ -172,6 +174,25 @@ export default function LeadDrawer({ lead, onClose }: Props) {
                   value={`${formatDate(lead.criadoEm)} às ${formatTime(lead.criadoEm)}`}
                 />
               </dl>
+
+              {/* Danger zone */}
+              {onDelete && (
+                <div className="rounded-xl border border-red-200 bg-red-50/50 p-4">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-red-700">
+                    Zona de perigo
+                  </p>
+                  <p className="mb-3 text-xs text-red-600/80">
+                    Excluir este lead é permanente. A senha será solicitada para confirmar.
+                  </p>
+                  <button
+                    onClick={() => onDelete(lead)}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 transition-colors hover:bg-red-600 hover:text-white hover:border-red-600"
+                  >
+                    <HiOutlineTrash className="text-base" />
+                    Excluir lead
+                  </button>
+                </div>
+              )}
 
               {/* ID footer */}
               <p className="text-center text-xs text-gray-400">ID: {lead.id}</p>
