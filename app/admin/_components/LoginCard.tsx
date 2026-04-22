@@ -2,13 +2,14 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { HiOutlineLockClosed } from "react-icons/hi";
+import { HiOutlineLockClosed, HiOutlineMail } from "react-icons/hi";
 
 interface Props {
-  onSuccess: () => Promise<void>;
+  onSuccess: (mustChangePassword: boolean) => Promise<void>;
 }
 
 export default function LoginCard({ onSuccess }: Props) {
+  const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
@@ -21,15 +22,17 @@ export default function LoginCard({ onSuccess }: Props) {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ senha }),
+        body: JSON.stringify({ email, senha }),
       });
       if (res.ok) {
+        const data = await res.json();
         setSenha("");
-        await onSuccess();
+        setEmail("");
+        await onSuccess(Boolean(data.user?.mustChangePassword));
       } else if (res.status === 429) {
         setErro("Muitas tentativas. Tente novamente em 15 minutos.");
       } else {
-        setErro("Senha incorreta");
+        setErro("Email ou senha incorretos");
       }
     } catch {
       setErro("Erro ao conectar com o servidor");
@@ -44,7 +47,6 @@ export default function LoginCard({ onSuccess }: Props) {
         onSubmit={handleLogin}
         className="relative w-full max-w-md rounded-2xl border border-gray-100 bg-white p-8 shadow-2xl"
       >
-        {/* Logo */}
         <div className="mb-6 flex items-center justify-center">
           <Image
             src="/images/logo-dark-v3.png"
@@ -56,29 +58,54 @@ export default function LoginCard({ onSuccess }: Props) {
           />
         </div>
 
-        <h1 className="text-center text-2xl font-bold text-secondary" style={{ fontFamily: "var(--font-display), system-ui" }}>
+        <h1
+          className="text-center text-2xl font-bold text-secondary"
+          style={{ fontFamily: "var(--font-display), system-ui" }}
+        >
           Painel Admin
         </h1>
         <p className="mt-1 text-center text-sm text-gray-500">
           B4 Gestão Ocupacional
         </p>
 
-        <div className="mt-8">
-          <label htmlFor="senha" className="mb-1.5 block text-sm font-medium text-gray-700">
-            Senha de acesso
-          </label>
-          <div className="relative">
-            <HiOutlineLockClosed className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-              id="senha"
-              type="password"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              autoComplete="current-password"
-              className="w-full rounded-lg border border-gray-300 bg-white py-3 pl-10 pr-4 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
-              placeholder="Digite a senha"
-              autoFocus
-            />
+        <div className="mt-8 space-y-4">
+          <div>
+            <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <div className="relative">
+              <HiOutlineMail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="username"
+                required
+                className="w-full rounded-lg border border-gray-300 bg-white py-3 pl-10 pr-4 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+                placeholder="seu@email.com"
+                autoFocus
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="senha" className="mb-1.5 block text-sm font-medium text-gray-700">
+              Senha
+            </label>
+            <div className="relative">
+              <HiOutlineLockClosed className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                id="senha"
+                type="password"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                autoComplete="current-password"
+                required
+                className="w-full rounded-lg border border-gray-300 bg-white py-3 pl-10 pr-4 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+                placeholder="Digite a senha"
+              />
+            </div>
           </div>
         </div>
 
@@ -90,7 +117,7 @@ export default function LoginCard({ onSuccess }: Props) {
 
         <button
           type="submit"
-          disabled={loading || !senha}
+          disabled={loading || !email || !senha}
           className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-dark disabled:opacity-50"
         >
           {loading ? "Entrando..." : "Entrar"}

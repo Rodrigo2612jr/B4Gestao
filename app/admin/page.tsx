@@ -7,6 +7,7 @@ import {
   HiOutlineDownload,
   HiOutlineLogout,
   HiOutlineExternalLink,
+  HiOutlineKey,
 } from "react-icons/hi";
 import LoginCard from "./_components/LoginCard";
 import StatsGrid from "./_components/StatsGrid";
@@ -15,6 +16,7 @@ import LeadsTable from "./_components/LeadsTable";
 import LeadsCardList from "./_components/LeadsCardList";
 import LeadDrawer from "./_components/LeadDrawer";
 import DeleteDialog from "./_components/DeleteDialog";
+import ChangePasswordDialog from "./_components/ChangePasswordDialog";
 import EmptyState from "./_components/EmptyState";
 import { StatsSkeleton, TableSkeleton } from "./_components/TableSkeleton";
 import ToastProvider, { useToast } from "./_components/ToastProvider";
@@ -38,11 +40,28 @@ function AdminInner() {
   const [filters, setFilters] = useState<Filters>(INITIAL_FILTERS);
   const [selected, setSelected] = useState<Submission | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Submission | null>(null);
+  const [showChangePwd, setShowChangePwd] = useState(false);
+  const [forcedChangePwd, setForcedChangePwd] = useState(false);
+  const [userName, setUserName] = useState<string>("");
   const { push } = useToast();
 
   const fetchSubmissions = useCallback(async () => {
     setLoading(true);
     try {
+      // First, check auth + user info
+      const meRes = await fetch("/api/admin/me");
+      if (!meRes.ok) {
+        setAutenticado(false);
+        setSubmissions([]);
+        return;
+      }
+      const meData = await meRes.json();
+      setUserName(meData.user?.name ?? "");
+      if (meData.user?.mustChangePassword) {
+        setForcedChangePwd(true);
+        setShowChangePwd(true);
+      }
+
       const res = await fetch("/api/submissions");
       if (!res.ok) {
         if (res.status === 401) {
@@ -102,7 +121,17 @@ function AdminInner() {
   }, []);
 
   if (!autenticado && !loading) {
-    return <LoginCard onSuccess={fetchSubmissions} />;
+    return (
+      <LoginCard
+        onSuccess={async (mustChange) => {
+          if (mustChange) {
+            setForcedChangePwd(true);
+            setShowChangePwd(true);
+          }
+          await fetchSubmissions();
+        }}
+      />
+    );
   }
 
   return (
@@ -129,6 +158,7 @@ function AdminInner() {
               </h1>
               <p className="text-xs text-gray-500">
                 {submissions.length} {submissions.length === 1 ? "recebido" : "recebidos"}
+                {userName && <span className="ml-2 hidden sm:inline">• {userName}</span>}
               </p>
             </div>
           </div>
@@ -159,6 +189,17 @@ function AdminInner() {
             >
               <HiOutlineDownload />
               <span className="hidden sm:inline">Exportar CSV</span>
+            </button>
+            <button
+              onClick={() => {
+                setForcedChangePwd(false);
+                setShowChangePwd(true);
+              }}
+              className="flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:h-10 sm:px-4 sm:text-sm"
+              title="Alterar senha"
+            >
+              <HiOutlineKey />
+              <span className="hidden sm:inline">Senha</span>
             </button>
             <button
               onClick={handleLogout}
@@ -224,6 +265,16 @@ function AdminInner() {
         lead={selected}
         onClose={() => setSelected(null)}
         onDelete={(lead) => setDeleteTarget(lead)}
+      />
+      <ChangePasswordDialog
+        open={showChangePwd}
+        forced={forcedChangePwd}
+        onClose={() => setShowChangePwd(false)}
+        onSuccess={() => {
+          setShowChangePwd(false);
+          setForcedChangePwd(false);
+          push("Senha alterada com sucesso");
+        }}
       />
       <DeleteDialog
         open={!!deleteTarget}

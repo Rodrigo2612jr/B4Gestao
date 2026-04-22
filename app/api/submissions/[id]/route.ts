@@ -3,10 +3,9 @@ import {
   SESSION_COOKIE_NAME,
   checkRateLimit,
   getClientIp,
-  timingSafeEqualStr,
   verifySessionToken,
 } from "@/lib/auth";
-import { deleteSubmission } from "@/lib/db";
+import { logAudit, softDeleteSubmission, verifyUserPassword } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -18,11 +17,12 @@ export async function DELETE(
 
   // Must have valid admin session
   const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  if (!verifySessionToken(token)) {
+  const session = verifySessionToken(token);
+  if (!session) {
     return NextResponse.json({ ok: false, error: "Não autorizado" }, { status: 401 });
   }
 
-  // Rate limit destructive actions: 10 deletes per 5 min per IP
+  // Rate limit destructive actions: 10 per 5 min per IP
   const rl = checkRateLimit(`delete:${ip}`, {
     max: 10,
     windowMs: 5 * 60 * 1000,
@@ -35,7 +35,6 @@ export async function DELETE(
     );
   }
 
-  // Re-confirm password in body
   let body: { senha?: string };
   try {
     body = await request.json();
@@ -43,13 +42,10 @@ export async function DELETE(
     return NextResponse.json({ ok: false, error: "Payload inválido" }, { status: 400 });
   }
 
-  const expected = process.env.ADMIN_PASSWORD;
-  if (!expected) {
-    return NextResponse.json({ ok: false, error: "Servidor não configurado" }, { status: 500 });
-  }
-
+  // Re-verify password against the logged-in user
   const senha = (body.senha ?? "").toString();
-  if (!timingSafeEqualStr(senha, expected)) {
+  const user = await verifyUserPassword(session.email, senha);
+  if (!user) {
     return NextResponse.json({ ok: false, error: "Senha incorreta" }, { status: 403 });
   }
 
@@ -58,13 +54,10 @@ export async function DELETE(
     return NextResponse.json({ ok: false, error: "ID inválido" }, { status: 400 });
   }
 
-  // Audit log
-  console.log(
-    `[audit] DELETE submission id=${id} ip=${ip} at=${new Date().toISOString()}`
-  );
+  await logAudit(session.email, "delete_lead", id, ip);
 
   try {
-    const ok = await deleteSubmission(id);
+    const ok = await softDeleteSubmission(id);
     if (!ok) {
       return NextResponse.json({ ok: false, error: "Registro não encontrado" }, { status: 404 });
     }

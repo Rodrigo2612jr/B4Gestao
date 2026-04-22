@@ -28,37 +28,48 @@ function sign(data: string): string {
     .digest("base64url");
 }
 
-export function createSessionToken(): string {
-  const payload = { exp: Date.now() + SESSION_DURATION_MS };
+export interface SessionPayload {
+  exp: number;
+  uid: string;
+  email: string;
+}
+
+export function createSessionToken(user: { id: string; email: string }): string {
+  const payload: SessionPayload = {
+    exp: Date.now() + SESSION_DURATION_MS,
+    uid: user.id,
+    email: user.email,
+  };
   const data = b64url(JSON.stringify(payload));
   const sig = sign(data);
   return `${data}.${sig}`;
 }
 
-export function verifySessionToken(token: string | undefined | null): boolean {
-  if (!token) return false;
+export function verifySessionToken(
+  token: string | undefined | null
+): SessionPayload | null {
+  if (!token) return null;
   const parts = token.split(".");
-  if (parts.length !== 2) return false;
+  if (parts.length !== 2) return null;
   const [data, sig] = parts;
   const expectedSig = sign(data);
-  // Timing-safe compare
-  if (sig.length !== expectedSig.length) return false;
+  if (sig.length !== expectedSig.length) return null;
   try {
     const eq = crypto.timingSafeEqual(
       Buffer.from(sig, "base64url"),
       Buffer.from(expectedSig, "base64url")
     );
-    if (!eq) return false;
+    if (!eq) return null;
   } catch {
-    return false;
+    return null;
   }
   try {
-    const payload = JSON.parse(Buffer.from(data, "base64url").toString());
-    if (typeof payload.exp !== "number") return false;
-    if (payload.exp < Date.now()) return false;
-    return true;
+    const payload = JSON.parse(Buffer.from(data, "base64url").toString()) as SessionPayload;
+    if (typeof payload.exp !== "number" || !payload.uid || !payload.email) return null;
+    if (payload.exp < Date.now()) return null;
+    return payload;
   } catch {
-    return false;
+    return null;
   }
 }
 

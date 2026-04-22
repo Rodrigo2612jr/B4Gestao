@@ -5,8 +5,8 @@ import {
   createSessionToken,
   getClientIp,
   resetRateLimit,
-  timingSafeEqualStr,
 } from "@/lib/auth";
+import { logAudit, touchLastLogin, verifyUserPassword } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -26,38 +26,44 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let body: { senha?: string };
+  let body: { email?: string; senha?: string };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ ok: false, error: "Payload inválido" }, { status: 400 });
   }
 
-  const expected = process.env.ADMIN_PASSWORD;
-  if (!expected) {
-    return NextResponse.json(
-      { ok: false, error: "Servidor não configurado" },
-      { status: 500 }
-    );
-  }
-
+  const email = (body.email ?? "").toString().trim().toLowerCase();
   const senha = (body.senha ?? "").toString();
-  const ok = timingSafeEqualStr(senha, expected);
-  if (!ok) {
+
+  if (!email || !senha) {
     return NextResponse.json({ ok: false, error: "Credenciais inválidas" }, { status: 401 });
   }
 
-  // Success — reset rate limit for this IP
-  resetRateLimit(`login:${ip}`);
+  const user = await verifyUserPassword(email, senha);
+  if (!user) {
+    return NextResponse.json({ ok: false, error: "Credenciais inválidas" }, { status: 401 });
+  }
 
-  const token = createSessionToken();
-  const res = NextResponse.json({ ok: true });
+  resetRateLimit(`login:${ip}`);
+  await touchLastLogin(user.id);
+  await logAudit(user.email, "login", null, ip);
+
+  const token = createSessionToken({ id: user.id, email: user.email });
+  const res = NextResponse.json({
+    ok: true,
+    user: {
+      email: user.email,
+      name: user.name,
+      mustChangePassword: user.must_change_password,
+    },
+  });
   res.cookies.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
     path: "/",
-    maxAge: 8 * 60 * 60, // 8 hours
+    maxAge: 8 * 60 * 60,
   });
   return res;
 }

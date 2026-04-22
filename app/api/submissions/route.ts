@@ -6,7 +6,8 @@ import {
   getClientIp,
   verifySessionToken,
 } from "@/lib/auth";
-import { insertSubmission, listSubmissions } from "@/lib/db";
+import { insertSubmission, listSubmissions, logAudit } from "@/lib/db";
+import { sendNewLeadEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const id = await insertSubmission({
+    const { id, row } = await insertSubmission({
       funcionarios: parsed.data.funcionarios,
       necessidade: parsed.data.necessidade,
       regiao: parsed.data.regiao,
@@ -79,6 +80,10 @@ export async function POST(request: NextRequest) {
       cnpj: parsed.data.cnpj ?? null,
       nome: parsed.data.nome,
       telefone: parsed.data.telefone,
+    });
+    // Fire-and-forget email notification (doesn't block response)
+    sendNewLeadEmail(row).catch((err) => {
+      console.error("[email] send failed:", err);
     });
     return NextResponse.json({ ok: true, id });
   } catch (err) {
@@ -91,16 +96,13 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const ip = getClientIp(request);
   const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+  const session = verifySessionToken(token);
 
-  if (!verifySessionToken(token)) {
+  if (!session) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
-  console.log(
-    `[audit] admin access ip=${ip} at=${new Date().toISOString()} ua=${
-      request.headers.get("user-agent") ?? "unknown"
-    }`
-  );
+  await logAudit(session.email, "list_leads", null, ip);
 
   try {
     const submissions = await listSubmissions();
