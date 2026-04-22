@@ -6,6 +6,7 @@ import {
   HiOutlineRefresh,
   HiOutlineDownload,
   HiOutlineLogout,
+  HiOutlineExternalLink,
 } from "react-icons/hi";
 import LoginCard from "./_components/LoginCard";
 import StatsGrid from "./_components/StatsGrid";
@@ -130,6 +131,16 @@ function AdminInner() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-xs font-medium text-gray-700 transition-all hover:bg-gray-50 sm:h-10 sm:px-4 sm:text-sm"
+              aria-label="Ver site"
+            >
+              <HiOutlineExternalLink />
+              <span className="hidden sm:inline">Ver site</span>
+            </a>
             <button
               onClick={handleRefresh}
               disabled={loading}
