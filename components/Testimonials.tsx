@@ -16,7 +16,7 @@ const testimonials = [
   {
     role: "Gerente de SESMT",
     sector: "Setor Logístico",
-    text: "O diferencial é o atendimento. Não é um software que cospe um documento. É gente que entende do assunto e fala a nossa língua.",
+    text: "O diferencial é o atendimento. Não é um software que apenas gera um documento. É gente que entende do assunto e fala a nossa língua.",
     rating: 5,
     initials: "GS",
   },
