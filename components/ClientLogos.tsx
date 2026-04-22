@@ -251,7 +251,7 @@ export default function ClientLogos() {
                 onClick={() => setActiveModal(null)}
                 className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-primary-dark"
               >
-                Solicitar avaliação para este setor
+                Falar com especialista para este setor
               </a>
             </div>
           </div>

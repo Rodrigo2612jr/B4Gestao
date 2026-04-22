@@ -15,7 +15,7 @@ export default function EmptyState({ variant, onClear }: Props) {
       : "Nenhum resultado";
   const desc =
     variant === "no-leads"
-      ? "Quando alguém preencher o formulário de avaliação gratuita, aparecerá aqui."
+      ? "Quando alguém preencher o formulário de contato, aparecerá aqui."
       : "Tente ajustar os filtros ou a busca.";
 
   return (

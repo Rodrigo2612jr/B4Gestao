@@ -13,7 +13,7 @@ const steps = [
   {
     step: 1,
     icon: HiOutlineSearchCircle,
-    title: "Avaliação Profissional",
+    title: "Mapeamento Profissional",
     desc: "Mapeamento dos fatores psicossociais por área, função e GHE usando metodologias reconhecidas. Nada de questionário genérico.",
   },
   {

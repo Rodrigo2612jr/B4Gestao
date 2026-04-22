@@ -121,7 +121,7 @@ const jsonLd = {
       name: "Gestão de Riscos Psicossociais (NR-01)",
       provider: { "@id": "https://b4gestao.com/#organization" },
       description:
-        "Avaliação e gestão de riscos psicossociais conforme NR-01, com metodologia em 5 passos e equipe multidisciplinar.",
+        "Análise e gestão de riscos psicossociais conforme NR-01, com metodologia em 5 passos e equipe multidisciplinar.",
       areaServed: "BR",
     },
     {
@@ -190,7 +190,7 @@ const jsonLd = {
           name: "O que está incluso na gestão de riscos psicossociais da B4?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Nossa metodologia em 5 passos inclui: avaliação profissional por área/função/GHE, integração ao PGR/GRO com classificação de severidade, plano de ação personalizado, treinamento de lideranças e monitoramento contínuo com indicadores.",
+            text: "Nossa metodologia em 5 passos inclui: mapeamento profissional por área/função/GHE, integração ao PGR/GRO com classificação de severidade, plano de ação personalizado, treinamento de lideranças e monitoramento contínuo com indicadores.",
           },
         },
         {
@@ -206,7 +206,7 @@ const jsonLd = {
           name: "Quanto custa contratar a B4?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Cada projeto é dimensionado de acordo com o porte, segmento e necessidades da empresa. Trabalhamos com propostas personalizadas. Solicite uma avaliação gratuita e receba uma proposta sob medida. Sem compromisso.",
+            text: "Cada projeto é dimensionado de acordo com o porte, segmento e necessidades da empresa. Trabalhamos com propostas personalizadas. Fale com um especialista e receba uma proposta sob medida. Sem compromisso.",
           },
         },
       ],

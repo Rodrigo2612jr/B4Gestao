@@ -68,7 +68,7 @@ export default function CtaBanner() {
               href="#avaliacao"
               className="inline-flex items-center gap-2 rounded-full border-2 border-white/30 px-8 py-4 text-base font-semibold text-white transition-colors hover:border-white hover:bg-white/10"
             >
-              Prefiro uma avaliação gratuita primeiro
+              Prefiro entrar em contato primeiro
             </motion.a>
           </div>
           <p className="mt-4 text-sm text-white/90">

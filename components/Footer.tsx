@@ -24,7 +24,7 @@ const footerLinks = [
     links: [
       { label: "Quem Somos", href: "#quem-somos" },
       { label: "Metodologia NR-01", href: "#nr01" },
-      { label: "Avaliação Gratuita", href: "#avaliacao" },
+      { label: "Falar com Especialista", href: "#avaliacao" },
     ],
   },
 ];

@@ -41,12 +41,12 @@ const services = [
   {
     id: "psicossociais",
     title: "Riscos Psicossociais (NR-01)",
-    shortDesc: "Avaliação e gestão com metodologia em 5 passos",
+    shortDesc: "Análise e gestão com metodologia em 5 passos",
     image: "/images/reports-review.jpg",
     imageFit: "cover",
     imageBg: "bg-transparent",
     features: [
-      "Avaliação por área, função e GHE com metodologias reconhecidas",
+      "Mapeamento por área, função e GHE com metodologias reconhecidas",
       "Integração ao PGR/GRO com matriz de probabilidade x severidade",
       "Plano de ação prático, priorizado e com responsáveis definidos",
       "Responsabilidade técnica de Engenheiro de Segurança e Psicólogo",
@@ -181,7 +181,7 @@ export default function Services() {
                               href="#avaliacao"
                               className="inline-flex items-center justify-center rounded-full border border-gray-200 px-6 py-3 text-sm font-medium text-secondary transition-all hover:border-primary hover:text-primary"
                             >
-                              Fazer avaliação gratuita
+                              Falar com especialista
                             </a>
                           </div>
                         </div>

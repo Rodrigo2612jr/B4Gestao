@@ -50,7 +50,7 @@ export const NAV_LINKS = [
   { label: "Quem Somos", href: "#quem-somos" },
   { label: "Serviços", href: "#servicos" },
   { label: "NR-01", href: "#nr01" },
-  { label: "Avaliação", href: "#avaliacao" },
+  { label: "Falar com Especialista", href: "#avaliacao" },
   { label: "Contato", href: "#contato" },
 ] as const;
 

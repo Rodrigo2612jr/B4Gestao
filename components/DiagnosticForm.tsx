@@ -61,7 +61,7 @@ export default function DiagnosticForm() {
           <div role="status" aria-live="polite" className="hero-enter hero-delay-0 rounded-2xl bg-primary/5 p-12 shadow-lg border border-primary/10">
             <HiOutlineCheckCircle className="mx-auto text-6xl text-primary" aria-hidden="true" />
             <h3 className="mt-4 text-2xl font-bold text-secondary">
-              Avaliação Enviada!
+              Solicitação enviada!
             </h3>
             <p className="mt-2 text-gray">
               Pronto! Seus dados foram enviados via WhatsApp.
@@ -145,7 +145,7 @@ export default function DiagnosticForm() {
               aria-labelledby="form-heading"
             >
               <h3 id="form-heading" className="text-lg font-bold text-white">
-                Solicite sua avaliação gratuita
+                Fale com um especialista
               </h3>
               <p className="text-xs text-white/70 mt-1 mb-6">Leva menos de 1 minuto. Resposta em até 24h.</p>
 
@@ -346,7 +346,7 @@ export default function DiagnosticForm() {
                 className="mt-6 flex w-full items-center justify-center gap-3 rounded-xl bg-accent px-6 py-4 text-base font-bold text-secondary shadow-lg transition-all hover:bg-accent-dark hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <FaWhatsapp className="text-xl" aria-hidden="true" />
-                {isSubmitting ? "Enviando..." : "Quero minha avaliação gratuita"}
+                {isSubmitting ? "Enviando..." : "Quero falar com um especialista"}
               </button>
               <p className="mt-3 text-center text-xs text-white/60">
                 Enviado direto via WhatsApp. Sem spam. Atendimento por profissionais reais.

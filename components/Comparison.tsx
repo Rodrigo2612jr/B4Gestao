@@ -14,7 +14,7 @@ const dontDo = [
 ];
 
 const doItems = [
-  "Avaliação feita por especialistas com décadas de experiência",
+  "Análise feita por especialistas com décadas de experiência",
   "Metodologias internacionais. Não inventamos a roda",
   "Entendemos o contexto da operação antes de montar qualquer plano",
   "Cada ação tem dono, prazo e indicador",
