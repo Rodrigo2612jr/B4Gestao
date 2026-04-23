@@ -14,7 +14,7 @@ const capabilities = [
   },
   {
     icon: HiOutlineDocumentSearch,
-    title: "Análise de Nexo Causal",
+    title: "Nexo Causal Técnico",
     desc: "Determinação técnica se o afastamento é laboral ou não, com laudos bem fundamentados.",
   },
   {
@@ -52,7 +52,7 @@ export default function AbsenceManagement() {
             <div className="relative mt-6 overflow-hidden rounded-2xl aspect-[3/2]">
               <Image
                 src="/images/reports-review.jpg"
-                alt="Análise de relatórios de afastamento"
+                alt="Relatórios de afastamento"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover object-center rounded-2xl"

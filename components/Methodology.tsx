@@ -13,8 +13,8 @@ const steps = [
   {
     step: 1,
     icon: HiOutlineSearchCircle,
-    title: "Mapeamento Profissional",
-    desc: "Mapeamento dos fatores psicossociais por área, função e GHE usando metodologias reconhecidas. Nada de questionário genérico.",
+    title: "Entendimento da Operação",
+    desc: "Identificação dos fatores psicossociais por área, função e GHE usando metodologias reconhecidas. Nada de questionário genérico.",
   },
   {
     step: 2,

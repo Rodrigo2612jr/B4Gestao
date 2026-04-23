@@ -65,8 +65,8 @@ export default function DiagnosticForm() {
             </h3>
             <p className="mt-2 text-gray">
               Pronto! Seus dados foram enviados via WhatsApp.
-              Um especialista da B4 vai analisar sua situação e
-              retornar em até 24 horas com recomendações práticas.
+              Um especialista da B4 vai entrar em contato em até 24 horas
+              para conversar sobre sua necessidade.
             </p>
             <a
               href="#inicio"
@@ -94,7 +94,7 @@ export default function DiagnosticForm() {
               <span className="text-primary">vulnerável</span> antes da fiscalização
             </h2>
             <p className="mt-4 text-lg text-gray leading-relaxed">
-              Preencha o formulário e receba uma análise personalizada.
+              Preencha o formulário e fale direto com um especialista.
               Sem custo, sem contrato, sem cobrança.
             </p>
 
