@@ -21,7 +21,7 @@ const faqs = [
   {
     question: "Qual a diferença entre a B4 e plataformas automatizadas de SST?",
     answer:
-      "Plataformas geram documentos padronizados automaticamente. A B4 tem uma equipe experiente que entende a situação de verdade, compreende o contexto e monta um plano que funciona na prática.",
+      "Plataformas geram documentos padronizados automaticamente. A B4 tem uma equipe experiente que analisa a situação de verdade, entende o contexto e monta um plano que funciona na prática.",
   },
   {
     question: "Em quanto tempo vocês entregam o PGR e PCMSO?",
@@ -36,7 +36,7 @@ const faqs = [
   {
     question: "O que está incluso na gestão de riscos psicossociais da B4?",
     answer:
-      "Seguimos 5 etapas: atuação por área, GHE e função, integração ao PGR com classificação de severidade, plano de ação prático com responsáveis e prazos, capacitação de líderes e monitoramento contínuo. Tudo com metodologias reconhecidas e documentação.",
+      "Seguimos 5 etapas: avaliação por área, GHE e função, integração ao PGR com classificação de severidade, plano de ação prático com responsáveis e prazos, capacitação de líderes e monitoramento contínuo. Tudo com metodologias reconhecidas e documentação.",
   },
   {
     question: "Vocês oferecem suporte psicológico para colaboradores?",

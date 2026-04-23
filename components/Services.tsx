@@ -41,16 +41,16 @@ const services = [
   {
     id: "psicossociais",
     title: "Riscos Psicossociais (NR-01)",
-    shortDesc: "Consultoria e gestão com metodologia em 5 passos",
+    shortDesc: "Avaliação e gestão com metodologia em 5 passos",
     image: "/images/reports-review.jpg",
     imageFit: "cover",
     imageBg: "bg-transparent",
     features: [
-      "Atuação por área, função e GHE com metodologias reconhecidas",
+      "Avaliação por área, função e GHE com metodologias reconhecidas",
       "Integração ao PGR/GRO com matriz de probabilidade x severidade",
       "Plano de ação prático, priorizado e com responsáveis definidos",
       "Responsabilidade técnica de Engenheiro de Segurança e Psicólogo",
-      "Consultoria feita por especialistas, não por software",
+      "Análise feita por especialistas, não por software",
     ],
   },
   {

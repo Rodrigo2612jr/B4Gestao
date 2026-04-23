@@ -121,7 +121,7 @@ const jsonLd = {
       name: "Gestão de Riscos Psicossociais (NR-01)",
       provider: { "@id": "https://b4gestao.com/#organization" },
       description:
-        "Consultoria e gestão de riscos psicossociais conforme NR-01, com metodologia em 5 passos e equipe multidisciplinar.",
+        "Avaliação e gestão de riscos psicossociais conforme NR-01, com metodologia em 5 passos e equipe multidisciplinar.",
       areaServed: "BR",
     },
     {
@@ -137,7 +137,7 @@ const jsonLd = {
       name: "Gestão de Afastamentos",
       provider: { "@id": "https://b4gestao.com/#organization" },
       description:
-        "Gestão especializada de afastamentos por CID F, determinação técnica de nexo causal e protocolos de retorno ao trabalho.",
+        "Gestão especializada de afastamentos por CID F, análise de nexo causal e protocolos de retorno ao trabalho.",
       areaServed: "BR",
     },
 
@@ -190,7 +190,7 @@ const jsonLd = {
           name: "O que está incluso na gestão de riscos psicossociais da B4?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Nossa metodologia em 5 passos inclui: entendimento profissional por área/função/GHE, integração ao PGR/GRO com classificação de severidade, plano de ação personalizado, treinamento de lideranças e monitoramento contínuo com indicadores.",
+            text: "Nossa metodologia em 5 passos inclui: avaliação profissional por área/função/GHE, integração ao PGR/GRO com classificação de severidade, plano de ação personalizado, treinamento de lideranças e monitoramento contínuo com indicadores.",
           },
         },
         {

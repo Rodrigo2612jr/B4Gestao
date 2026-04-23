@@ -7,14 +7,14 @@ import { HiX, HiCheck } from "react-icons/hi";
 const dontDo = [
   "Plataformas que geram documentos genéricos automaticamente",
   "Metodologias rasas, sem respaldo técnico",
-  "Abordagens que ignoram o contexto da operação",
+  "Avaliações que ignoram o contexto da operação",
   "Planos bonitos que nunca saem do papel",
   "Compliance apenas para constar",
   "Atendimento por chatbot, sem ninguém de verdade",
 ];
 
 const doItems = [
-  "Consultoria feita por especialistas com décadas de experiência",
+  "Avaliação feita por especialistas com décadas de experiência",
   "Metodologias internacionais. Não inventamos a roda",
   "Entendemos o contexto da operação antes de montar qualquer plano",
   "Cada ação tem dono, prazo e indicador",
