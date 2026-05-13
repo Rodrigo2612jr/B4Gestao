@@ -48,9 +48,9 @@ const jsonLd = {
     // Organization
     {
       "@type": "Organization",
-      "@id": "https://b4gestao.com/#organization",
+      "@id": "https://b4gestao.com.br/#organization",
       name: "B4 Gestão Ocupacional",
-      url: "https://b4gestao.com",
+      url: "https://b4gestao.com.br",
       description:
         "Consultoria em Saúde e Segurança do Trabalho para empresas que precisam de resultado, não de papel bonito.",
       telephone: "+5511945023304",
@@ -87,13 +87,13 @@ const jsonLd = {
     // LocalBusiness
     {
       "@type": "LocalBusiness",
-      "@id": "https://b4gestao.com/#localbusiness",
+      "@id": "https://b4gestao.com.br/#localbusiness",
       name: "B4 Gestão Ocupacional",
       description:
         "Consultoria especializada em SST: PGR, PCMSO, Riscos Psicossociais, Saúde Mental Corporativa e Gestão de Afastados.",
       telephone: "+5511945023304",
       email: "liege.alves@b4gestao.com",
-      url: "https://b4gestao.com",
+      url: "https://b4gestao.com.br",
       areaServed: "BR",
       openingHours: "Mo-Fr 08:00-18:00",
       priceRange: "$$",
@@ -103,7 +103,7 @@ const jsonLd = {
     {
       "@type": "Service",
       name: "PGR: Programa de Gerenciamento de Riscos",
-      provider: { "@id": "https://b4gestao.com/#organization" },
+      provider: { "@id": "https://b4gestao.com.br/#organization" },
       description:
         "Elaboração do PGR estruturado e alinhado à NR-01, com entrega em até 7 dias úteis.",
       areaServed: "BR",
@@ -111,7 +111,7 @@ const jsonLd = {
     {
       "@type": "Service",
       name: "PCMSO: Programa de Controle Médico de Saúde Ocupacional",
-      provider: { "@id": "https://b4gestao.com/#organization" },
+      provider: { "@id": "https://b4gestao.com.br/#organization" },
       description:
         "PCMSO com gestão centralizada de clínicas credenciadas em todo o Brasil.",
       areaServed: "BR",
@@ -119,7 +119,7 @@ const jsonLd = {
     {
       "@type": "Service",
       name: "Gestão de Riscos Psicossociais (NR-01)",
-      provider: { "@id": "https://b4gestao.com/#organization" },
+      provider: { "@id": "https://b4gestao.com.br/#organization" },
       description:
         "Avaliação e gestão de riscos psicossociais conforme NR-01, com metodologia em 5 passos e equipe multidisciplinar.",
       areaServed: "BR",
@@ -127,7 +127,7 @@ const jsonLd = {
     {
       "@type": "Service",
       name: "Saúde Mental Corporativa",
-      provider: { "@id": "https://b4gestao.com/#organization" },
+      provider: { "@id": "https://b4gestao.com.br/#organization" },
       description:
         "SOS Psicológico 24/7, teleconsultas com psicólogos, brigadas de saúde mental e capacitação de lideranças.",
       areaServed: "BR",
@@ -135,7 +135,7 @@ const jsonLd = {
     {
       "@type": "Service",
       name: "Gestão de Afastamentos",
-      provider: { "@id": "https://b4gestao.com/#organization" },
+      provider: { "@id": "https://b4gestao.com.br/#organization" },
       description:
         "Gestão especializada de afastamentos por CID F, análise de nexo causal e protocolos de retorno ao trabalho.",
       areaServed: "BR",
@@ -216,14 +216,14 @@ const jsonLd = {
     {
       "@type": "WebPage",
       name: "B4 Gestão Ocupacional | Saúde e Segurança do Trabalho",
-      url: "https://b4gestao.com",
+      url: "https://b4gestao.com.br",
       description:
         "Consultoria especializada em SST com soluções estratégicas para PGR, PCMSO, riscos psicossociais e saúde mental corporativa.",
       inLanguage: "pt-BR",
       isPartOf: {
         "@type": "WebSite",
         name: "B4 Gestão Ocupacional",
-        url: "https://b4gestao.com",
+        url: "https://b4gestao.com.br",
       },
     },
   ],

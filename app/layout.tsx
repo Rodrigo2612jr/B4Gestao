@@ -15,7 +15,7 @@ const display = Outfit({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://b4gestao.com"),
+  metadataBase: new URL("https://b4gestao.com.br"),
   icons: {
     icon: "/images/logo-icon.png",
     apple: "/images/logo-icon.png",
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://b4gestao.com",
+    canonical: "https://b4gestao.com.br",
   },
   openGraph: {
     title:
@@ -69,7 +69,7 @@ export const metadata: Metadata = {
       "Rigor técnico, segurança jurídica e inteligência estratégica. Consultoria em SST: PGR em até 7 dias, riscos psicossociais (NR-01), saúde mental corporativa. Cobertura nacional.",
     type: "website",
     locale: "pt_BR",
-    url: "https://b4gestao.com",
+    url: "https://b4gestao.com.br",
     siteName: "B4 Gestão Ocupacional",
     images: [
       {

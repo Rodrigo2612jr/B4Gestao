@@ -12,7 +12,7 @@ export const COMPANY = {
   yearsFounded: 2021,
   teamExperienceYears: 20,
   pgrDeliveryDays: 7,
-  url: "https://b4gestao.com",
+  url: "https://b4gestao.com.br",
 } as const;
 
 // Contato
