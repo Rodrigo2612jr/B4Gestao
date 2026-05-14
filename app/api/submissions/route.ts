@@ -8,6 +8,7 @@ import {
 } from "@/lib/auth";
 import { insertSubmission, listSubmissions, logAudit } from "@/lib/db";
 import { sendNewLeadEmail } from "@/lib/email";
+import { isValidCnpj, resolveCompany, stripCnpj } from "@/lib/companies";
 
 export const runtime = "nodejs";
 
@@ -17,7 +18,11 @@ const submissionSchema = z.object({
   necessidade: z.string().min(1).max(200),
   regiao: z.string().min(1).max(100),
   empresa: z.string().min(2).max(200),
-  cnpj: z.string().max(20).optional(),
+  cnpj: z
+    .string()
+    .min(14)
+    .max(20)
+    .refine((v) => isValidCnpj(v), { message: "CNPJ inválido" }),
   nome: z.string().min(2).max(100),
   telefone: z.string().min(10).max(20),
 });
@@ -72,20 +77,45 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    // Resolve a empresa (cria nova ou vincula a existente por CNPJ)
+    let companyId: string | null = null;
+    let companyDupSuggestions: { id: string; name: string; score: number }[] = [];
+    try {
+      const resolved = await resolveCompany({
+        cnpj: parsed.data.cnpj,
+        name: parsed.data.empresa,
+        state: parsed.data.regiao,
+      });
+      companyId = resolved.company.id;
+      companyDupSuggestions = resolved.suggestions.map((s) => ({
+        id: s.company.id,
+        name: s.company.name,
+        score: s.score,
+      }));
+    } catch (err) {
+      console.error("[submissions] resolveCompany failed:", err);
+    }
+
     const { id, row } = await insertSubmission({
       funcionarios: parsed.data.funcionarios,
       necessidade: parsed.data.necessidade,
       regiao: parsed.data.regiao,
       empresa: parsed.data.empresa,
-      cnpj: parsed.data.cnpj ?? null,
+      cnpj: stripCnpj(parsed.data.cnpj),
       nome: parsed.data.nome,
       telefone: parsed.data.telefone,
+      company_id: companyId,
     });
     // Fire-and-forget email notification (doesn't block response)
     sendNewLeadEmail(row).catch((err) => {
       console.error("[email] send failed:", err);
     });
-    return NextResponse.json({ ok: true, id });
+    return NextResponse.json({
+      ok: true,
+      id,
+      companyId,
+      dupSuggestions: companyDupSuggestions,
+    });
   } catch (err) {
     console.error("[submissions] insert error:", err);
     return NextResponse.json({ ok: false, error: "Erro ao salvar" }, { status: 500 });
@@ -117,6 +147,7 @@ export async function GET(request: NextRequest) {
       nome: s.nome,
       telefone: s.telefone,
       criadoEm: s.criado_em,
+      companyId: s.company_id ?? undefined,
     }));
     return NextResponse.json(out);
   } catch (err) {

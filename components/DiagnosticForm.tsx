@@ -1,9 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+
+// CNPJ helpers (cliente — duplicado mínimo para evitar bundle do lib server)
+function stripCnpj(v: string) { return (v || "").replace(/\D+/g, ""); }
+function maskCnpj(v: string) {
+  const c = stripCnpj(v).slice(0, 14);
+  if (c.length <= 2) return c;
+  if (c.length <= 5) return `${c.slice(0, 2)}.${c.slice(2)}`;
+  if (c.length <= 8) return `${c.slice(0, 2)}.${c.slice(2, 5)}.${c.slice(5)}`;
+  if (c.length <= 12) return `${c.slice(0, 2)}.${c.slice(2, 5)}.${c.slice(5, 8)}/${c.slice(8)}`;
+  return `${c.slice(0, 2)}.${c.slice(2, 5)}.${c.slice(5, 8)}/${c.slice(8, 12)}-${c.slice(12)}`;
+}
+function isValidCnpj(input: string): boolean {
+  const cnpj = stripCnpj(input);
+  if (cnpj.length !== 14) return false;
+  if (/^(\d)\1+$/.test(cnpj)) return false;
+  const calc = (slice: string, factors: number[]) => {
+    const sum = slice.split("").reduce((a, n, i) => a + parseInt(n, 10) * factors[i], 0);
+    const mod = sum % 11;
+    return mod < 2 ? 0 : 11 - mod;
+  };
+  const base = cnpj.slice(0, 12);
+  const d1 = calc(base, [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+  const d2 = calc(base + d1, [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+  return cnpj === base + String(d1) + String(d2);
+}
 import Image from "next/image";
 import FadeIn from "@/components/FadeIn";
 import { FaWhatsapp } from "react-icons/fa";
@@ -15,7 +40,10 @@ const schema = z.object({
   necessidade: z.string().min(1, "Selecione a necessidade"),
   regiao: z.string().min(1, "Selecione a região"),
   empresa: z.string().min(2, "Informe o nome da empresa"),
-  cnpj: z.string().optional(),
+  cnpj: z
+    .string()
+    .min(1, "Informe o CNPJ")
+    .refine((v) => isValidCnpj(v), { message: "CNPJ inválido" }),
   nome: z.string().min(2, "Informe seu nome"),
   telefone: z.string().min(10, "Informe um telefone válido"),
 });
@@ -28,6 +56,7 @@ export default function DiagnosticForm() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -272,20 +301,39 @@ export default function DiagnosticForm() {
                     )}
                   </div>
 
-                  {/* CNPJ (opcional) */}
+                  {/* CNPJ (obrigatório) */}
                   <div>
                     <label
                       htmlFor="cnpj"
                       className="mb-1.5 block text-sm font-medium text-white"
                     >
-                      CNPJ <span className="text-xs text-white/50">(opcional)</span>
+                      CNPJ <span className="text-red-400">*</span>
                     </label>
-                    <input
-                      id="cnpj"
-                      {...register("cnpj")}
-                      className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/30 placeholder:text-white/40"
-                      placeholder="00.000.000/0000-00"
+                    <Controller
+                      name="cnpj"
+                      control={control}
+                      defaultValue=""
+                      render={({ field }) => (
+                        <input
+                          id="cnpj"
+                          inputMode="numeric"
+                          value={field.value ?? ""}
+                          onChange={(e) => field.onChange(maskCnpj(e.target.value))}
+                          onBlur={field.onBlur}
+                          aria-required="true"
+                          aria-invalid={!!errors.cnpj}
+                          aria-describedby={errors.cnpj ? "cnpj-error" : undefined}
+                          className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/30 placeholder:text-white/40"
+                          placeholder="00.000.000/0000-00"
+                          maxLength={18}
+                        />
+                      )}
                     />
+                    {errors.cnpj && (
+                      <p id="cnpj-error" className="mt-1 text-xs text-red-500" role="alert">
+                        {errors.cnpj.message}
+                      </p>
+                    )}
                   </div>
                 </div>
 

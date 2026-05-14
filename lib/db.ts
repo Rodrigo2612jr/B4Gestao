@@ -26,6 +26,7 @@ export interface Submission {
   nome: string;
   telefone: string;
   criado_em: string;
+  company_id?: string | null;
 }
 
 export interface AdminUser {
@@ -46,7 +47,37 @@ export async function initDb(): Promise<void> {
   if (!sql) return;
   if (initPromise) return initPromise;
   initPromise = (async () => {
-    // Submissions (with soft delete)
+    // pg_trgm para fuzzy matching de nomes de empresa
+    try {
+      await sql`CREATE EXTENSION IF NOT EXISTS pg_trgm`;
+    } catch (err) {
+      console.warn("[db] pg_trgm extension could not be created:", err);
+    }
+
+    // Companies — espinha dorsal do CRM
+    await sql`
+      CREATE TABLE IF NOT EXISTS companies (
+        id UUID PRIMARY KEY,
+        cnpj TEXT NOT NULL UNIQUE,
+        name TEXT NOT NULL,
+        slug TEXT NOT NULL,
+        city TEXT,
+        state TEXT,
+        notes TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        merged_into_id UUID REFERENCES companies(id)
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_companies_slug ON companies(slug)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_companies_merged ON companies(merged_into_id)`;
+    try {
+      await sql`CREATE INDEX IF NOT EXISTS idx_companies_slug_trgm ON companies USING gin (slug gin_trgm_ops)`;
+    } catch (err) {
+      console.warn("[db] trigram index could not be created:", err);
+    }
+
+    // Submissions (with soft delete + company FK)
     await sql`
       CREATE TABLE IF NOT EXISTS submissions (
         id UUID PRIMARY KEY,
@@ -58,11 +89,13 @@ export async function initDb(): Promise<void> {
         nome TEXT NOT NULL,
         telefone TEXT NOT NULL,
         criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        deleted_at TIMESTAMPTZ
+        deleted_at TIMESTAMPTZ,
+        company_id UUID REFERENCES companies(id)
       )
     `;
     await sql`CREATE INDEX IF NOT EXISTS idx_submissions_criado_em ON submissions(criado_em DESC)`;
-    // Add deleted_at column if missing (migration for existing deploys)
+    await sql`CREATE INDEX IF NOT EXISTS idx_submissions_company ON submissions(company_id)`;
+    // Migrations idempotentes
     await sql`
       DO $$ BEGIN
         IF NOT EXISTS (
@@ -70,6 +103,12 @@ export async function initDb(): Promise<void> {
           WHERE table_name = 'submissions' AND column_name = 'deleted_at'
         ) THEN
           ALTER TABLE submissions ADD COLUMN deleted_at TIMESTAMPTZ;
+        END IF;
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'submissions' AND column_name = 'company_id'
+        ) THEN
+          ALTER TABLE submissions ADD COLUMN company_id UUID REFERENCES companies(id);
         END IF;
       END $$
     `;
@@ -113,9 +152,9 @@ export async function insertSubmission(
   await initDb();
   const id = crypto.randomUUID();
   const rows = await sql`
-    INSERT INTO submissions (id, funcionarios, necessidade, regiao, empresa, cnpj, nome, telefone)
-    VALUES (${id}, ${s.funcionarios}, ${s.necessidade}, ${s.regiao}, ${s.empresa}, ${s.cnpj || null}, ${s.nome}, ${s.telefone})
-    RETURNING id, funcionarios, necessidade, regiao, empresa, cnpj, nome, telefone,
+    INSERT INTO submissions (id, funcionarios, necessidade, regiao, empresa, cnpj, nome, telefone, company_id)
+    VALUES (${id}, ${s.funcionarios}, ${s.necessidade}, ${s.regiao}, ${s.empresa}, ${s.cnpj || null}, ${s.nome}, ${s.telefone}, ${s.company_id ?? null})
+    RETURNING id, funcionarios, necessidade, regiao, empresa, cnpj, nome, telefone, company_id,
               to_char(criado_em, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS criado_em
   `;
   return { id, row: rows[0] as unknown as Submission };
@@ -126,14 +165,14 @@ export async function listSubmissions(includeDeleted = false): Promise<Submissio
   await initDb();
   const rows = includeDeleted
     ? await sql`
-        SELECT id, funcionarios, necessidade, regiao, empresa, cnpj, nome, telefone,
+        SELECT id, funcionarios, necessidade, regiao, empresa, cnpj, nome, telefone, company_id,
                to_char(criado_em, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS criado_em
         FROM submissions
         ORDER BY criado_em DESC
         LIMIT 5000
       `
     : await sql`
-        SELECT id, funcionarios, necessidade, regiao, empresa, cnpj, nome, telefone,
+        SELECT id, funcionarios, necessidade, regiao, empresa, cnpj, nome, telefone, company_id,
                to_char(criado_em, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS criado_em
         FROM submissions
         WHERE deleted_at IS NULL
