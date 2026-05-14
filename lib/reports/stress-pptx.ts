@@ -106,8 +106,13 @@ export async function generateStressTestPptx(input: StressReportInput): Promise<
   s2.addText(input.result.semaforo, { x: 5, y: 2.4, w: 8, h: 0.7, fontSize: 36, color: semColor, bold: true, fontFace: "Calibri" });
   s2.addText(input.result.semaforoLabel, { x: 5, y: 3.2, w: 8, h: 0.5, fontSize: 16, color: B4_DARK, fontFace: "Calibri" });
 
-  s2.addText("FAIXA DE EXPOSIÇÃO REGULATÓRIA", { x: 5, y: 4.2, w: 8, h: 0.4, fontSize: 12, color: "888888", bold: true, fontFace: "Calibri" });
-  s2.addText(`${input.result.faixa} — ${input.result.faixaLabel}`, { x: 5, y: 4.6, w: 8, h: 0.5, fontSize: 18, color: B4_DARK, bold: true, fontFace: "Calibri" });
+  s2.addText("EXPOSIÇÃO REGULATÓRIA", { x: 5, y: 4.2, w: 8, h: 0.4, fontSize: 12, color: "888888", bold: true, fontFace: "Calibri" });
+  const faixaColor =
+    input.result.faixa === "BAIXA" ? COLOR_VERDE
+    : input.result.faixa === "MODERADA" ? COLOR_AMARELO
+    : COLOR_VERMELHO;
+  s2.addText(input.result.faixa, { x: 5, y: 4.6, w: 2.5, h: 0.5, fontSize: 22, color: faixaColor, bold: true, fontFace: "Calibri" });
+  s2.addText(input.result.faixaLabel, { x: 7.5, y: 4.65, w: 5.5, h: 0.5, fontSize: 14, color: B4_DARK, fontFace: "Calibri" });
 
   // Respondente
   s2.addText(`Respondente: ${input.respondentName}${input.respondentRole ? ` · ${input.respondentRole}` : ""}`, {
@@ -127,8 +132,11 @@ export async function generateStressTestPptx(input: StressReportInput): Promise<
   s3.addText(`${input.result.engavetamento.score} / ${input.result.engavetamento.max}`, {
     x: 0.8, y: 2.2, w: 5.4, h: 0.9, fontSize: 40, color: B4_DARK, bold: true, fontFace: "Calibri",
   });
-  s3.addText(input.result.engavetamento.label, { x: 0.8, y: 3.3, w: 5.4, h: 0.5, fontSize: 14, color: B4_DARK, fontFace: "Calibri" });
-  s3.addText("Mede se a empresa só faz papel ou tem evidência documental real para a NR-1.", {
+  s3.addText(`Classificação: ${input.result.engavetamento.classification}`, {
+    x: 0.8, y: 3.1, w: 5.4, h: 0.4, fontSize: 16, color: B4_PRIMARY, bold: true, fontFace: "Calibri",
+  });
+  s3.addText(input.result.engavetamento.label, { x: 0.8, y: 3.5, w: 5.4, h: 0.6, fontSize: 13, color: B4_DARK, fontFace: "Calibri" });
+  s3.addText("Faixas: Baixo 24-32 / Médio 14-23 / Alto 0-13.", {
     x: 0.8, y: 4.2, w: 5.4, h: 0.8, fontSize: 11, color: "666666", italic: true, fontFace: "Calibri",
   });
 
@@ -209,8 +217,14 @@ export async function generateStressTestPptx(input: StressReportInput): Promise<
     });
   });
 
+  // Disclaimer obrigatório
+  s6.addShape(pres.ShapeType.rect, { x: 0.5, y: 6.0, w: 12, h: 0.6, fill: { color: "F59E0B" }, line: { type: "none" } });
+  s6.addText(
+    "⚠ Disclaimer: estimativa preliminar — depende de enquadramento e fiscalização. Recomenda-se validação técnica in loco.",
+    { x: 0.7, y: 6.05, w: 11.6, h: 0.5, fontSize: 11, color: "FFFFFF", bold: true, valign: "middle", fontFace: "Calibri" }
+  );
   s6.addText("contato@b4gestao.com   ·   b4gestao.com.br   ·   (11) 9 4502-3304", {
-    x: 0.5, y: 6.8, w: 12, h: 0.4, fontSize: 11, color: "FFFFFF", align: "center", fontFace: "Calibri",
+    x: 0.5, y: 6.9, w: 12, h: 0.4, fontSize: 11, color: "FFFFFF", align: "center", fontFace: "Calibri",
   });
 
   const out = await pres.write({ outputType: "nodebuffer" });

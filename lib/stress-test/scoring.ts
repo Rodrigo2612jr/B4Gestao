@@ -1,38 +1,74 @@
 /**
- * Stress Test NR-1 — engine de scoring.
+ * Stress Test NR-1 — engine de scoring (alinhado ao Briefing v3).
  *
- * - Score total: soma dos pesos das alternativas escolhidas (máx 100)
+ * - Score total: normalizado 0-100 (soma dos pesos ÷ máximo × 100)
  * - Semáforo: Verde 80-100 / Amarelo 55-79 / Vermelho 0-54
- * - Risco de Engavetamento: 0-32 (subset de 8 perguntas de evidência)
- * - Coerência Psicossocial: cruza Q18A × Q18B
- * - FAIXA de exposição regulatória: LOW / MODERATE / HIGH
+ * - Risco de Engavetamento (8 perguntas núcleo): 0-32
+ *     Baixo 24-32 | Médio 14-23 | Alto 0-13
+ * - Coerência Psicossocial: 5 rótulos oficiais (Q18A × Q18B)
+ * - Exposição regulatória: BAIXA / MODERADA / ELEVADA
+ *     calculada com 8 perguntas-chave de evidência/integração
+ *
+ * Disclaimer obrigatório: estimativa preliminar; depende de
+ * enquadramento/fiscalização; recomendada validação técnica in loco.
  */
 
 import {
   QUESTIONS,
   ALTERNATIVE_WEIGHTS,
   ENGAVETAMENTO_QUESTION_IDS,
+  EXPOSICAO_QUESTION_IDS,
   COERENCIA_PAIR,
   type Alternative,
   type Category,
 } from "./questions";
 
 export type Semaforo = "VERDE" | "AMARELO" | "VERMELHO";
-export type Faixa = "LOW" | "MODERATE" | "HIGH";
+export type Faixa = "BAIXA" | "MODERADA" | "ELEVADA";
 
-export type Answers = Record<string, Alternative>; // { Q1: "A", Q2: "B", ... }
+export type CoerenciaLabel =
+  | "CONVERGENTE_E_INTEGRADO"
+  | "MEDE_MAS_NAO_TRADUZ_EM_OPERACAO"
+  | "ENTENDE_OPERACAO_MAS_NAO_MEDE"
+  | "AUSENCIA_ESTRUTURAL"
+  | "EXISTE_MAS_NAO_RASTREAVEL";
+
+export type Answers = Record<string, Alternative>;
 
 export interface ScoreResult {
-  total: number; // 0-100
+  total: number; // 0-100 normalizado
+  rawTotal: number; // soma de pesos
+  rawMax: number; // máximo possível (104)
   semaforo: Semaforo;
   semaforoLabel: string;
-  engavetamento: { score: number; max: number; label: string }; // 0-32
-  coerencia: { label: string; description: string };
+  engavetamento: {
+    score: number; // 0-32
+    max: number; // 32
+    classification: "Baixo" | "Médio" | "Alto";
+    label: string;
+  };
+  coerencia: {
+    code: CoerenciaLabel;
+    label: string;
+    description: string;
+    q18a: Alternative | null;
+    q18b: Alternative | null;
+  };
   faixa: Faixa;
   faixaLabel: string;
+  faixaScore: number; // 0-100 (heurístico interno)
   byCategory: Record<Category, { score: number; max: number; pct: number }>;
-  weakSpots: Array<{ id: string; text: string; chosen: Alternative; weight: number }>;
+  weakSpots: Array<{
+    id: string;
+    text: string;
+    chosen: Alternative;
+    weight: number;
+  }>;
+  disclaimer: string;
 }
+
+export const DISCLAIMER_OFICIAL =
+  "Estimativa preliminar — depende de enquadramento e fiscalização. Recomenda-se validação técnica in loco para confirmar exposição e medidas de controle.";
 
 export function validateAnswers(answers: Answers): { ok: boolean; missing: string[] } {
   const missing = QUESTIONS.filter((q) => !answers[q.id]).map((q) => q.id);
@@ -42,6 +78,8 @@ export function validateAnswers(answers: Answers): { ok: boolean; missing: strin
 export function calculateScore(answers: Answers): ScoreResult {
   let rawTotal = 0;
   let engavetamento = 0;
+  let faixaSum = 0;
+  let faixaMax = 0;
   const rawMax = QUESTIONS.length * 4;
 
   const byCategory: Record<Category, { score: number; max: number; pct: number }> = {
@@ -64,6 +102,10 @@ export function calculateScore(answers: Answers): ScoreResult {
     if (ENGAVETAMENTO_QUESTION_IDS.includes(q.id)) {
       engavetamento += w;
     }
+    if (EXPOSICAO_QUESTION_IDS.includes(q.id)) {
+      faixaSum += w;
+      faixaMax += 4;
+    }
 
     if (w <= 2) {
       weakSpots.push({ id: q.id, text: q.text, chosen, weight: w });
@@ -75,13 +117,12 @@ export function calculateScore(answers: Answers): ScoreResult {
     b.pct = b.max > 0 ? Math.round((b.score / b.max) * 100) : 0;
   }
 
-  // Ordena weak spots pelos piores primeiro
   weakSpots.sort((a, b) => a.weight - b.weight);
 
-  // Normaliza para 0-100
+  // Score total normalizado 0-100
   const total = rawMax > 0 ? Math.round((rawTotal / rawMax) * 100) : 0;
 
-  // Semáforo
+  // Semáforo (Verde 80-100 / Amarelo 55-79 / Vermelho 0-54)
   let semaforo: Semaforo;
   let semaforoLabel: string;
   if (total >= 80) {
@@ -95,86 +136,124 @@ export function calculateScore(answers: Answers): ScoreResult {
     semaforoLabel = "Exposição crítica à fiscalização";
   }
 
-  // Engavetamento (máx 32 = 8 perguntas × 4)
+  // Engavetamento (8Q × 4 = 32)
   const engavetamentoMax = ENGAVETAMENTO_QUESTION_IDS.length * 4;
+  let engClass: "Baixo" | "Médio" | "Alto";
   let engLabel: string;
-  const engPct = engavetamentoMax > 0 ? engavetamento / engavetamentoMax : 0;
-  if (engPct >= 0.75) engLabel = "Baixo risco — boa evidência documental";
-  else if (engPct >= 0.5) engLabel = "Médio risco — evidências parciais";
-  else engLabel = "Alto risco de engavetamento — falta de evidência";
+  if (engavetamento >= 24) {
+    engClass = "Baixo";
+    engLabel = "Baixo risco de engavetamento — boa evidência documental e rastreabilidade";
+  } else if (engavetamento >= 14) {
+    engClass = "Médio";
+    engLabel = "Médio risco — evidências parciais, lacunas relevantes";
+  } else {
+    engClass = "Alto";
+    engLabel = "Alto risco de engavetamento — documentação insuficiente, alta exposição";
+  }
 
   // Coerência Psicossocial (Q18A × Q18B)
-  const a = answers[COERENCIA_PAIR.a];
-  const b = answers[COERENCIA_PAIR.b];
-  const coerencia = labelCoerencia(a, b);
+  const aAlt = answers[COERENCIA_PAIR.a] ?? null;
+  const bAlt = answers[COERENCIA_PAIR.b] ?? null;
+  const coerencia = labelCoerencia(aAlt, bAlt);
 
-  // FAIXA regulatória
+  // Exposição regulatória (BAIXA / MODERADA / ELEVADA)
+  const faixaScore = faixaMax > 0 ? Math.round((faixaSum / faixaMax) * 100) : 0;
   let faixa: Faixa;
   let faixaLabel: string;
-  if (semaforo === "VERMELHO" || engPct < 0.4) {
-    faixa = "HIGH";
-    faixaLabel = "Alta exposição regulatória";
-  } else if (semaforo === "AMARELO" || engPct < 0.7) {
-    faixa = "MODERATE";
-    faixaLabel = "Exposição moderada";
+  if (faixaScore >= 70) {
+    faixa = "BAIXA";
+    faixaLabel = "BAIXA exposição regulatória";
+  } else if (faixaScore >= 40) {
+    faixa = "MODERADA";
+    faixaLabel = "MODERADA exposição regulatória";
   } else {
-    faixa = "LOW";
-    faixaLabel = "Baixa exposição";
+    faixa = "ELEVADA";
+    faixaLabel = "ELEVADA exposição regulatória";
   }
 
   return {
     total,
+    rawTotal,
+    rawMax,
     semaforo,
     semaforoLabel,
-    engavetamento: { score: engavetamento, max: engavetamentoMax, label: engLabel },
+    engavetamento: {
+      score: engavetamento,
+      max: engavetamentoMax,
+      classification: engClass,
+      label: engLabel,
+    },
     coerencia,
     faixa,
     faixaLabel,
+    faixaScore,
     byCategory,
     weakSpots: weakSpots.slice(0, 10),
+    disclaimer: DISCLAIMER_OFICIAL,
   };
 }
 
+/**
+ * Coerência Psicossocial — rótulos oficiais do briefing v3.
+ *
+ * Q18A = avaliação psicossocial estruturada (survey/instrumento)
+ * Q18B = AET/AEP (atividade real e organização do trabalho)
+ *
+ * Mapa:
+ *   A (forte) + A (forte) → CONVERGENTE_E_INTEGRADO
+ *   A         + D/E       → MEDE_MAS_NAO_TRADUZ_EM_OPERACAO
+ *   D/E       + A         → ENTENDE_OPERACAO_MAS_NAO_MEDE
+ *   D/E       + D/E       → AUSENCIA_ESTRUTURAL
+ *   B/C       + B/C       → EXISTE_MAS_NAO_RASTREAVEL
+ *   demais combinações intermediárias → EXISTE_MAS_NAO_RASTREAVEL
+ */
 function labelCoerencia(
-  a: Alternative | undefined,
-  b: Alternative | undefined
-): { label: string; description: string } {
-  if (!a || !b) {
-    return { label: "Incompleto", description: "Respostas Q18A/Q18B ausentes" };
+  aAlt: Alternative | null,
+  bAlt: Alternative | null
+): ScoreResult["coerencia"] {
+  if (!aAlt || !bAlt) {
+    return {
+      code: "AUSENCIA_ESTRUTURAL",
+      label: "Ausência estrutural",
+      description: "Respostas Q18A/Q18B ausentes — não foi possível avaliar coerência.",
+      q18a: aAlt,
+      q18b: bAlt,
+    };
   }
-  const wA = ALTERNATIVE_WEIGHTS[a]; // afirmação
-  const wB = ALTERNATIVE_WEIGHTS[b]; // evidência
 
-  // Afirma alto mas não comprova → discurso vazio
-  if (wA >= 4 && wB <= 2) {
-    return {
-      label: "Discurso sem lastro",
-      description: "Empresa afirma estar bem, mas não consegue comprovar documentalmente.",
-    };
+  const isStrong = (a: Alternative) => a === "A";
+  const isAbsent = (a: Alternative) => a === "D" || a === "E";
+
+  let code: CoerenciaLabel;
+  let label: string;
+  let description: string;
+
+  if (isStrong(aAlt) && isStrong(bAlt)) {
+    code = "CONVERGENTE_E_INTEGRADO";
+    label = "Convergente e integrado";
+    description =
+      "Avaliação psicossocial estruturada e AET/AEP coerentes — visão integrada entre métrica e operação real.";
+  } else if (isStrong(aAlt) && isAbsent(bAlt)) {
+    code = "MEDE_MAS_NAO_TRADUZ_EM_OPERACAO";
+    label = "Mede, mas não traduz em operação";
+    description =
+      "Avalia o psicossocial por survey/instrumento, mas falta AET/AEP — os achados não orientam mudança na operação.";
+  } else if (isAbsent(aAlt) && isStrong(bAlt)) {
+    code = "ENTENDE_OPERACAO_MAS_NAO_MEDE";
+    label = "Entende a operação, mas não mede";
+    description =
+      "Tem leitura da atividade real (AET/AEP) mas falta avaliação psicossocial estruturada — sem instrumento defensável.";
+  } else if (isAbsent(aAlt) && isAbsent(bAlt)) {
+    code = "AUSENCIA_ESTRUTURAL";
+    label = "Ausência estrutural";
+    description =
+      "Sem metodologia estruturada nem AET/AEP — psicossocial fora do PGR de forma defensável.";
+  } else {
+    code = "EXISTE_MAS_NAO_RASTREAVEL";
+    label = "Existe, mas não rastreável";
+    description =
+      "Há iniciativas pontuais nos dois eixos, mas sem evidência consolidada de integração no PGR.";
   }
-  // Afirma alto e comprova → coerente
-  if (wA >= 4 && wB >= 4) {
-    return {
-      label: "Coerência alta",
-      description: "Afirmação alinhada com evidências documentais robustas.",
-    };
-  }
-  // Afirma baixo mas tem evidência → autocrítica saudável
-  if (wA <= 2 && wB >= 4) {
-    return {
-      label: "Autocrítica produtiva",
-      description: "Empresa reconhece lacunas e tem base documental para corrigir.",
-    };
-  }
-  // Afirma baixo e não comprova → exposição assumida
-  if (wA <= 2 && wB <= 2) {
-    return {
-      label: "Exposição reconhecida",
-      description: "Empresa reconhece estar mal e ainda não construiu evidências.",
-    };
-  }
-  return {
-    label: "Intermediária",
-    description: "Discurso e evidências em meio-termo.",
-  };
+
+  return { code, label, description, q18a: aAlt, q18b: bAlt };
 }

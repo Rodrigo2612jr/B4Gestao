@@ -138,8 +138,9 @@ function Inner({ id }: { id: string }) {
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-200">
             <div className="h-full bg-primary" style={{ width: `${(r.engavetamento.score / r.engavetamento.max) * 100}%` }} />
           </div>
-          <p className="mt-3 text-sm text-gray-700">{r.engavetamento.label}</p>
-          <p className="mt-1 text-xs text-gray-500">Mede se a empresa só faz papel ou tem evidência documental real.</p>
+          <p className="mt-3 text-sm font-semibold text-gray-900">Classificação: {r.engavetamento.classification}</p>
+          <p className="mt-1 text-sm text-gray-700">{r.engavetamento.label}</p>
+          <p className="mt-1 text-xs text-gray-500">Perguntas núcleo: Q01, Q12-Q16, Q21, Q25. Faixas: Baixo 24-32 / Médio 14-23 / Alto 0-13.</p>
         </div>
 
         {/* Coerência psicossocial */}
@@ -212,6 +213,12 @@ function Inner({ id }: { id: string }) {
           })}
         </div>
       </details>
+
+      {/* Disclaimer obrigatório */}
+      <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-4 text-sm">
+        <p className="font-semibold text-amber-900">⚠ Disclaimer técnico</p>
+        <p className="mt-1 text-amber-800">{r.disclaimer ?? "Estimativa preliminar — depende de enquadramento e fiscalização. Recomenda-se validação técnica in loco."}</p>
+      </div>
 
       {/* Metadados */}
       <div className="rounded-xl border border-gray-200 bg-white p-5 text-sm shadow-sm">

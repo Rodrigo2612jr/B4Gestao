@@ -1,24 +1,22 @@
 /**
- * Stress Test NR-1 — banco de 25 perguntas (v1).
+ * Stress Test NR-1 — questionário oficial v3 (briefing 11/05/2026).
  *
- * NOTA: Os textos abaixo são uma primeira versão baseada no framework NR-1
- * psicossocial. Devem ser substituídos pelos textos exatos do briefing oficial
- * do cliente assim que disponíveis.
+ * 25 perguntas + Q18 dividida em Q18A/Q18B (26 itens totais, 25 lógicas).
+ * Pesos: A=4, B=2, C=2, D=0, E=0 (máx 4×26 = 104, normalizado para 0-100).
  *
- * Pesos por alternativa: A=4, B=2, C=2, D=0, E=0 → máx 100 pts (25×4).
- *
- * Categorização de cada pergunta para sub-scores:
- *   - "evidencia"   → mede se a empresa só faz papel (Risco de Engavetamento)
- *   - "psicossocial" → relacionada a saúde mental, clima, assédio
- *   - "estrutura"  → governança, comitês, processos formais
- *   - "fiscalizacao" → exposição direta à fiscalização e eSocial
+ * Padrão de alternativas:
+ *   A. Sim, plenamente — formal, com evidências e rastreabilidade
+ *   B. Sim, parcialmente — existe mas com lacunas
+ *   C. Em construção — em implantação ou prevista
+ *   D. Apenas iniciativas isoladas/informais
+ *   E. Não atende — inexistente ou inadequado
  */
 
 export type Alternative = "A" | "B" | "C" | "D" | "E";
 export type Category = "evidencia" | "psicossocial" | "estrutura" | "fiscalizacao";
 
 export interface Question {
-  id: string; // Q1..Q25
+  id: string;
   text: string;
   category: Category;
   alternatives: Record<Alternative, string>;
@@ -32,330 +30,222 @@ export const ALTERNATIVE_WEIGHTS: Record<Alternative, number> = {
   E: 0,
 };
 
-/** Sub-score "Risco de Engavetamento": perguntas de evidência (máx 32 pts). */
+/**
+ * Risco de Engavetamento — perguntas núcleo (oficiais v3).
+ * 8 perguntas × 4 = máximo 32.
+ *   Baixo  24-32
+ *   Médio  14-23
+ *   Alto    0-13
+ */
 export const ENGAVETAMENTO_QUESTION_IDS = [
-  "Q4", "Q9", "Q14", "Q18A", "Q18B", "Q21", "Q23", "Q25",
+  "Q01", "Q12", "Q13", "Q14", "Q15", "Q16", "Q21", "Q25",
 ];
 
-/** Coerência psicossocial: cruzamento Q18A × Q18B. */
+/**
+ * Exposição regulatória — perguntas-chave de evidência/integração.
+ * Score 0-100 heurístico para BAIXA/MODERADA/ELEVADA.
+ */
+export const EXPOSICAO_QUESTION_IDS = [
+  "Q01", "Q04", "Q06", "Q10", "Q21", "Q22", "Q23", "Q25",
+];
+
+/** Coerência Psicossocial — cruzamento Q18A × Q18B. */
 export const COERENCIA_PAIR = { a: "Q18A", b: "Q18B" };
+
+// Alternativas padrão (DRY)
+const altPadrao = (a: string, b: string, c: string, d: string, e: string) => ({ A: a, B: b, C: c, D: d, E: e });
+
+const ALT_GENERICO = altPadrao(
+  "Sim, plenamente — formal, com evidências e rastreabilidade",
+  "Sim, parcialmente — existe mas com lacunas",
+  "Em construção — em implantação ou previsto",
+  "Apenas iniciativas isoladas/informais",
+  "Não atende — inexistente ou inadequado",
+);
 
 export const QUESTIONS: Question[] = [
   {
-    id: "Q1",
-    text: "A empresa já elaborou ou atualizou o PGR contemplando riscos psicossociais conforme NR-01?",
-    category: "estrutura",
-    alternatives: {
-      A: "Sim, atualizado nos últimos 12 meses com plano de ação ativo",
-      B: "Sim, mas precisa de atualização",
-      C: "Está em elaboração agora",
-      D: "Existe, mas sem riscos psicossociais contemplados",
-      E: "Não existe ou está desatualizado há mais de 2 anos",
-    },
-  },
-  {
-    id: "Q2",
-    text: "Existe processo formal de identificação e avaliação de riscos psicossociais?",
-    category: "estrutura",
-    alternatives: {
-      A: "Sim, com metodologia validada e aplicação periódica",
-      B: "Sim, mas aplicação esporádica",
-      C: "Em implantação",
-      D: "Apenas conversas informais com lideranças",
-      E: "Nenhum processo",
-    },
-  },
-  {
-    id: "Q3",
-    text: "Há canal formal e confidencial para denúncia de assédio moral e sexual?",
-    category: "psicossocial",
-    alternatives: {
-      A: "Sim, com comitê independente e acompanhamento de casos",
-      B: "Sim, mas pouco divulgado",
-      C: "Em implantação",
-      D: "Apenas e-mail/ouvidoria geral",
-      E: "Nenhum canal formal",
-    },
-  },
-  {
-    id: "Q4",
-    text: "As lideranças foram capacitadas em fatores psicossociais e NR-01 no último ano?",
+    id: "Q01",
+    text: "Existe repositório controlado e acessível (SST, RH e Jurídico) com versões e evidências do PGR/PCMSO?",
     category: "evidencia",
-    alternatives: {
-      A: "Sim, capacitação formal com certificação para 100% dos líderes",
-      B: "Sim, parcial (50-99% dos líderes)",
-      C: "Treinamento em andamento",
-      D: "Apenas comunicados/e-mails",
-      E: "Nenhuma capacitação",
-    },
+    alternatives: ALT_GENERICO,
   },
   {
-    id: "Q5",
-    text: "A empresa monitora indicadores de afastamento por CID F (saúde mental)?",
-    category: "fiscalizacao",
-    alternatives: {
-      A: "Sim, com dashboard mensal e ações corretivas",
-      B: "Sim, mas sem ações estruturadas",
-      C: "Coleta começou recentemente",
-      D: "Acompanha só quando recebe alerta do INSS",
-      E: "Não monitora",
-    },
-  },
-  {
-    id: "Q6",
-    text: "Existe oferta de suporte psicológico para colaboradores (teleconsulta, SOS, etc.)?",
-    category: "psicossocial",
-    alternatives: {
-      A: "Sim, com acesso 24/7 e dados de utilização monitorados",
-      B: "Sim, em horário comercial",
-      C: "Em implantação",
-      D: "Apenas benefício de plano de saúde tradicional",
-      E: "Nenhum suporte",
-    },
-  },
-  {
-    id: "Q7",
-    text: "Como é tratada a sobrecarga de trabalho identificada em diagnósticos ou pesquisas?",
-    category: "psicossocial",
-    alternatives: {
-      A: "Plano de ação documentado com responsáveis e prazos",
-      B: "Discussão com lideranças, sem plano formal",
-      C: "Sob avaliação",
-      D: "Reconhece o problema, mas sem ação",
-      E: "Não há diagnóstico ou ação",
-    },
-  },
-  {
-    id: "Q8",
-    text: "A empresa possui PCMSO atualizado e integrado ao PGR?",
+    id: "Q02",
+    text: "O PGR entregue contém Inventário de riscos + Plano de ação com responsáveis e prazos definidos?",
     category: "estrutura",
-    alternatives: {
-      A: "Sim, integrado e revisado anualmente",
-      B: "Sim, mas integração parcial",
-      C: "Em revisão",
-      D: "Existe, mas desatualizado",
-      E: "Inexistente",
-    },
+    alternatives: altPadrao(
+      "Sim, inventário e plano de ação completos com responsáveis e prazos",
+      "Sim, mas com lacunas em responsáveis ou prazos",
+      "Em construção",
+      "Apenas inventário, sem plano de ação estruturado",
+      "Não atende",
+    ),
   },
   {
-    id: "Q9",
-    text: "Existem evidências documentais (atas, relatórios, planos) dos riscos psicossociais avaliados?",
+    id: "Q03",
+    text: "O inventário de riscos é detalhado por área/setor/função/GHE (não genérico)?",
+    category: "estrutura",
+    alternatives: altPadrao(
+      "Sim, detalhado por área/setor/função/GHE",
+      "Sim, parcialmente detalhado",
+      "Em construção",
+      "Genérico, sem segmentação",
+      "Não há inventário",
+    ),
+  },
+  {
+    id: "Q04",
+    text: "A avaliação é defensável tecnicamente (fonte geradora, expostos, tempo/frequência, severidade, critério)?",
     category: "evidencia",
-    alternatives: {
-      A: "Sim, registros completos e acessíveis para auditoria",
-      B: "Parciais (alguns registros)",
-      C: "Em organização",
-      D: "Existem, mas dispersos",
-      E: "Nenhum registro",
-    },
+    alternatives: ALT_GENERICO,
+  },
+  {
+    id: "Q05",
+    text: "O plano de ação é coerente com a redução real de risco (não apenas formal)?",
+    category: "estrutura",
+    alternatives: ALT_GENERICO,
+  },
+  {
+    id: "Q06",
+    text: "Os controles citados no PGR existem na prática e são localizáveis (APR, EPC, EPI, procedimentos)?",
+    category: "evidencia",
+    alternatives: ALT_GENERICO,
+  },
+  {
+    id: "Q07",
+    text: "APRs e procedimentos têm conteúdo suficiente (passos críticos, barreiras, responsáveis)?",
+    category: "estrutura",
+    alternatives: ALT_GENERICO,
+  },
+  {
+    id: "Q08",
+    text: "Existe critério e registro de seleção de EPC/EPI (CA, aplicabilidade, treinamento, troca)?",
+    category: "estrutura",
+    alternatives: ALT_GENERICO,
+  },
+  {
+    id: "Q09",
+    text: "Há evidência de eficácia dos controles (checklists, inspeções, manutenções)?",
+    category: "evidencia",
+    alternatives: ALT_GENERICO,
   },
   {
     id: "Q10",
-    text: "Como é a comunicação dos riscos psicossociais para os trabalhadores?",
-    category: "estrutura",
-    alternatives: {
-      A: "Comunicação contínua, multicanal e mensurada",
-      B: "Comunicação pontual em eventos",
-      C: "Em planejamento",
-      D: "Apenas no DDS/integração",
-      E: "Não há comunicação",
-    },
+    text: "A redução de risco declarada é sustentada por evidência do controle implementado?",
+    category: "evidencia",
+    alternatives: ALT_GENERICO,
   },
   {
     id: "Q11",
-    text: "Existe protocolo de retorno ao trabalho após afastamento por motivo de saúde mental?",
-    category: "psicossocial",
-    alternatives: {
-      A: "Sim, multidisciplinar com acompanhamento por 90+ dias",
-      B: "Sim, mas só com médico do trabalho",
-      C: "Em construção",
-      D: "Trata caso a caso, sem protocolo",
-      E: "Nenhum protocolo",
-    },
+    text: "A avaliação evita subestimação por padrão (não classifica tudo como 'baixo')?",
+    category: "evidencia",
+    alternatives: ALT_GENERICO,
   },
   {
     id: "Q12",
-    text: "Como a empresa lida com transmissão dos eventos psicossociais no eSocial?",
-    category: "fiscalizacao",
-    alternatives: {
-      A: "Envio em dia, com revisão técnica antes do envio",
-      B: "Envio em dia, sem revisão",
-      C: "Atrasos esporádicos",
-      D: "Frequentes atrasos ou erros",
-      E: "Eventos não enviados",
-    },
+    text: "Existe dono formal do GRO/PGR, substituto designado e papéis claros (matriz RACI)?",
+    category: "estrutura",
+    alternatives: ALT_GENERICO,
   },
   {
     id: "Q13",
-    text: "Existe orçamento específico para ações de saúde mental e bem-estar?",
+    text: "Há ritual mensal/trimestral com ata para acompanhamento de status e bloqueios?",
     category: "estrutura",
-    alternatives: {
-      A: "Sim, orçamento anual aprovado e rastreado",
-      B: "Verba pontual aprovada caso a caso",
-      C: "Em discussão para próximo ano",
-      D: "Sem orçamento, apenas iniciativas voluntárias",
-      E: "Nenhum investimento",
-    },
+    alternatives: ALT_GENERICO,
   },
   {
     id: "Q14",
-    text: "Há registro de plano de ação para os riscos psicossociais classificados como críticos?",
+    text: "O status do plano de ação é atualizado regularmente (andamento, concluído, atrasado)?",
     category: "evidencia",
-    alternatives: {
-      A: "Sim, com responsáveis, prazos e indicadores de eficácia",
-      B: "Sim, mas sem indicadores claros",
-      C: "Em elaboração",
-      D: "Lista de intenções, sem responsáveis",
-      E: "Nenhum plano",
-    },
+    alternatives: ALT_GENERICO,
   },
   {
     id: "Q15",
-    text: "Como é feito o engajamento da alta liderança nas pautas psicossociais?",
-    category: "psicossocial",
-    alternatives: {
-      A: "Comitê executivo com agenda mensal e KPIs",
-      B: "Reuniões trimestrais",
-      C: "Reuniões esporádicas",
-      D: "Delegado ao RH/SST sem envolvimento direto",
-      E: "Sem engajamento da liderança",
-    },
+    text: "A empresa tem template/processo próprio de evidências, sem depender do terceiro?",
+    category: "estrutura",
+    alternatives: ALT_GENERICO,
   },
   {
     id: "Q16",
-    text: "Há pesquisa de clima ou diagnóstico psicossocial aplicado em 12 meses?",
+    text: "Existe resumo executivo periódico para a liderança (1 slide/página)?",
     category: "estrutura",
-    alternatives: {
-      A: "Sim, com retorno aos colaboradores e ações implementadas",
-      B: "Sim, mas sem retorno formal",
-      C: "Programada para próximos meses",
-      D: "Realizada há mais de 24 meses",
-      E: "Nunca realizada",
-    },
+    alternatives: ALT_GENERICO,
   },
   {
     id: "Q17",
-    text: "Como a empresa atua sobre fatores de risco identificados (assédio, sobrecarga, jornada)?",
+    text: "As ações psicossociais estão dentro do plano do PGR, com responsável, prazo e KPI?",
     category: "psicossocial",
-    alternatives: {
-      A: "Plano estruturado com KPIs e revisão trimestral",
-      B: "Ações pontuais sem plano consolidado",
-      C: "Em discussão",
-      D: "Apenas se chega denúncia",
-      E: "Nenhuma ação",
-    },
+    alternatives: ALT_GENERICO,
   },
   {
     id: "Q18A",
-    text: "A empresa AFIRMA que as condições psicossociais estão bem geridas?",
-    category: "evidencia",
-    alternatives: {
-      A: "Sim, com forte convicção",
-      B: "Sim, parcialmente",
-      C: "Neutro / não sabe",
-      D: "Reconhece lacunas importantes",
-      E: "Reconhece que está mal",
-    },
+    text: "Existe metodologia estruturada (survey/instrumento validado) para avaliação psicossocial, com resultados utilizados no PGR?",
+    category: "psicossocial",
+    alternatives: altPadrao(
+      "Sim, metodologia estruturada com resultados aplicados no PGR",
+      "Sim, mas com uso parcial no PGR",
+      "Em implantação",
+      "Apenas iniciativas pontuais",
+      "Não há metodologia",
+    ),
   },
   {
     id: "Q18B",
-    text: "A empresa CONSEGUE COMPROVAR documentalmente o que afirma na Q18A?",
-    category: "evidencia",
-    alternatives: {
-      A: "Sim, evidências completas para auditoria",
-      B: "Sim, parciais",
-      C: "Em organização",
-      D: "Evidências dispersas",
-      E: "Nenhuma evidência",
-    },
+    text: "Existe AET/AEP (análise da atividade real e organização do trabalho) e os achados são usados para orientar riscos e ações?",
+    category: "psicossocial",
+    alternatives: altPadrao(
+      "Sim, AET/AEP estruturada com achados orientando o PGR",
+      "Sim, mas uso parcial",
+      "Em construção",
+      "Apenas iniciativas pontuais",
+      "Não realiza",
+    ),
   },
   {
     id: "Q19",
-    text: "Existe programa de prevenção e tratamento de burnout?",
-    category: "psicossocial",
-    alternatives: {
-      A: "Sim, com protocolo formal e equipe dedicada",
-      B: "Sim, mas informal",
-      C: "Em implantação",
-      D: "Reativo, só após casos",
-      E: "Nenhum programa",
-    },
+    text: "Existe critério objetivo para classificar uma área como crítica?",
+    category: "estrutura",
+    alternatives: ALT_GENERICO,
   },
   {
     id: "Q20",
-    text: "Como a empresa controla jornada de trabalho e horas extras?",
-    category: "fiscalizacao",
-    alternatives: {
-      A: "Controle eletrônico com alertas automáticos de sobrecarga",
-      B: "Controle eletrônico sem alertas",
-      C: "Controle manual",
-      D: "Controle parcial",
-      E: "Sem controle",
-    },
+    text: "Há medidas estruturais nas áreas críticas (mudança de processo, escala, gestão, recursos)?",
+    category: "psicossocial",
+    alternatives: ALT_GENERICO,
   },
   {
     id: "Q21",
-    text: "Há registros de capacitação dos colaboradores sobre fatores psicossociais?",
-    category: "evidencia",
-    alternatives: {
-      A: "Sim, com listas de presença e avaliação de eficácia",
-      B: "Sim, apenas listas de presença",
-      C: "Em aplicação",
-      D: "Apenas comunicados",
-      E: "Sem capacitação",
-    },
+    text: "Existe processo formal de integração PGR → PCMSO em revisões e mudanças?",
+    category: "estrutura",
+    alternatives: ALT_GENERICO,
   },
   {
     id: "Q22",
-    text: "Como a empresa monitora a aplicação de medidas de controle dos riscos psicossociais?",
-    category: "estrutura",
-    alternatives: {
-      A: "Auditoria interna periódica com KPIs",
-      B: "Verificação semestral pelo RH/SST",
-      C: "Em implantação",
-      D: "Apenas quando há denúncia",
-      E: "Não monitora",
-    },
+    text: "Os ASO/exames são checados por função/GHE, cobrindo os riscos que exigem monitoramento?",
+    category: "fiscalizacao",
+    alternatives: ALT_GENERICO,
   },
   {
     id: "Q23",
-    text: "Há rastreabilidade entre risco psicossocial identificado → medida → evidência → resultado?",
-    category: "evidencia",
-    alternatives: {
-      A: "Sim, cadeia completa documentada para 100% dos riscos críticos",
-      B: "Sim, parcial",
-      C: "Em construção",
-      D: "Documentação fragmentada",
-      E: "Sem rastreabilidade",
-    },
+    text: "Existe critério para evitar overtesting (exame sem necessidade) e justificar exames adicionais?",
+    category: "fiscalizacao",
+    alternatives: ALT_GENERICO,
   },
   {
     id: "Q24",
-    text: "Como a empresa lida com CATs relacionadas a fatores psicossociais?",
-    category: "fiscalizacao",
-    alternatives: {
-      A: "Emissão imediata, análise de nexo causal e ação preventiva",
-      B: "Emite, mas sem análise estruturada",
-      C: "Caso a caso",
-      D: "Hesita em emitir",
-      E: "Não emite ou desconhece",
-    },
+    text: "Existe protocolo de retorno ao trabalho (incluindo saúde mental quando aplicável)?",
+    category: "psicossocial",
+    alternatives: ALT_GENERICO,
   },
   {
     id: "Q25",
-    text: "Existe responsável formal nomeado pela gestão dos riscos psicossociais (com carta de designação)?",
+    text: "O PGR é retroalimentado por eventos reais (afastamentos longos/repetidos, burnout, CATs)?",
     category: "evidencia",
-    alternatives: {
-      A: "Sim, com carta formal e atribuições claras",
-      B: "Sim, mas sem documento formal",
-      C: "Em definição",
-      D: "Atribuição informal",
-      E: "Sem responsável",
-    },
+    alternatives: ALT_GENERICO,
   },
 ];
 
-// Q18 é composta de Q18A + Q18B (cruzamento de coerência). Total: 26 itens, 25 lógicas.
 if (QUESTIONS.length < 25 || QUESTIONS.length > 27) {
   throw new Error(`Stress Test deve ter entre 25 e 27 itens, tem ${QUESTIONS.length}`);
 }
