@@ -96,12 +96,18 @@ function Inner({ id }: { id: string }) {
         <Link href="/admin/stress-test" className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary">
           <HiOutlineArrowLeft /> Voltar
         </Link>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <a
             href={`/api/stress-test/${id}/report`}
             className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-dark"
           >
-            <HiOutlineDownload /> Baixar PPTX
+            <HiOutlineDownload /> PPTX Executivo
+          </a>
+          <a
+            href={`/api/stress-test/${id}/report?variant=dashboard`}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5 text-xs font-semibold text-white hover:bg-secondary/90"
+          >
+            <HiOutlineDownload /> PPTX Dashboard
           </a>
           <button
             onClick={() => setDeleteOpen(true)}

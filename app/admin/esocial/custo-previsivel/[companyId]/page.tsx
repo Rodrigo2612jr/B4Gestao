@@ -97,12 +97,20 @@ function Inner({ companyId }: { companyId: string }) {
         <Link href={`/admin/companies/${companyId}`} className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary">
           <HiOutlineArrowLeft /> Voltar para empresa
         </Link>
-        <button
-          onClick={() => setShowConfig(!showConfig)}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-        >
-          <HiOutlineAdjustments /> Premissas
-        </button>
+        <div className="flex gap-2">
+          <a
+            href={`/api/esocial/dashboard-pptx/${companyId}`}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5 text-xs font-semibold text-white hover:bg-secondary/90"
+          >
+            📥 PPTX Dashboard
+          </a>
+          <button
+            onClick={() => setShowConfig(!showConfig)}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+          >
+            <HiOutlineAdjustments /> Premissas
+          </button>
+        </div>
       </div>
 
       {/* Card integridade */}

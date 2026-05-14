@@ -91,12 +91,18 @@ function Inner({ id }: { id: string }) {
         <Link href="/admin/pulse" className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary">
           <HiOutlineArrowLeft /> Voltar
         </Link>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <a
             href={`/api/pulse/${id}/report`}
             className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-dark"
           >
-            <HiOutlineDownload /> Baixar PPTX
+            <HiOutlineDownload /> PPTX Executivo
+          </a>
+          <a
+            href={`/api/pulse/${id}/report?variant=dashboard`}
+            className="inline-flex items-center gap-1 rounded-lg bg-secondary px-3 py-1.5 text-xs font-semibold text-white hover:bg-secondary/90"
+          >
+            <HiOutlineDownload /> PPTX Dashboard
           </a>
           <button onClick={load} className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">
             <HiOutlineRefresh /> Atualizar

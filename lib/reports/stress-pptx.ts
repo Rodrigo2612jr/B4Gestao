@@ -31,6 +31,13 @@ export interface StressReportInput {
   respondentRole: string | null;
   createdAt: string;
   result: ScoreResult;
+  /** Texto blindado opcional gerado por IA (se disponível). */
+  narrative?: {
+    executiveSummary: string;
+    topRecommendations: string[];
+    technicalNarrative: string;
+    disclaimer: string;
+  } | null;
 }
 
 export async function generateStressTestPptx(input: StressReportInput): Promise<Buffer> {
@@ -197,6 +204,27 @@ export async function generateStressTestPptx(input: StressReportInput): Promise<
       s5.addText(w.text, { x: 1.5, y, w: 9.5, h: 0.55, fontSize: 12, color: B4_DARK, valign: "middle", fontFace: "Calibri" });
       s5.addText(`Resposta: ${w.chosen}`, { x: 11, y, w: 1.5, h: 0.55, fontSize: 12, color: COLOR_VERMELHO, bold: true, valign: "middle", align: "right", fontFace: "Calibri" });
     });
+  }
+
+  // ============ SLIDE AI NARRATIVE (opcional) ============
+  if (input.narrative) {
+    const sAI = pres.addSlide();
+    sAI.background = { color: "FFFFFF" };
+    sAI.addText("Análise executiva", { x: 0.5, y: 0.3, w: 12, h: 0.6, fontSize: 28, color: B4_DARK, bold: true, fontFace: "Calibri" });
+    sAI.addShape(pres.ShapeType.line, { x: 0.5, y: 0.95, w: 1.5, h: 0, line: { color: B4_PRIMARY, width: 4 } });
+
+    sAI.addText("RESUMO EXECUTIVO", { x: 0.5, y: 1.3, w: 12, h: 0.4, fontSize: 12, color: "888888", bold: true, fontFace: "Calibri" });
+    sAI.addText(input.narrative.executiveSummary, { x: 0.5, y: 1.7, w: 12, h: 1.6, fontSize: 14, color: B4_DARK, fontFace: "Calibri", valign: "top" });
+
+    sAI.addText("RECOMENDAÇÕES PRIORITÁRIAS", { x: 0.5, y: 3.5, w: 12, h: 0.4, fontSize: 12, color: "888888", bold: true, fontFace: "Calibri" });
+    input.narrative.topRecommendations.slice(0, 3).forEach((rec, idx) => {
+      const y = 3.9 + idx * 0.5;
+      sAI.addShape(pres.ShapeType.rect, { x: 0.5, y, w: 0.15, h: 0.4, fill: { color: B4_PRIMARY }, line: { type: "none" } });
+      sAI.addText(rec, { x: 0.8, y, w: 11.7, h: 0.4, fontSize: 12, color: B4_DARK, valign: "middle", fontFace: "Calibri" });
+    });
+
+    sAI.addText("ANÁLISE TÉCNICA", { x: 0.5, y: 5.5, w: 12, h: 0.4, fontSize: 12, color: "888888", bold: true, fontFace: "Calibri" });
+    sAI.addText(input.narrative.technicalNarrative, { x: 0.5, y: 5.9, w: 12, h: 1.5, fontSize: 11, color: "555555", italic: true, valign: "top", fontFace: "Calibri" });
   }
 
   // ============ SLIDE 6 — PRÓXIMOS PASSOS ============
