@@ -236,12 +236,139 @@ export async function initDb(): Promise<void> {
         evidence JSONB,
         custo_faixa TEXT,
         resolved BOOLEAN NOT NULL DEFAULT FALSE,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        alert_code TEXT,
+        period_start DATE,
+        period_end DATE,
+        related_events JSONB,
+        recommended_action TEXT
       )
     `;
     await sql`CREATE INDEX IF NOT EXISTS idx_esocial_alerts_company ON esocial_alerts(company_id)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_esocial_alerts_upload ON esocial_alerts(upload_id)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_esocial_alerts_severity ON esocial_alerts(severity)`;
+    // Migration idempotente para colunas novas
+    await sql`
+      DO $$ BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='esocial_alerts' AND column_name='alert_code') THEN
+          ALTER TABLE esocial_alerts ADD COLUMN alert_code TEXT;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='esocial_alerts' AND column_name='period_start') THEN
+          ALTER TABLE esocial_alerts ADD COLUMN period_start DATE;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='esocial_alerts' AND column_name='period_end') THEN
+          ALTER TABLE esocial_alerts ADD COLUMN period_end DATE;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='esocial_alerts' AND column_name='related_events') THEN
+          ALTER TABLE esocial_alerts ADD COLUMN related_events JSONB;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='esocial_alerts' AND column_name='recommended_action') THEN
+          ALTER TABLE esocial_alerts ADD COLUMN recommended_action TEXT;
+        END IF;
+      END $$
+    `;
+
+    // ============================================================
+    // MÓDULO C — CAMADA TEMPORAL (Briefing v3, seção 7)
+    // ============================================================
+
+    // exposure_timeline (S-2240) — vigência por agente
+    await sql`
+      CREATE TABLE IF NOT EXISTS esocial_exposure_timeline (
+        id UUID PRIMARY KEY,
+        upload_id UUID NOT NULL REFERENCES esocial_uploads(id) ON DELETE CASCADE,
+        company_id UUID NOT NULL REFERENCES companies(id),
+        worker_key_hash TEXT NOT NULL,
+        cod_ag_noc TEXT,
+        descr_agente TEXT,
+        start_date DATE NOT NULL,
+        end_date DATE,
+        source_event_id TEXT,
+        receipt TEXT,
+        layout_version TEXT,
+        raw JSONB,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_exposure_worker ON esocial_exposure_timeline(worker_key_hash)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_exposure_company ON esocial_exposure_timeline(company_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_exposure_dates ON esocial_exposure_timeline(start_date, end_date)`;
+
+    // medical_events (S-2220) — ASOs
+    await sql`
+      CREATE TABLE IF NOT EXISTS esocial_medical_events (
+        id UUID PRIMARY KEY,
+        upload_id UUID NOT NULL REFERENCES esocial_uploads(id) ON DELETE CASCADE,
+        company_id UUID NOT NULL REFERENCES companies(id),
+        worker_key_hash TEXT NOT NULL,
+        aso_date DATE NOT NULL,
+        tp_exame_ocup TEXT,
+        source_event_id TEXT,
+        receipt TEXT,
+        layout_version TEXT,
+        raw JSONB,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_medev_worker ON esocial_medical_events(worker_key_hash)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_medev_company ON esocial_medical_events(company_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_medev_aso ON esocial_medical_events(aso_date)`;
+
+    // medical_exams (filha de medical_events)
+    await sql`
+      CREATE TABLE IF NOT EXISTS esocial_medical_exams (
+        id UUID PRIMARY KEY,
+        medical_event_id UUID NOT NULL REFERENCES esocial_medical_events(id) ON DELETE CASCADE,
+        exam_code_raw TEXT,
+        exam_code_normalized TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_medex_event ON esocial_medical_exams(medical_event_id)`;
+
+    // leave_intervals (S-2230)
+    await sql`
+      CREATE TABLE IF NOT EXISTS esocial_leave_intervals (
+        id UUID PRIMARY KEY,
+        upload_id UUID NOT NULL REFERENCES esocial_uploads(id) ON DELETE CASCADE,
+        company_id UUID NOT NULL REFERENCES companies(id),
+        worker_key_hash TEXT NOT NULL,
+        leave_start DATE NOT NULL,
+        leave_end DATE,
+        reason_code TEXT,
+        cid TEXT,
+        is_work_related BOOLEAN NOT NULL DEFAULT FALSE,
+        source_event_id TEXT,
+        receipt TEXT,
+        layout_version TEXT,
+        raw JSONB,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_leave_worker ON esocial_leave_intervals(worker_key_hash)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_leave_company ON esocial_leave_intervals(company_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_leave_dates ON esocial_leave_intervals(leave_start, leave_end)`;
+
+    // cat_events (S-2210)
+    await sql`
+      CREATE TABLE IF NOT EXISTS esocial_cat_events (
+        id UUID PRIMARY KEY,
+        upload_id UUID NOT NULL REFERENCES esocial_uploads(id) ON DELETE CASCADE,
+        company_id UUID NOT NULL REFERENCES companies(id),
+        worker_key_hash TEXT NOT NULL,
+        accident_date DATE NOT NULL,
+        cat_type TEXT,
+        cid TEXT,
+        source_event_id TEXT,
+        receipt TEXT,
+        layout_version TEXT,
+        raw JSONB,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_cat_worker ON esocial_cat_events(worker_key_hash)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_cat_company ON esocial_cat_events(company_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_cat_date ON esocial_cat_events(accident_date)`;
 
     // Audit log
     await sql`

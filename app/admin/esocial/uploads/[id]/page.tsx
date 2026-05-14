@@ -15,6 +15,11 @@ interface Alert {
   custoFaixa: string | null;
   resolved: boolean;
   createdAt: string;
+  alertCode?: string | null;
+  periodStart?: string | null;
+  periodEnd?: string | null;
+  relatedEvents?: Record<string, string[]> | null;
+  recommendedAction?: string | null;
 }
 interface Upload {
   id: string;
@@ -131,6 +136,11 @@ function Inner({ id }: { id: string }) {
                   }`} />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
+                      {a.alertCode && (
+                        <span className="rounded bg-gray-900 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase text-white">
+                          {a.alertCode}
+                        </span>
+                      )}
                       <h4 className="text-sm font-semibold text-gray-900">{a.title}</h4>
                       <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${SEVERITY_TAG[a.severity]}`}>
                         {a.severity}
@@ -142,6 +152,24 @@ function Inner({ id }: { id: string }) {
                       )}
                     </div>
                     <p className="mt-1 text-sm text-gray-700">{a.description}</p>
+                    {a.recommendedAction && (
+                      <div className="mt-2 rounded-lg bg-white p-2 border border-gray-200">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Ação recomendada</p>
+                        <p className="mt-0.5 text-sm text-gray-800">{a.recommendedAction}</p>
+                      </div>
+                    )}
+                    {(a.periodStart || a.relatedEvents) && (
+                      <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-gray-500">
+                        {a.periodStart && (
+                          <span>📅 {a.periodStart}{a.periodEnd ? ` → ${a.periodEnd}` : ""}</span>
+                        )}
+                        {a.relatedEvents && Object.entries(a.relatedEvents).map(([k, ids]) => (
+                          <span key={k} className="rounded bg-gray-100 px-2 py-0.5 font-mono">
+                            {k}: {Array.isArray(ids) ? ids.length : 0}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
