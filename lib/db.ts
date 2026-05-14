@@ -148,6 +148,23 @@ export async function initDb(): Promise<void> {
         deleted_at TIMESTAMPTZ
       )
     `;
+
+    // Convites públicos (cliente preenche o Stress Test sozinho)
+    await sql`
+      CREATE TABLE IF NOT EXISTS stress_test_invites (
+        id UUID PRIMARY KEY,
+        company_id UUID NOT NULL REFERENCES companies(id),
+        token TEXT NOT NULL UNIQUE,
+        status TEXT NOT NULL DEFAULT 'open',
+        audit_id UUID REFERENCES stress_test_audits(id),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        created_by TEXT,
+        used_at TIMESTAMPTZ
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_stress_invites_company ON stress_test_invites(company_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_stress_invites_token ON stress_test_invites(token)`;
+
     await sql`CREATE INDEX IF NOT EXISTS idx_stress_company ON stress_test_audits(company_id)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_stress_created ON stress_test_audits(created_at DESC)`;
 

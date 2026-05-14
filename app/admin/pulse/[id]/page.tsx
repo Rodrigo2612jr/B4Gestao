@@ -7,6 +7,7 @@ import {
   HiOutlineClipboardCopy,
   HiOutlineLockClosed,
   HiOutlineRefresh,
+  HiOutlineDownload,
 } from "react-icons/hi";
 import AdminShell from "../../_components/AdminShell";
 import { useToast } from "../../_components/ToastProvider";
@@ -88,6 +89,12 @@ function Inner({ id }: { id: string }) {
           <HiOutlineArrowLeft /> Voltar
         </Link>
         <div className="flex gap-2">
+          <a
+            href={`/api/pulse/${id}/report`}
+            className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-dark"
+          >
+            <HiOutlineDownload /> Baixar PPTX
+          </a>
           <button onClick={load} className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">
             <HiOutlineRefresh /> Atualizar
           </button>

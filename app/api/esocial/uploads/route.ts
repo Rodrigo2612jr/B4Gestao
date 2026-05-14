@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     await finishUpload(uploadId, {
       eventsCount: result.eventsTotal,
       alertsCount: result.alertsCreated,
-      meta: { byType: result.byType },
+      meta: { byType: result.byType, workersDetected: result.workersDetected },
     });
     return NextResponse.json({ ok: true, id: uploadId, result });
   } catch (err) {

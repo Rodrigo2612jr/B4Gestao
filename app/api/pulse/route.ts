@@ -6,12 +6,20 @@ import { createCampaign, listCampaigns } from "@/lib/pulse/db";
 
 export const runtime = "nodejs";
 
+const questionSchema = z.object({
+  id: z.string().min(1).max(20),
+  text: z.string().min(3).max(300),
+  dimension: z.enum(["demandas", "controle", "apoio", "relacionamentos", "papel", "mudanca", "saude"]),
+  reverse: z.boolean().optional(),
+});
+
 const createSchema = z.object({
   companyId: z.string().uuid(),
   title: z.string().min(3).max(200),
   areas: z.array(z.string().min(1).max(80)).min(1).max(50),
   anonymityThreshold: z.number().int().min(3).max(50).optional(),
   closesAt: z.string().datetime().nullable().optional(),
+  questions: z.array(questionSchema).min(3).max(60).optional(),
 });
 
 export async function GET(request: NextRequest) {
@@ -54,6 +62,7 @@ export async function POST(request: NextRequest) {
       companyId: parsed.data.companyId,
       title: parsed.data.title,
       areas: parsed.data.areas,
+      questions: parsed.data.questions,
       anonymityThreshold: parsed.data.anonymityThreshold,
       closesAt: parsed.data.closesAt ? new Date(parsed.data.closesAt) : null,
       createdBy: session.email,

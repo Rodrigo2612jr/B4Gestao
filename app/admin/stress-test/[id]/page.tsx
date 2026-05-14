@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, use } from "react";
 import Link from "next/link";
-import { HiOutlineArrowLeft, HiOutlineTrash, HiOutlineUser } from "react-icons/hi";
+import { HiOutlineArrowLeft, HiOutlineTrash, HiOutlineUser, HiOutlineDownload } from "react-icons/hi";
 import AdminShell from "../../_components/AdminShell";
 import { useToast } from "../../_components/ToastProvider";
 import type { ScoreResult } from "@/lib/stress-test/scoring";
@@ -96,12 +96,20 @@ function Inner({ id }: { id: string }) {
         <Link href="/admin/stress-test" className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary">
           <HiOutlineArrowLeft /> Voltar
         </Link>
-        <button
-          onClick={() => setDeleteOpen(true)}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50"
-        >
-          <HiOutlineTrash /> Excluir
-        </button>
+        <div className="flex gap-2">
+          <a
+            href={`/api/stress-test/${id}/report`}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-dark"
+          >
+            <HiOutlineDownload /> Baixar PPTX
+          </a>
+          <button
+            onClick={() => setDeleteOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50"
+          >
+            <HiOutlineTrash /> Excluir
+          </button>
+        </div>
       </div>
 
       {/* Big card: Score + Semáforo */}

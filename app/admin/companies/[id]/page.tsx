@@ -11,6 +11,8 @@ import {
   HiOutlineDocumentReport,
   HiOutlinePhone,
   HiOutlineUser,
+  HiOutlineClipboardCopy,
+  HiOutlineLink,
 } from "react-icons/hi";
 import AdminShell from "../../_components/AdminShell";
 import { useToast } from "../../_components/ToastProvider";
@@ -174,6 +176,7 @@ function CompanyDetailInner({ companyId }: { companyId: string }) {
             )}
           </div>
         </div>
+        <StressInviteRow companyId={company.id} />
       </div>
 
       {/* Sugestões de mesclagem */}
@@ -297,6 +300,57 @@ function CompanyDetailInner({ companyId }: { companyId: string }) {
               </button>
             </div>
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StressInviteRow({ companyId }: { companyId: string }) {
+  const [link, setLink] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const generate = async () => {
+    setBusy(true);
+    try {
+      const res = await fetch("/api/stress-test/invites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ companyId }),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || "Erro");
+      const isProd = window.location.host.includes("b4gestao.com.br");
+      const url = isProd
+        ? `https://stress.b4gestao.com.br/${d.token}`
+        : `${window.location.origin}/stress/${d.token}`;
+      setLink(url);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Erro");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-4">
+      <button
+        onClick={generate}
+        disabled={busy}
+        className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-dark disabled:opacity-60"
+      >
+        <HiOutlineLink /> {busy ? "Gerando..." : "Gerar link Stress Test (cliente preenche)"}
+      </button>
+      {link && (
+        <div className="flex flex-1 min-w-[200px] items-center gap-1 rounded-lg border border-gray-200 bg-gray-50 px-2 py-1.5">
+          <input readOnly value={link} className="flex-1 min-w-0 bg-transparent font-mono text-xs outline-none" />
+          <button
+            onClick={() => { navigator.clipboard.writeText(link); }}
+            className="rounded p-1 text-gray-500 hover:bg-white hover:text-primary"
+            title="Copiar link"
+          >
+            <HiOutlineClipboardCopy />
+          </button>
         </div>
       )}
     </div>
