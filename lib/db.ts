@@ -93,9 +93,7 @@ export async function initDb(): Promise<void> {
         company_id UUID REFERENCES companies(id)
       )
     `;
-    await sql`CREATE INDEX IF NOT EXISTS idx_submissions_criado_em ON submissions(criado_em DESC)`;
-    await sql`CREATE INDEX IF NOT EXISTS idx_submissions_company ON submissions(company_id)`;
-    // Migrations idempotentes
+    // Migrations idempotentes — adicionar colunas ANTES de criar índices nelas
     await sql`
       DO $$ BEGIN
         IF NOT EXISTS (
@@ -112,6 +110,8 @@ export async function initDb(): Promise<void> {
         END IF;
       END $$
     `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_submissions_criado_em ON submissions(criado_em DESC)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_submissions_company ON submissions(company_id)`;
 
     // Admin users
     await sql`
