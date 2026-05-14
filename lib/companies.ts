@@ -8,6 +8,9 @@
  */
 
 import { sql, initDb, logAudit } from "./db";
+import { countStressByCompany } from "./stress-test/db";
+import { countCampaignsByCompany } from "./pulse/db";
+import { countAlertsByCompany } from "./esocial/db";
 
 // ============================================================
 // CNPJ helpers
@@ -370,6 +373,12 @@ export async function getCompanyAggregate(companyId: string): Promise<{
     ORDER BY criado_em DESC
   `;
 
+  const [pulseCount, stressCount, esocialCounts] = await Promise.all([
+    countCampaignsByCompany(companyId),
+    countStressByCompany(companyId),
+    countAlertsByCompany(companyId),
+  ]);
+
   return {
     company,
     submissions: subs as unknown as Array<{
@@ -385,9 +394,9 @@ export async function getCompanyAggregate(companyId: string): Promise<{
     }>,
     counts: {
       leads: subs.length,
-      pulse: 0, // TODO Módulo A
-      stress: 0, // TODO Módulo B
-      esocial: 0, // TODO Módulo C
+      pulse: pulseCount,
+      stress: stressCount,
+      esocial: esocialCounts.total,
     },
   };
 }

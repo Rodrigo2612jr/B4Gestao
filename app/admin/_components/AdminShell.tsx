@@ -30,9 +30,9 @@ interface NavItem {
 const NAV: NavItem[] = [
   { href: "/admin/companies", label: "Empresas", Icon: HiOutlineOfficeBuilding },
   { href: "/admin/leads", label: "Leads do site", Icon: HiOutlineClipboardList },
-  { href: "/admin/pulse", label: "Pulse NR-1", Icon: HiOutlineChartBar, badge: "em breve" },
-  { href: "/admin/stress-test", label: "Stress Test", Icon: HiOutlineExclamationCircle, badge: "em breve" },
-  { href: "/admin/esocial", label: "eSocial Analytics", Icon: HiOutlineDocumentReport, badge: "em breve" },
+  { href: "/admin/pulse", label: "Pulse NR-1", Icon: HiOutlineChartBar },
+  { href: "/admin/stress-test", label: "Stress Test", Icon: HiOutlineExclamationCircle },
+  { href: "/admin/esocial", label: "eSocial Analytics", Icon: HiOutlineDocumentReport },
 ];
 
 export default function AdminShell({ children, title }: { children: ReactNode; title: string }) {

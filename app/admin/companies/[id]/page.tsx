@@ -144,9 +144,9 @@ function CompanyDetailInner({ companyId }: { companyId: string }) {
   const { company, submissions, counts, suggestions } = data;
   const buckets = [
     { key: "leads", label: "Leads do site", count: counts.leads, Icon: HiOutlineClipboardList, href: "#leads", active: true },
-    { key: "pulse", label: "Pulse NR-1", count: counts.pulse, Icon: HiOutlineChartBar, href: "/admin/pulse", active: false },
-    { key: "stress", label: "Stress Test", count: counts.stress, Icon: HiOutlineExclamationCircle, href: "/admin/stress-test", active: false },
-    { key: "esocial", label: "eSocial Analytics", count: counts.esocial, Icon: HiOutlineDocumentReport, href: "/admin/esocial", active: false },
+    { key: "pulse", label: "Pulse NR-1", count: counts.pulse, Icon: HiOutlineChartBar, href: "/admin/pulse", active: true },
+    { key: "stress", label: "Stress Test", count: counts.stress, Icon: HiOutlineExclamationCircle, href: "/admin/stress-test", active: true },
+    { key: "esocial", label: "eSocial alertas", count: counts.esocial, Icon: HiOutlineDocumentReport, href: "/admin/esocial", active: true },
   ];
 
   return (
@@ -213,23 +213,15 @@ function CompanyDetailInner({ companyId }: { companyId: string }) {
       {/* Buckets de módulos */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {buckets.map((b) => (
-          <div
+          <Link
             key={b.key}
-            className={`rounded-xl border bg-white p-4 ${
-              b.active ? "border-primary/30 shadow-sm" : "border-gray-200 opacity-60"
-            }`}
+            href={b.href}
+            className="rounded-xl border border-primary/30 bg-white p-4 shadow-sm transition-all hover:border-primary/60 hover:shadow-md"
           >
-            <div className="flex items-center justify-between">
-              <b.Icon className={`text-2xl ${b.active ? "text-primary" : "text-gray-400"}`} />
-              {!b.active && (
-                <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-gray-500">
-                  em breve
-                </span>
-              )}
-            </div>
+            <b.Icon className="text-2xl text-primary" />
             <p className="mt-3 text-2xl font-bold text-secondary">{b.count}</p>
             <p className="text-xs text-gray-500">{b.label}</p>
-          </div>
+          </Link>
         ))}
       </div>
 
