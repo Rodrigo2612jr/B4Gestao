@@ -1,25 +1,19 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   HiOutlineArrowLeft,
   HiOutlineArrowRight,
   HiOutlineCheck,
-  HiOutlineSearch,
 } from "react-icons/hi";
 import AdminShell from "../../_components/AdminShell";
+import CompanyPickerOrCreate, { type SelectableCompany as Company } from "../../_components/CompanyPickerOrCreate";
 import { useToast } from "../../_components/ToastProvider";
 import { QUESTIONS, type Alternative } from "@/lib/stress-test/questions";
 
 const QUESTIONS_PER_PAGE = 5;
 const TOTAL_PAGES = Math.ceil(QUESTIONS.length / QUESTIONS_PER_PAGE);
-
-interface Company {
-  id: string;
-  name: string;
-  cnpj_formatted: string;
-}
 
 export default function StressTestNewPage() {
   return (
@@ -110,7 +104,7 @@ function Inner() {
       )}
 
       {step === "company" && (
-        <CompanyStep selected={company} onSelect={setCompany} />
+        <CompanyPickerOrCreate selected={company} onSelect={setCompany} title="Empresa auditada" />
       )}
 
       {step === "respondent" && (
@@ -176,73 +170,6 @@ function Inner() {
             : <>Continuar <HiOutlineArrowRight /></>}
         </button>
       </div>
-    </div>
-  );
-}
-
-function CompanyStep({ selected, onSelect }: { selected: Company | null; onSelect: (c: Company) => void }) {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<Company[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(async () => {
-      setLoading(true);
-      try {
-        const url = query.length >= 2 ? `/api/companies?q=${encodeURIComponent(query)}` : "/api/companies";
-        const res = await fetch(url);
-        if (res.ok) setResults(await res.json());
-      } finally {
-        setLoading(false);
-      }
-    }, 250);
-    return () => clearTimeout(t);
-  }, [query]);
-
-  return (
-    <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-secondary">Selecione a empresa auditada</h2>
-      {selected ? (
-        <div className="flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 p-3">
-          <div>
-            <div className="font-medium text-secondary">{selected.name}</div>
-            <div className="font-mono text-xs text-gray-500">{selected.cnpj_formatted}</div>
-          </div>
-          <button onClick={() => onSelect(null as unknown as Company)} className="text-xs font-medium text-gray-500 hover:text-red-600">
-            Trocar
-          </button>
-        </div>
-      ) : (
-        <>
-          <div className="relative">
-            <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-400" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar empresa por nome..."
-              className="w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
-          <div className="max-h-64 space-y-1 overflow-y-auto">
-            {loading ? (
-              <p className="p-3 text-xs text-gray-500">Buscando...</p>
-            ) : results.length === 0 ? (
-              <p className="p-3 text-xs text-gray-500">Nenhuma empresa encontrada.</p>
-            ) : (
-              results.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => onSelect(c)}
-                  className="block w-full rounded-lg border border-gray-200 p-3 text-left transition-colors hover:border-primary/30 hover:bg-primary/5"
-                >
-                  <div className="text-sm font-medium text-gray-900">{c.name}</div>
-                  <div className="font-mono text-xs text-gray-500">{c.cnpj_formatted}</div>
-                </button>
-              ))
-            )}
-          </div>
-        </>
-      )}
     </div>
   );
 }

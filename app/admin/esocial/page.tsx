@@ -6,9 +6,9 @@ import {
   HiOutlineUpload,
   HiOutlineDocumentReport,
   HiOutlineExclamation,
-  HiOutlineSearch,
 } from "react-icons/hi";
 import AdminShell from "../_components/AdminShell";
+import CompanyPickerOrCreate, { type SelectableCompany } from "../_components/CompanyPickerOrCreate";
 import { useToast } from "../_components/ToastProvider";
 
 interface Upload {
@@ -22,7 +22,7 @@ interface Upload {
   createdAt: string;
   error: string | null;
 }
-interface Company { id: string; name: string; cnpj_formatted: string }
+type Company = SelectableCompany;
 
 const SEVERITY_BG = {
   info: "bg-blue-100 text-blue-800",
@@ -141,21 +141,10 @@ function Inner() {
 
 function UploadDialog({ onClose, onDone }: { onClose: () => void; onDone: () => void }) {
   const [company, setCompany] = useState<Company | null>(null);
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<Company[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const { push } = useToast();
-
-  useEffect(() => {
-    const t = setTimeout(async () => {
-      const url = query.length >= 2 ? `/api/companies?q=${encodeURIComponent(query)}` : "/api/companies";
-      const res = await fetch(url);
-      if (res.ok) setResults(await res.json());
-    }, 250);
-    return () => clearTimeout(t);
-  }, [query]);
 
   const submit = async () => {
     if (!company || !file) return setErr("Empresa e arquivo são obrigatórios");
@@ -178,39 +167,11 @@ function UploadDialog({ onClose, onDone }: { onClose: () => void; onDone: () => 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 overflow-y-auto">
+      <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl my-8">
         <h3 className="text-lg font-bold text-secondary">Novo upload do eSocial</h3>
-        <div className="mt-4 space-y-3">
-          <div>
-            <label className="text-xs font-medium text-gray-700">Empresa</label>
-            {company ? (
-              <div className="flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 p-2">
-                <div className="text-sm">{company.name}</div>
-                <button onClick={() => setCompany(null)} className="text-xs text-gray-500 hover:text-red-600">Trocar</button>
-              </div>
-            ) : (
-              <>
-                <div className="relative">
-                  <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-400" />
-                  <input
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Buscar empresa..."
-                    className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-                <div className="mt-1 max-h-40 space-y-1 overflow-y-auto">
-                  {results.map((c) => (
-                    <button key={c.id} onClick={() => setCompany(c)} className="block w-full rounded-lg border border-gray-200 p-2 text-left text-xs hover:border-primary/30 hover:bg-primary/5">
-                      <div className="font-medium">{c.name}</div>
-                      <div className="font-mono text-gray-500">{c.cnpj_formatted}</div>
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
+        <div className="mt-4 space-y-4">
+          <CompanyPickerOrCreate selected={company} onSelect={setCompany} title="Empresa do eSocial" />
           <div>
             <label className="text-xs font-medium text-gray-700">Arquivo (XML/CSV/ZIP, máx 10MB)</label>
             <input
