@@ -156,12 +156,15 @@ export async function countCampaignsByCompany(companyId: string): Promise<number
 export interface AggregateResult {
   totalResponses: number;
   threshold: number;
+  /** Índice global 1-5 (média ponderada por n das áreas válidas). */
+  globalIndex: number;
+  globalLabel: string;
   byDimension: Record<string, { score: number; count: number; pct: number; label: string }>;
   byArea: Record<
     string,
     {
       count: number;
-      blocked: boolean; // true se abaixo do threshold
+      blocked: boolean;
       byDimension?: Record<string, { score: number; pct: number; label: string }>;
     }
   >;
@@ -172,6 +175,8 @@ export interface AggregateResult {
     cells: Array<{ dimension: string; label: string; pct: number | null }>;
   }>;
   quickWins: Array<{ dimension: string; label: string; pct: number; reason: string }>;
+  /** Top 5 perguntas com pior média — drivers que mais puxam o score. */
+  drivers: Array<{ questionId: string; text: string; avgScore: number; dimension: string }>;
 }
 
 export function aggregate(
@@ -183,6 +188,8 @@ export function aggregate(
 
   const byDimensionGlobal: Record<string, { sum: number; count: number; max: number }> = {};
   const byArea: Record<string, { count: number; byDim: Record<string, { sum: number; count: number; max: number }> }> = {};
+  // Para drivers — média por pergunta
+  const byQuestion: Record<string, { sum: number; count: number; text: string; dimension: string }> = {};
 
   for (const r of responses) {
     const area = (r.area || "Sem área").trim();
@@ -195,17 +202,19 @@ export function aggregate(
       const score = q.reverse ? 6 - raw : raw;
       const max = 5;
 
-      // global
       const g = (byDimensionGlobal[q.dimension] ??= { sum: 0, count: 0, max: 0 });
       g.sum += score;
       g.count++;
       g.max += max;
 
-      // por área
       const a = (byArea[area].byDim[q.dimension] ??= { sum: 0, count: 0, max: 0 });
       a.sum += score;
       a.count++;
       a.max += max;
+
+      const qAgg = (byQuestion[q.id] ??= { sum: 0, count: 0, text: q.text, dimension: q.dimension });
+      qAgg.sum += score;
+      qAgg.count++;
     }
   }
 
@@ -268,5 +277,54 @@ export function aggregate(
       reason: v.pct < 40 ? "Dimensão crítica — ação imediata" : "Dimensão de atenção — ação em 30 dias",
     }));
 
-  return { totalResponses: responses.length, threshold, byDimension, byArea: byAreaOut, heatmap, quickWins };
+  // Índice global 1-5 — média ponderada pelo número de respostas de cada área válida
+  let weightedSum = 0;
+  let totalWeight = 0;
+  for (const [, areaData] of Object.entries(byArea)) {
+    if (areaData.count < threshold) continue; // só áreas válidas
+    // Score médio da área (1-5)
+    let areaSum = 0;
+    let areaCount = 0;
+    for (const dim of Object.keys(areaData.byDim)) {
+      const d = areaData.byDim[dim];
+      if (d.count === 0) continue;
+      areaSum += d.sum / d.count;
+      areaCount++;
+    }
+    if (areaCount > 0) {
+      const areaAvg = areaSum / areaCount;
+      weightedSum += areaAvg * areaData.count;
+      totalWeight += areaData.count;
+    }
+  }
+  const globalIndex = totalWeight > 0 ? Math.round((weightedSum / totalWeight) * 10) / 10 : 0;
+  const globalLabel =
+    globalIndex >= 4.0 ? "Clima psicossocial saudável" :
+    globalIndex >= 3.0 ? "Clima moderado — pontos de atenção" :
+    globalIndex >= 2.0 ? "Clima crítico — ação necessária" :
+    "Clima muito crítico — ação urgente";
+
+  // Drivers — top 5 perguntas com menor média
+  const drivers = Object.entries(byQuestion)
+    .filter(([, v]) => v.count > 0)
+    .map(([id, v]) => ({
+      questionId: id,
+      text: v.text,
+      avgScore: Math.round((v.sum / v.count) * 10) / 10,
+      dimension: v.dimension,
+    }))
+    .sort((a, b) => a.avgScore - b.avgScore)
+    .slice(0, 5);
+
+  return {
+    totalResponses: responses.length,
+    threshold,
+    globalIndex,
+    globalLabel,
+    byDimension,
+    byArea: byAreaOut,
+    heatmap,
+    quickWins,
+    drivers,
+  };
 }

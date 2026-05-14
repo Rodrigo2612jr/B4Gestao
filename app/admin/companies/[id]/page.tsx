@@ -228,6 +228,20 @@ function CompanyDetailInner({ companyId }: { companyId: string }) {
         ))}
       </div>
 
+      {/* Link Custo Previsível */}
+      <Link
+        href={`/admin/esocial/custo-previsivel/${company.id}`}
+        className="block rounded-xl border-2 border-dashed border-primary/40 bg-primary/5 p-4 transition-all hover:border-primary hover:bg-primary/10"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-semibold text-primary">💰 Painel Custo Previsível (FAIXAS)</p>
+            <p className="text-xs text-gray-600">Previdenciário · Trabalhista · Operacional · Integridade SST</p>
+          </div>
+          <span className="text-sm font-medium text-primary">Abrir →</span>
+        </div>
+      </Link>
+
       {/* Submissions */}
       <div id="leads" className="rounded-xl border border-gray-200 bg-white shadow-sm">
         <div className="border-b border-gray-200 p-4">

@@ -29,6 +29,8 @@ export interface Submission {
   company_id?: string | null;
 }
 
+export type AdminRole = "ADMIN" | "SST" | "RH" | "JURIDICO";
+
 export interface AdminUser {
   id: string;
   email: string;
@@ -37,6 +39,7 @@ export interface AdminUser {
   must_change_password: boolean;
   created_at: string;
   last_login: string | null;
+  role: AdminRole;
 }
 
 /**
@@ -122,8 +125,17 @@ export async function initDb(): Promise<void> {
         name TEXT NOT NULL,
         must_change_password BOOLEAN NOT NULL DEFAULT TRUE,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        last_login TIMESTAMPTZ
+        last_login TIMESTAMPTZ,
+        role TEXT NOT NULL DEFAULT 'ADMIN'
       )
+    `;
+    // Migration idempotente — adicionar role se não existir
+    await sql`
+      DO $$ BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='admin_users' AND column_name='role') THEN
+          ALTER TABLE admin_users ADD COLUMN role TEXT NOT NULL DEFAULT 'ADMIN';
+        END IF;
+      END $$
     `;
 
     // ============================================================
@@ -446,7 +458,7 @@ export async function findUserByEmail(email: string): Promise<AdminUser | null> 
   if (!sql) return null;
   await initDb();
   const rows = await sql`
-    SELECT id, email, password_hash, name, must_change_password,
+    SELECT id, email, password_hash, name, must_change_password, role,
            to_char(created_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS created_at,
            to_char(last_login, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS last_login
     FROM admin_users
@@ -509,7 +521,7 @@ export async function listUsers(): Promise<Omit<AdminUser, "password_hash">[]> {
   if (!sql) return [];
   await initDb();
   const rows = await sql`
-    SELECT id, email, name, must_change_password,
+    SELECT id, email, name, must_change_password, role,
            to_char(created_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS created_at,
            to_char(last_login, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS last_login
     FROM admin_users

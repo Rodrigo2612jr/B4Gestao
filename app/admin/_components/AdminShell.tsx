@@ -24,16 +24,24 @@ interface NavItem {
   href: string;
   label: string;
   Icon: React.ComponentType<{ className?: string }>;
+  module: "companies" | "leads" | "pulse" | "stress" | "esocial" | "users";
   badge?: string;
 }
 
 const NAV: NavItem[] = [
-  { href: "/admin/companies", label: "Empresas", Icon: HiOutlineOfficeBuilding },
-  { href: "/admin/leads", label: "Leads do site", Icon: HiOutlineClipboardList },
-  { href: "/admin/pulse", label: "Pulse NR-1", Icon: HiOutlineChartBar },
-  { href: "/admin/stress-test", label: "Stress Test", Icon: HiOutlineExclamationCircle },
-  { href: "/admin/esocial", label: "eSocial Analytics", Icon: HiOutlineDocumentReport },
+  { href: "/admin/companies", label: "Empresas", Icon: HiOutlineOfficeBuilding, module: "companies" },
+  { href: "/admin/leads", label: "Leads do site", Icon: HiOutlineClipboardList, module: "leads" },
+  { href: "/admin/pulse", label: "Pulse NR-1", Icon: HiOutlineChartBar, module: "pulse" },
+  { href: "/admin/stress-test", label: "Stress Test", Icon: HiOutlineExclamationCircle, module: "stress" },
+  { href: "/admin/esocial", label: "eSocial Analytics", Icon: HiOutlineDocumentReport, module: "esocial" },
 ];
+
+const ROLE_PERMS: Record<string, string[]> = {
+  ADMIN: ["companies", "leads", "pulse", "stress", "esocial", "users"],
+  SST: ["companies", "leads", "pulse", "stress", "esocial"],
+  RH: ["companies", "pulse", "stress"],
+  JURIDICO: ["companies", "esocial"],
+};
 
 export default function AdminShell({ children, title }: { children: ReactNode; title: string }) {
   return (
@@ -47,6 +55,7 @@ function AdminShellInner({ children, title }: { children: ReactNode; title: stri
   const pathname = usePathname();
   const [authState, setAuthState] = useState<"loading" | "in" | "out">("loading");
   const [userName, setUserName] = useState("");
+  const [userRole, setUserRole] = useState<string>("ADMIN");
   const [showChangePwd, setShowChangePwd] = useState(false);
   const [forcedChangePwd, setForcedChangePwd] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -61,6 +70,7 @@ function AdminShellInner({ children, title }: { children: ReactNode; title: stri
       }
       const data = await res.json();
       setUserName(data.user?.name ?? "");
+      setUserRole(data.user?.role ?? "ADMIN");
       if (data.user?.mustChangePassword) {
         setForcedChangePwd(true);
         setShowChangePwd(true);
@@ -110,7 +120,7 @@ function AdminShellInner({ children, title }: { children: ReactNode; title: stri
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar — desktop */}
       <aside className="hidden w-64 flex-shrink-0 border-r border-gray-200 bg-white lg:flex lg:flex-col">
-        <SidebarContent pathname={pathname} onNavigate={() => setSidebarOpen(false)} />
+        <SidebarContent pathname={pathname} userRole={userRole} onNavigate={() => setSidebarOpen(false)} />
       </aside>
 
       {/* Sidebar — mobile (drawer) */}
@@ -121,7 +131,7 @@ function AdminShellInner({ children, title }: { children: ReactNode; title: stri
             onClick={() => setSidebarOpen(false)}
           />
           <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-white shadow-xl lg:hidden">
-            <SidebarContent pathname={pathname} onNavigate={() => setSidebarOpen(false)} />
+            <SidebarContent pathname={pathname} userRole={userRole} onNavigate={() => setSidebarOpen(false)} />
           </aside>
         </>
       )}
@@ -204,11 +214,16 @@ function AdminShellInner({ children, title }: { children: ReactNode; title: stri
 
 function SidebarContent({
   pathname,
+  userRole,
   onNavigate,
 }: {
   pathname: string;
+  userRole: string;
   onNavigate: () => void;
 }) {
+  const allowedModules = ROLE_PERMS[userRole] ?? ROLE_PERMS["ADMIN"];
+  const visibleNav = NAV.filter((item) => allowedModules.includes(item.module));
+
   return (
     <>
       <div className="flex items-center gap-3 border-b border-gray-200 px-5 py-4">
@@ -225,12 +240,12 @@ function SidebarContent({
             B4 Admin
           </div>
           <div className="text-[10px] uppercase tracking-wider text-gray-400">
-            Gestão Ocupacional
+            {userRole}
           </div>
         </div>
       </div>
       <nav className="flex-1 space-y-1 p-3">
-        {NAV.map((item) => {
+        {visibleNav.map((item) => {
           const active = pathname?.startsWith(item.href);
           return (
             <Link

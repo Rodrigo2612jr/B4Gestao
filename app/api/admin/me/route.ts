@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
       name: user.name,
       mustChangePassword: user.must_change_password,
       lastLogin: user.last_login,
+      role: user.role ?? "ADMIN",
     },
   });
 }

@@ -67,7 +67,7 @@ export async function generatePulsePptx(input: PulseReportInput): Promise<Buffer
 
   const cards = [
     { label: "Respostas coletadas", value: String(aggregate.totalResponses) },
-    { label: "Score médio (0-100)", value: `${avgPct}` },
+    { label: "Índice global (1-5)", value: aggregate.globalIndex ? aggregate.globalIndex.toFixed(1) : "—" },
     { label: "Dimensões críticas", value: String(criticalDims) },
     { label: "Áreas com agregado visível", value: `${visibleAreas} / ${aggregate.heatmap.length}` },
   ];

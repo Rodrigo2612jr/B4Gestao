@@ -26,8 +26,11 @@ interface Data {
   aggregate: {
     totalResponses: number;
     threshold: number;
+    globalIndex: number;
+    globalLabel: string;
     byDimension: Record<string, { score: number; pct: number; count: number; label: string }>;
     quickWins: Array<{ dimension: string; label: string; pct: number; reason: string }>;
+    drivers: Array<{ questionId: string; text: string; avgScore: number; dimension: string }>;
     heatmap: Array<{
       area: string;
       blocked: boolean;
@@ -113,6 +116,28 @@ function Inner({ id }: { id: string }) {
           {data.aggregate.totalResponses} resposta{data.aggregate.totalResponses !== 1 ? "s" : ""} · {data.campaign.areas.length} áreas · threshold {data.campaign.threshold}
         </p>
 
+        {/* Índice global */}
+        <div className={`mt-4 rounded-xl border-2 p-4 ${
+          data.aggregate.globalIndex >= 4.0 ? "border-emerald-200 bg-emerald-50" :
+          data.aggregate.globalIndex >= 3.0 ? "border-yellow-200 bg-yellow-50" :
+          "border-red-200 bg-red-50"
+        }`}>
+          <div className="flex items-center gap-4">
+            <div className={`flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full text-2xl font-bold text-white ${
+              data.aggregate.globalIndex >= 4.0 ? "bg-emerald-500" :
+              data.aggregate.globalIndex >= 3.0 ? "bg-yellow-500" :
+              "bg-red-500"
+            }`}>
+              {data.aggregate.globalIndex.toFixed(1)}
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Índice global Pulse (1-5)</p>
+              <p className="text-lg font-bold text-secondary">{data.aggregate.globalLabel}</p>
+              <p className="mt-0.5 text-xs text-gray-500">Média ponderada por n das áreas válidas</p>
+            </div>
+          </div>
+        </div>
+
         {/* Public URL */}
         <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-3">
           <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Link público para respondentes</p>
@@ -149,6 +174,33 @@ function Inner({ id }: { id: string }) {
                 }`}>
                   {w.pct}%
                 </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Drivers — top 5 perguntas mais críticas */}
+      {data.aggregate.drivers && data.aggregate.drivers.length > 0 && (
+        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">
+            Drivers — perguntas que mais puxam o score pra baixo
+          </h3>
+          <p className="mt-1 text-xs text-gray-500">Top 5 com menor média de concordância (1-5).</p>
+          <ul className="mt-3 space-y-2">
+            {data.aggregate.drivers.map((d) => (
+              <li key={d.questionId} className="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
+                <span className={`flex h-10 w-12 flex-shrink-0 items-center justify-center rounded text-sm font-bold ${
+                  d.avgScore < 2.5 ? "bg-red-500 text-white" :
+                  d.avgScore < 3.5 ? "bg-yellow-500 text-white" :
+                  "bg-emerald-500 text-white"
+                }`}>
+                  {d.avgScore.toFixed(1)}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-gray-900">{d.text}</p>
+                  <p className="text-xs text-gray-500">Dimensão: {d.dimension}</p>
+                </div>
               </li>
             ))}
           </ul>
