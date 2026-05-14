@@ -23,6 +23,7 @@ export default function PulseRespondPage({ params }: { params: Promise<{ token: 
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [showMissingHighlight, setShowMissingHighlight] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -44,10 +45,20 @@ export default function PulseRespondPage({ params }: { params: Promise<{ token: 
 
   const submit = async () => {
     if (!campaign) return;
-    if (!area) return alert("Selecione sua área");
+    if (!area) {
+      alert("Selecione sua área antes de enviar");
+      document.getElementById("area-selector")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
     const missing = campaign.questions.filter((q) => !answers[q.id]);
-    if (missing.length > 0) return alert(`Faltam ${missing.length} respostas.`);
+    if (missing.length > 0) {
+      setShowMissingHighlight(true);
+      const first = document.getElementById(`q-${missing[0].id}`);
+      if (first) first.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
 
+    setShowMissingHighlight(false);
     setSubmitting(true);
     try {
       const res = await fetch(`/api/pulse/public/${token}`, {
@@ -60,6 +71,8 @@ export default function PulseRespondPage({ params }: { params: Promise<{ token: 
         const d = await res.json().catch(() => ({}));
         alert(d.error || "Erro ao enviar");
       }
+    } catch {
+      alert("Erro de conexão. Tente novamente.");
     } finally {
       setSubmitting(false);
     }
@@ -104,7 +117,7 @@ export default function PulseRespondPage({ params }: { params: Promise<{ token: 
           </p>
         </header>
 
-        <div className="rounded-xl bg-white p-5 shadow-sm">
+        <div id="area-selector" className="rounded-xl bg-white p-5 shadow-sm">
           <label className="text-sm font-medium text-gray-700">Sua área *</label>
           <select
             value={area}
@@ -117,11 +130,26 @@ export default function PulseRespondPage({ params }: { params: Promise<{ token: 
           <p className="mt-2 text-xs text-gray-500">Resultados só são divulgados quando há respostas suficientes na sua área.</p>
         </div>
 
-        {campaign.questions.map((q, idx) => (
-          <div key={q.id} className="rounded-xl bg-white p-5 shadow-sm">
+        {campaign.questions.map((q, idx) => {
+          const isMissing = !answers[q.id];
+          const highlight = showMissingHighlight && isMissing;
+          return (
+          <div
+            key={q.id}
+            id={`q-${q.id}`}
+            className={`rounded-xl bg-white p-5 shadow-sm transition-all ${
+              highlight ? "ring-2 ring-red-500 ring-offset-2" : ""
+            }`}
+          >
+            {highlight && (
+              <p className="mb-3 rounded-md bg-red-50 px-3 py-2 text-xs font-medium text-red-700">
+                ⚠ Resposta obrigatória
+              </p>
+            )}
             <p className="text-sm font-medium text-gray-900">
               <span className="text-primary font-bold mr-2">{idx + 1}.</span>
               {q.text}
+              <span className="text-red-500 ml-0.5">*</span>
             </p>
             <div className="mt-3 grid grid-cols-5 gap-1.5">
               {[1, 2, 3, 4, 5].map((v) => {
@@ -148,15 +176,33 @@ export default function PulseRespondPage({ params }: { params: Promise<{ token: 
               <span>Concordo</span>
             </div>
           </div>
-        ))}
+          );
+        })}
 
-        <button
-          onClick={submit}
-          disabled={submitting}
-          className="sticky bottom-4 w-full rounded-xl bg-primary px-6 py-3 text-base font-bold text-white shadow-lg hover:bg-primary-dark disabled:opacity-60"
-        >
-          {submitting ? "Enviando..." : "Enviar respostas"}
-        </button>
+        {(() => {
+          const remaining = campaign.questions.filter((q) => !answers[q.id]).length;
+          const allDone = remaining === 0 && !!area;
+          return (
+            <div className="sticky bottom-4 flex flex-col gap-1">
+              {!allDone && (
+                <p className="text-center text-xs font-medium text-red-600">
+                  {!area
+                    ? "Selecione sua área para enviar"
+                    : `${remaining} resposta${remaining !== 1 ? "s" : ""} ainda faltando`}
+                </p>
+              )}
+              <button
+                onClick={submit}
+                disabled={submitting}
+                className={`w-full rounded-xl px-6 py-3 text-base font-bold text-white shadow-lg disabled:opacity-60 ${
+                  allDone ? "bg-primary hover:bg-primary-dark" : "bg-gray-400 hover:bg-gray-500"
+                }`}
+              >
+                {submitting ? "Enviando..." : "Enviar respostas"}
+              </button>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );

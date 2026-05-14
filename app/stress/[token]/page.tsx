@@ -31,6 +31,7 @@ export default function StressPublicPage({ params }: { params: Promise<{ token: 
   const [answers, setAnswers] = useState<Record<string, Alternative>>({});
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{ total: number; semaforo: string; semaforoLabel: string } | null>(null);
+  const [showMissingHighlight, setShowMissingHighlight] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -154,14 +155,30 @@ export default function StressPublicPage({ params }: { params: Promise<{ token: 
   const answered = Object.keys(answers).length;
   const progress = Math.round((answered / data.questions.length) * 100);
 
+  // Quais perguntas DESTA página não foram respondidas
+  const pageMissing = slice.filter((q) => !answers[q.id]).map((q) => q.id);
+  const pageComplete = pageMissing.length === 0;
+
   const next = async () => {
+    if (!pageComplete) {
+      setShowMissingHighlight(true);
+      // Scroll até a primeira pergunta não respondida
+      const el = document.getElementById(`q-${pageMissing[0]}`);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    setShowMissingHighlight(false);
+
     if (pageIdx < totalPages - 1) {
       setStep(pageIdx + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
-      // Final — submit
+      // Final — verifica global e submete
       const missing = data.questions.filter((q) => !answers[q.id]);
-      if (missing.length > 0) return alert(`Faltam ${missing.length} respostas`);
+      if (missing.length > 0) {
+        alert(`Ainda faltam ${missing.length} respostas em páginas anteriores`);
+        return;
+      }
       setSubmitting(true);
       try {
         const res = await fetch(`/api/stress-test/public/${token}`, {
@@ -170,11 +187,11 @@ export default function StressPublicPage({ params }: { params: Promise<{ token: 
           body: JSON.stringify({ respondentName, respondentRole: respondentRole || undefined, answers }),
         });
         const d = await res.json();
-        if (!res.ok) throw new Error(d.error || "Erro");
+        if (!res.ok) throw new Error(d.error || "Erro ao enviar");
         setResult({ total: d.result.total, semaforo: d.result.semaforo, semaforoLabel: d.result.semaforoLabel });
         setStep("done");
       } catch (e) {
-        alert(e instanceof Error ? e.message : "Erro");
+        alert(e instanceof Error ? e.message : "Erro ao salvar. Tente novamente.");
       } finally {
         setSubmitting(false);
       }
@@ -196,11 +213,26 @@ export default function StressPublicPage({ params }: { params: Promise<{ token: 
       </div>
 
       <div className="mx-auto max-w-2xl space-y-3 p-4">
-        {slice.map((q) => (
-          <div key={q.id} className="rounded-2xl bg-white p-5 shadow-sm">
+        {slice.map((q) => {
+          const isMissing = !answers[q.id];
+          const highlight = showMissingHighlight && isMissing;
+          return (
+          <div
+            key={q.id}
+            id={`q-${q.id}`}
+            className={`rounded-2xl bg-white p-5 shadow-sm transition-all ${
+              highlight ? "ring-2 ring-red-500 ring-offset-2" : ""
+            }`}
+          >
+            {highlight && (
+              <p className="mb-3 rounded-md bg-red-50 px-3 py-2 text-xs font-medium text-red-700">
+                ⚠ Resposta obrigatória — selecione uma alternativa
+              </p>
+            )}
             <div className="flex items-start gap-3">
               <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                 {q.id.replace("Q", "")}
+                <span className="text-red-500 ml-0.5">*</span>
               </span>
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-900">{q.text}</p>
@@ -231,21 +263,35 @@ export default function StressPublicPage({ params }: { params: Promise<{ token: 
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="fixed bottom-0 inset-x-0 z-20 border-t border-gray-200 bg-white p-3">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
           {pageIdx > 0 ? (
-            <button onClick={() => { setStep(pageIdx - 1); window.scrollTo({ top: 0 }); }} className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700">
+            <button onClick={() => { setShowMissingHighlight(false); setStep(pageIdx - 1); window.scrollTo({ top: 0 }); }} className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700">
               <HiOutlineArrowLeft /> Voltar
             </button>
           ) : <div />}
-          <button onClick={next} disabled={submitting} className="flex items-center gap-1.5 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white disabled:opacity-60">
-            {pageIdx === totalPages - 1
-              ? (submitting ? "Calculando..." : <>Finalizar <HiOutlineCheckCircle /></>)
-              : <>Continuar <HiOutlineArrowRight /></>}
-          </button>
+          <div className="flex flex-col items-end gap-1">
+            {!pageComplete && (
+              <span className="text-[11px] font-medium text-red-600">
+                {pageMissing.length} resposta{pageMissing.length !== 1 ? "s" : ""} faltando nesta página
+              </span>
+            )}
+            <button
+              onClick={next}
+              disabled={submitting}
+              className={`flex items-center gap-1.5 rounded-lg px-5 py-2 text-sm font-semibold text-white shadow-sm disabled:opacity-60 ${
+                pageComplete ? "bg-primary hover:bg-primary-dark" : "bg-gray-400 hover:bg-gray-500"
+              }`}
+            >
+              {pageIdx === totalPages - 1
+                ? (submitting ? "Calculando..." : <>Finalizar <HiOutlineCheckCircle /></>)
+                : <>Continuar <HiOutlineArrowRight /></>}
+            </button>
+          </div>
         </div>
       </div>
     </div>
