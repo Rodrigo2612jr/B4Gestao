@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { HiOutlineRefresh, HiOutlineDownload } from "react-icons/hi";
 import AdminShell from "../_components/AdminShell";
+import PageHeader from "../_components/PageHeader";
 import StatsGrid from "../_components/StatsGrid";
 import FilterBar from "../_components/FilterBar";
 import LeadsTable from "../_components/LeadsTable";
@@ -75,30 +76,41 @@ function LeadsInner() {
   }, []);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-gray-500">
-          {submissions.length} {submissions.length === 1 ? "lead recebido" : "leads recebidos"}
-        </p>
-        <div className="flex gap-2">
-          <button
-            onClick={handleRefresh}
-            disabled={loading}
-            className="flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-xs font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:opacity-50 sm:h-10 sm:px-4 sm:text-sm"
-          >
-            <HiOutlineRefresh className={loading ? "animate-spin" : ""} />
-            <span className="hidden sm:inline">Atualizar</span>
-          </button>
-          <button
-            onClick={handleExport}
-            disabled={filtered.length === 0}
-            className="flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-semibold text-white shadow-sm transition-all hover:bg-primary-dark disabled:opacity-50 sm:h-10 sm:px-4 sm:text-sm"
-          >
-            <HiOutlineDownload />
-            <span className="hidden sm:inline">Exportar CSV</span>
-          </button>
-        </div>
-      </div>
+    <div>
+      <PageHeader
+        title="Leads do site"
+        subtitle="Submissões do formulário público. Cada lead já vem com CNPJ obrigatório e vinculação automática à empresa."
+        breadcrumbs={[{ label: "Painel B4", href: "/admin" }, { label: "Leads do site" }]}
+        accent="emerald"
+        meta={
+          !loading && submissions.length > 0 ? (
+            <span className="rounded-md bg-emerald-100 px-2 py-0.5 font-mono text-xs font-bold text-emerald-700">
+              {submissions.length}
+            </span>
+          ) : undefined
+        }
+        actions={
+          <div className="flex gap-2">
+            <button
+              onClick={handleRefresh}
+              disabled={loading}
+              className="flex h-10 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 transition-all hover:bg-slate-50 disabled:opacity-50"
+            >
+              <HiOutlineRefresh className={loading ? "animate-spin" : ""} />
+              <span className="hidden sm:inline">Atualizar</span>
+            </button>
+            <button
+              onClick={handleExport}
+              disabled={filtered.length === 0}
+              className="flex h-10 items-center gap-1.5 rounded-lg bg-secondary px-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-secondary/90 disabled:opacity-50"
+            >
+              <HiOutlineDownload />
+              <span className="hidden sm:inline">Exportar CSV</span>
+            </button>
+          </div>
+        }
+      />
+      <div className="space-y-6">
 
       {loading && submissions.length === 0 ? (
         <StatsSkeleton />
@@ -172,6 +184,7 @@ function LeadsInner() {
           }
         }}
       />
+      </div>
     </div>
   );
 }

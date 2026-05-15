@@ -8,6 +8,8 @@ import {
   HiOutlineExclamation,
 } from "react-icons/hi";
 import AdminShell from "../_components/AdminShell";
+import PageHeader from "../_components/PageHeader";
+import EmptyState from "../_components/EmptyState";
 import CompanyPickerOrCreate, { type SelectableCompany } from "../_components/CompanyPickerOrCreate";
 import { useToast } from "../_components/ToastProvider";
 
@@ -59,35 +61,34 @@ function Inner() {
   useEffect(() => { load(); }, [load]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-500">
-          {uploads.length} {uploads.length === 1 ? "upload" : "uploads"}
-        </p>
-        <button
-          onClick={() => setShowUpload(true)}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark"
-        >
-          <HiOutlineUpload /> Novo upload eSocial
-        </button>
-      </div>
-
-      {loading ? (
-        <div className="rounded-xl bg-white p-12 text-center text-sm text-gray-500">Carregando...</div>
-      ) : uploads.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-300 bg-white p-12 text-center">
-          <HiOutlineDocumentReport className="mx-auto text-5xl text-gray-300" />
-          <p className="mt-3 text-sm text-gray-500">Nenhum upload do eSocial ainda.</p>
-          <p className="mt-1 text-xs text-gray-400">
-            Aceita XML, CSV e ZIP (até 10MB). O parser v1 detecta padrões — versão completa em desenvolvimento.
-          </p>
+    <div>
+      <PageHeader
+        title="eSocial Analytics"
+        subtitle="Ingestão de XML/ZIP/CSV do eSocial com cruzamento temporal (S-2240×S-2220, S-2210×S-2230) e detecção de passivos."
+        breadcrumbs={[{ label: "Painel B4", href: "/admin" }, { label: "eSocial Analytics" }]}
+        accent="rose"
+        meta={
+          !loading && uploads.length > 0 ? (
+            <span className="rounded-md bg-rose-100 px-2 py-0.5 font-mono text-xs font-bold text-rose-700">
+              {uploads.length}
+            </span>
+          ) : undefined
+        }
+        actions={
           <button
             onClick={() => setShowUpload(true)}
-            className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-secondary px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-secondary/90"
           >
-            <HiOutlineUpload /> Fazer primeiro upload
+            <HiOutlineUpload /> Novo upload
           </button>
-        </div>
+        }
+      />
+      <div className="space-y-6">
+
+      {loading ? (
+        <div className="rounded-xl border border-slate-200 bg-white p-12 text-center text-sm text-slate-500">Carregando...</div>
+      ) : uploads.length === 0 ? (
+        <EmptyState variant="no-uploads" action={{ label: "Fazer primeiro upload", onClick: () => setShowUpload(true) }} />
       ) : (
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
           <table className="min-w-full divide-y divide-gray-200">
@@ -135,6 +136,7 @@ function Inner() {
       )}
 
       {showUpload && <UploadDialog onClose={() => setShowUpload(false)} onDone={() => { setShowUpload(false); load(); }} />}
+      </div>
     </div>
   );
 }
