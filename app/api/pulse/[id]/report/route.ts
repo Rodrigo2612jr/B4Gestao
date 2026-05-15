@@ -4,6 +4,7 @@ import { getCampaign, listResponses, aggregate } from "@/lib/pulse/db";
 import { findCompanyById } from "@/lib/companies";
 import { generatePulsePptx } from "@/lib/reports/pulse-pptx";
 import { generatePulseDashboardPptx } from "@/lib/reports/dashboard-pptx";
+import { generatePulseNarrativeLocal } from "@/lib/reports/narrative-local";
 
 export const runtime = "nodejs";
 
@@ -36,12 +37,18 @@ export async function GET(
       aggregate: agg,
     });
   } else {
+    const narrative = generatePulseNarrativeLocal({
+      companyName: company?.name ?? "Empresa",
+      campaignTitle: campaign.title,
+      aggregate: agg,
+    });
     buffer = await generatePulsePptx({
       companyName: company?.name ?? "Empresa",
       cnpj: company?.cnpj_formatted ?? "—",
       campaignTitle: campaign.title,
       createdAt: campaign.created_at,
       aggregate: agg,
+      narrative,
     });
   }
 

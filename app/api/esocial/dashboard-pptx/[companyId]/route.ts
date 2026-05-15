@@ -4,6 +4,7 @@ import { findCompanyById } from "@/lib/companies";
 import { listAlerts } from "@/lib/esocial/db";
 import { calculateCostPanel } from "@/lib/esocial/custo-previsivel";
 import { generateESocialDashboardPptx } from "@/lib/reports/dashboard-pptx";
+import { generateESocialNarrativeLocal } from "@/lib/reports/narrative-local";
 
 export const runtime = "nodejs";
 
@@ -36,6 +37,21 @@ export async function GET(
     else if (a.severity === "warn" && alertsByCode[code].severity !== "critical") alertsByCode[code].severity = "warn";
   }
 
+  // Narrativa local — usa o disclaimer redigido + recomendações na metadata
+  const narrative = generateESocialNarrativeLocal({
+    companyName: company.name,
+    integrityScore: panel.integrityScore,
+    totalAlertsActive: panel.totalAlertsActive,
+    criticalAlerts: panel.criticalAlerts,
+    bands: panel.bands.map((b) => ({
+      category: b.category,
+      faixa: b.faixa,
+      rangeLow: b.rangeLow,
+      rangeHigh: b.rangeHigh,
+      label: b.label,
+    })),
+  });
+
   const buffer = await generateESocialDashboardPptx({
     companyName: company.name,
     cnpj: company.cnpj_formatted,
@@ -51,7 +67,8 @@ export async function GET(
       rangeLow: b.rangeLow,
       rangeHigh: b.rangeHigh,
     })),
-    disclaimer: panel.disclaimer,
+    // Disclaimer da narrativa local sobrescreve (mais elaborado)
+    disclaimer: narrative.disclaimer,
   });
 
   const safeName = company.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40);

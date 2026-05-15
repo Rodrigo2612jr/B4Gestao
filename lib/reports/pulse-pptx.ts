@@ -23,6 +23,13 @@ export interface PulseReportInput {
   campaignTitle: string;
   createdAt: string;
   aggregate: AggregateResult;
+  narrative?: {
+    executiveSummary: string;
+    driversAnalysis: string;
+    topRecommendations: string[];
+    cta: string;
+    disclaimer: string;
+  } | null;
 }
 
 function cellHexFromPct(pct: number | null): string {
@@ -169,6 +176,27 @@ export async function generatePulsePptx(input: PulseReportInput): Promise<Buffer
       s5.addText(w.label, { x: 0.9, y: y + 0.1, w: 10, h: 0.4, fontSize: 16, color: B4_DARK, bold: true, fontFace: "Calibri" });
       s5.addText(w.reason, { x: 0.9, y: y + 0.5, w: 10, h: 0.4, fontSize: 12, color: "666666", fontFace: "Calibri" });
       s5.addText(`${w.pct}%`, { x: 11, y, w: 1.5, h: 0.9, fontSize: 24, color: w.pct < 40 ? "EF4444" : "F59E0B", bold: true, valign: "middle", align: "center", fontFace: "Calibri" });
+    });
+  }
+
+  // ============ SLIDE NARRATIVA EXECUTIVA (local) ============
+  if (input.narrative) {
+    const sN = pres.addSlide();
+    sN.background = { color: "FFFFFF" };
+    sN.addText("Análise executiva", { x: 0.5, y: 0.3, w: 12, h: 0.6, fontSize: 28, color: B4_DARK, bold: true, fontFace: "Calibri" });
+    sN.addShape(pres.ShapeType.line, { x: 0.5, y: 0.95, w: 1.5, h: 0, line: { color: B4_PRIMARY, width: 4 } });
+
+    sN.addText("RESUMO EXECUTIVO", { x: 0.5, y: 1.3, w: 12, h: 0.3, fontSize: 11, color: "888888", bold: true, fontFace: "Calibri" });
+    sN.addText(input.narrative.executiveSummary, { x: 0.5, y: 1.65, w: 12, h: 1.4, fontSize: 13, color: B4_DARK, fontFace: "Calibri", valign: "top" });
+
+    sN.addText("ANÁLISE DE DRIVERS", { x: 0.5, y: 3.2, w: 12, h: 0.3, fontSize: 11, color: "888888", bold: true, fontFace: "Calibri" });
+    sN.addText(input.narrative.driversAnalysis, { x: 0.5, y: 3.55, w: 12, h: 1.3, fontSize: 12, color: B4_DARK, fontFace: "Calibri", valign: "top" });
+
+    sN.addText("RECOMENDAÇÕES PRIORITÁRIAS", { x: 0.5, y: 5.0, w: 12, h: 0.3, fontSize: 11, color: "888888", bold: true, fontFace: "Calibri" });
+    input.narrative.topRecommendations.slice(0, 3).forEach((rec, idx) => {
+      const y = 5.4 + idx * 0.45;
+      sN.addShape(pres.ShapeType.rect, { x: 0.5, y, w: 0.15, h: 0.35, fill: { color: B4_PRIMARY }, line: { type: "none" } });
+      sN.addText(rec, { x: 0.8, y, w: 11.7, h: 0.35, fontSize: 11, color: B4_DARK, valign: "middle", fontFace: "Calibri" });
     });
   }
 

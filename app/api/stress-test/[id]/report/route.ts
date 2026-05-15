@@ -4,7 +4,7 @@ import { getStressAudit } from "@/lib/stress-test/db";
 import { findCompanyById } from "@/lib/companies";
 import { generateStressTestPptx } from "@/lib/reports/stress-pptx";
 import { generateStressDashboardPptx } from "@/lib/reports/dashboard-pptx";
-import { generateStressNarrative } from "@/lib/ai/anthropic";
+import { generateStressNarrativeLocal } from "@/lib/reports/narrative-local";
 
 export const runtime = "nodejs";
 
@@ -35,23 +35,10 @@ export async function GET(
       result: audit.result_json,
     });
   } else {
-    // Tenta gerar narrativa AI (silencioso se falhar — usa fallback)
-    const narrative = await generateStressNarrative({
+    // Narrativa gerada localmente (determinística, sem IA externa)
+    const narrative = generateStressNarrativeLocal({
       companyName: company?.name ?? "Empresa",
-      scoreTotal: audit.result_json.total,
-      semaforo: audit.result_json.semaforo,
-      semaforoLabel: audit.result_json.semaforoLabel,
-      engavetamento: {
-        classification: audit.result_json.engavetamento.classification ?? "",
-        score: audit.result_json.engavetamento.score,
-        max: audit.result_json.engavetamento.max,
-      },
-      faixa: audit.result_json.faixa,
-      coerencia: {
-        label: audit.result_json.coerencia.label,
-        description: audit.result_json.coerencia.description,
-      },
-      weakSpots: audit.result_json.weakSpots.map((w) => ({ id: w.id, text: w.text, chosen: w.chosen })),
+      result: audit.result_json,
     });
     buffer = await generateStressTestPptx({
       companyName: company?.name ?? "Empresa não vinculada",
