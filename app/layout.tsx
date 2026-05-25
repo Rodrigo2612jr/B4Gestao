@@ -16,10 +16,7 @@ const display = Outfit({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://b4gestao.com.br"),
-  icons: {
-    icon: "/images/logo-icon.png",
-    apple: "/images/logo-icon.png",
-  },
+  // Favicons via convenção: app/icon.png (64×64) e app/apple-icon.png (180×180)
   other: {
     "theme-color": "#0e427b",
     "apple-mobile-web-app-capable": "yes",
