@@ -11,6 +11,7 @@ import { sql, initDb, logAudit } from "./db";
 import { countStressByCompany } from "./stress-test/db";
 import { countCampaignsByCompany } from "./pulse/db";
 import { countAlertsByCompany } from "./esocial/db";
+import { countAEPByCompany } from "./aep/db";
 
 // ============================================================
 // CNPJ helpers
@@ -357,13 +358,13 @@ export async function getCompanyAggregate(companyId: string): Promise<{
     telefone: string;
     criado_em: string;
   }>;
-  counts: { leads: number; pulse: number; stress: number; esocial: number };
+  counts: { leads: number; pulse: number; stress: number; esocial: number; aep: number };
 }> {
-  if (!sql) return { company: null, submissions: [], counts: { leads: 0, pulse: 0, stress: 0, esocial: 0 } };
+  if (!sql) return { company: null, submissions: [], counts: { leads: 0, pulse: 0, stress: 0, esocial: 0, aep: 0 } };
   await initDb();
 
   const company = await findCompanyById(companyId);
-  if (!company) return { company: null, submissions: [], counts: { leads: 0, pulse: 0, stress: 0, esocial: 0 } };
+  if (!company) return { company: null, submissions: [], counts: { leads: 0, pulse: 0, stress: 0, esocial: 0, aep: 0 } };
 
   const subs = await sql`
     SELECT id, funcionarios, necessidade, regiao, empresa, cnpj, nome, telefone,
@@ -373,10 +374,11 @@ export async function getCompanyAggregate(companyId: string): Promise<{
     ORDER BY criado_em DESC
   `;
 
-  const [pulseCount, stressCount, esocialCounts] = await Promise.all([
+  const [pulseCount, stressCount, esocialCounts, aepCount] = await Promise.all([
     countCampaignsByCompany(companyId),
     countStressByCompany(companyId),
     countAlertsByCompany(companyId),
+    countAEPByCompany(companyId),
   ]);
 
   return {
@@ -397,6 +399,7 @@ export async function getCompanyAggregate(companyId: string): Promise<{
       pulse: pulseCount,
       stress: stressCount,
       esocial: esocialCounts.total,
+      aep: aepCount,
     },
   };
 }

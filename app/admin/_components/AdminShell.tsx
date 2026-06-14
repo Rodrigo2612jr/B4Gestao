@@ -19,6 +19,7 @@ import {
   HiOutlineChevronDown,
   HiOutlineSearch,
   HiOutlineSparkles,
+  HiOutlineClipboardCheck,
 } from "react-icons/hi";
 import LoginCard from "./LoginCard";
 import ChangePasswordDialog from "./ChangePasswordDialog";
@@ -31,7 +32,7 @@ interface NavItem {
   href: string;
   label: string;
   Icon: React.ComponentType<{ className?: string }>;
-  module: "dashboard" | "companies" | "leads" | "pulse" | "stress" | "esocial" | "users";
+  module: "dashboard" | "companies" | "leads" | "pulse" | "stress" | "esocial" | "users" | "aep";
 }
 
 const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
@@ -56,13 +57,21 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
       { href: "/admin/esocial", label: "Analytics", Icon: HiOutlineDocumentReport, module: "esocial" },
     ],
   },
+  {
+    label: "ERGONOMIA",
+    items: [
+      { href: "/admin/aep", label: "AEP", Icon: HiOutlineClipboardCheck, module: "aep" },
+    ],
+  },
 ];
 
 const ROLE_PERMS: Record<string, string[]> = {
-  ADMIN: ["dashboard", "companies", "leads", "pulse", "stress", "esocial", "users"],
-  SST: ["dashboard", "companies", "leads", "pulse", "stress", "esocial"],
+  ADMIN: ["dashboard", "companies", "leads", "pulse", "stress", "esocial", "users", "aep"],
+  SST: ["dashboard", "companies", "leads", "pulse", "stress", "esocial", "aep"],
   RH: ["dashboard", "companies", "pulse", "stress"],
   JURIDICO: ["dashboard", "companies", "esocial"],
+  TECNICO: ["dashboard", "companies", "aep"],
+  SUPERVISOR: ["dashboard", "companies", "aep"],
 };
 
 const ROLE_LABEL: Record<string, string> = {
@@ -70,6 +79,8 @@ const ROLE_LABEL: Record<string, string> = {
   SST: "SST",
   RH: "RH",
   JURIDICO: "Jurídico",
+  TECNICO: "Técnico (AEP)",
+  SUPERVISOR: "Supervisor (AEP)",
 };
 
 export default function AdminShell({ children, title }: { children: ReactNode; title: string }) {

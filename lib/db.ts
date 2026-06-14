@@ -29,7 +29,7 @@ export interface Submission {
   company_id?: string | null;
 }
 
-export type AdminRole = "ADMIN" | "SST" | "RH" | "JURIDICO";
+export type AdminRole = "ADMIN" | "SST" | "RH" | "JURIDICO" | "TECNICO" | "SUPERVISOR";
 
 export interface AdminUser {
   id: string;
@@ -382,6 +382,148 @@ export async function initDb(): Promise<void> {
     await sql`CREATE INDEX IF NOT EXISTS idx_cat_company ON esocial_cat_events(company_id)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_cat_date ON esocial_cat_events(accident_date)`;
 
+    // ============================================================
+    // MÓDULO D — AEP (Avaliação Ergonômica Preliminar) — FO-SST.013
+    // Fluxo técnico ↔ supervisor (preenchimento, chat, aprovação)
+    // ============================================================
+
+    // Raiz da avaliação + cabeçalho geral + estado da máquina
+    await sql`
+      CREATE TABLE IF NOT EXISTS aep_assessments (
+        id UUID PRIMARY KEY,
+        company_id UUID NOT NULL REFERENCES companies(id),
+        title TEXT NOT NULL,
+        unidade TEXT,
+        data_avaliacao DATE,
+        avaliador_user_id UUID REFERENCES admin_users(id),
+        supervisor_user_id UUID REFERENCES admin_users(id),
+        avaliador_cargo TEXT,
+        norma_base TEXT NOT NULL DEFAULT 'NR-17 / ABNT ISO 20646:2017',
+        checklist JSONB NOT NULL DEFAULT '{}'::jsonb,
+        status TEXT NOT NULL DEFAULT 'rascunho',
+        rejection_reason TEXT,
+        tecnico_seen_at TIMESTAMPTZ,
+        supervisor_seen_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        submitted_at TIMESTAMPTZ,
+        approved_at TIMESTAMPTZ,
+        created_by TEXT,
+        deleted_at TIMESTAMPTZ
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_aep_company ON aep_assessments(company_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_aep_status ON aep_assessments(status)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_aep_created ON aep_assessments(created_at DESC)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_aep_avaliador ON aep_assessments(avaliador_user_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_aep_supervisor ON aep_assessments(supervisor_user_id)`;
+
+    // Setores (loop ADD SETOR)
+    await sql`
+      CREATE TABLE IF NOT EXISTS aep_sectors (
+        id UUID PRIMARY KEY,
+        assessment_id UUID NOT NULL REFERENCES aep_assessments(id) ON DELETE CASCADE,
+        company_id UUID NOT NULL REFERENCES companies(id),
+        nome TEXT NOT NULL,
+        ordem INTEGER NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_aep_sectors_assessment ON aep_sectors(assessment_id)`;
+
+    // Funções / GHE / paradigma (loop ADD FUNÇÃO)
+    await sql`
+      CREATE TABLE IF NOT EXISTS aep_functions (
+        id UUID PRIMARY KEY,
+        assessment_id UUID NOT NULL REFERENCES aep_assessments(id) ON DELETE CASCADE,
+        sector_id UUID NOT NULL REFERENCES aep_sectors(id) ON DELETE CASCADE,
+        company_id UUID NOT NULL REFERENCES companies(id),
+        ghe TEXT,
+        funcao_paradigma TEXT NOT NULL,
+        posto_trabalho TEXT,
+        descricao_ambiente TEXT,
+        descricao_atividade TEXT,
+        modo_operatorio TEXT,
+        mobiliario_equipamentos TEXT,
+        conforto_acustico TEXT,
+        temperatura TEXT,
+        iluminacao TEXT,
+        ordem INTEGER NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_aep_functions_assessment ON aep_functions(assessment_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_aep_functions_sector ON aep_functions(sector_id)`;
+
+    // Fotos do posto de trabalho (Vercel Blob)
+    await sql`
+      CREATE TABLE IF NOT EXISTS aep_photos (
+        id UUID PRIMARY KEY,
+        function_id UUID NOT NULL REFERENCES aep_functions(id) ON DELETE CASCADE,
+        assessment_id UUID NOT NULL REFERENCES aep_assessments(id) ON DELETE CASCADE,
+        url TEXT NOT NULL,
+        pathname TEXT,
+        caption TEXT,
+        ordem INTEGER NOT NULL DEFAULT 0,
+        size_bytes INTEGER,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_aep_photos_function ON aep_photos(function_id)`;
+
+    // Inventário de perigos e riscos por GHE/função
+    await sql`
+      CREATE TABLE IF NOT EXISTS aep_risk_items (
+        id UUID PRIMARY KEY,
+        assessment_id UUID NOT NULL REFERENCES aep_assessments(id) ON DELETE CASCADE,
+        function_id UUID REFERENCES aep_functions(id) ON DELETE CASCADE,
+        company_id UUID NOT NULL REFERENCES companies(id),
+        tipo TEXT NOT NULL DEFAULT 'ERGONOMICO',
+        fator_risco TEXT,
+        fonte_geradora TEXT,
+        possiveis_danos TEXT,
+        controles_existentes TEXT,
+        p INTEGER,
+        s INTEGER,
+        n INTEGER,
+        ordem INTEGER NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_aep_risk_assessment ON aep_risk_items(assessment_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_aep_risk_function ON aep_risk_items(function_id)`;
+
+    // Chat técnico ↔ supervisor
+    await sql`
+      CREATE TABLE IF NOT EXISTS aep_chat_messages (
+        id UUID PRIMARY KEY,
+        assessment_id UUID NOT NULL REFERENCES aep_assessments(id) ON DELETE CASCADE,
+        author_user_id UUID REFERENCES admin_users(id),
+        author_email TEXT,
+        author_name TEXT,
+        author_role TEXT,
+        body TEXT NOT NULL,
+        kind TEXT NOT NULL DEFAULT 'message',
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_aep_chat_assessment ON aep_chat_messages(assessment_id, created_at)`;
+
+    // Log de transições de estado (auditoria do fluxo de aprovação)
+    await sql`
+      CREATE TABLE IF NOT EXISTS aep_events (
+        id UUID PRIMARY KEY,
+        assessment_id UUID NOT NULL REFERENCES aep_assessments(id) ON DELETE CASCADE,
+        actor_user_id UUID REFERENCES admin_users(id),
+        actor_email TEXT,
+        from_status TEXT,
+        to_status TEXT NOT NULL,
+        note TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_aep_events_assessment ON aep_events(assessment_id, created_at)`;
+
     // Audit log
     await sql`
       CREATE TABLE IF NOT EXISTS audit_log (
@@ -504,17 +646,33 @@ export async function touchLastLogin(userId: string): Promise<void> {
 export async function createUser(
   email: string,
   name: string,
-  tempPassword: string
+  tempPassword: string,
+  role: AdminRole = "ADMIN"
 ): Promise<string> {
   if (!sql) throw new Error("Database not configured");
   await initDb();
   const id = crypto.randomUUID();
   const hash = await bcrypt.hash(tempPassword, 12);
   await sql`
-    INSERT INTO admin_users (id, email, password_hash, name, must_change_password)
-    VALUES (${id}, ${email.toLowerCase()}, ${hash}, ${name}, TRUE)
+    INSERT INTO admin_users (id, email, password_hash, name, must_change_password, role)
+    VALUES (${id}, ${email.toLowerCase()}, ${hash}, ${name}, TRUE, ${role})
   `;
   return id;
+}
+
+/** Lista usuários por perfil (ex.: supervisores para o select do AEP). */
+export async function getUsersByRole(
+  role: AdminRole
+): Promise<Pick<AdminUser, "id" | "email" | "name" | "role">[]> {
+  if (!sql) return [];
+  await initDb();
+  const rows = await sql`
+    SELECT id, email, name, role
+    FROM admin_users
+    WHERE role = ${role}
+    ORDER BY name ASC
+  `;
+  return rows as unknown as Pick<AdminUser, "id" | "email" | "name" | "role">[];
 }
 
 export async function listUsers(): Promise<Omit<AdminUser, "password_hash">[]> {
