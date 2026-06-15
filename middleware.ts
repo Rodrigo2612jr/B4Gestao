@@ -37,8 +37,8 @@ export function middleware(req: NextRequest) {
       return NextResponse.rewrite(newUrl);
     }
 
-    // admin.b4gestao.com.br/* → /admin/*
-    if (sub === "admin" && !url.pathname.startsWith("/admin")) {
+    // painel.b4gestao.com.br/* (e admin. legado) → /admin/*
+    if ((sub === "painel" || sub === "admin") && !url.pathname.startsWith("/admin")) {
       const newUrl = url.clone();
       newUrl.pathname = `/admin${url.pathname === "/" ? "" : url.pathname}`;
       return NextResponse.rewrite(newUrl);
