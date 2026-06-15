@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import {
   HiOutlineSearch,
   HiOutlineOfficeBuilding,
   HiOutlineInformationCircle,
   HiOutlineSparkles,
+  HiOutlineChevronRight,
 } from "react-icons/hi";
 import AdminShell from "../_components/AdminShell";
-import PageHeader from "../_components/PageHeader";
+import KpiTile from "../_components/KpiTile";
 import EmptyState from "../_components/EmptyState";
 import { useToast } from "../_components/ToastProvider";
 
@@ -32,6 +33,11 @@ export default function CompaniesPage() {
       <Inner />
     </AdminShell>
   );
+}
+
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  return ((parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "")).toUpperCase() || "?";
 }
 
 function Inner() {
@@ -70,36 +76,71 @@ function Inner() {
 
   const hasFuzzy = companies.some((c) => c.score !== undefined && c.score < 1);
 
+  const kpis = useMemo(() => {
+    const total = companies.length;
+    const comCidade = companies.filter((c) => c.city).length;
+    const semCidade = companies.filter((c) => !c.city).length;
+    return { total, comCidade, semCidade };
+  }, [companies]);
+
   return (
-    <div>
-      <PageHeader
-        title="Empresas"
-        subtitle="Espinha dorsal do CRM — identificadas e unificadas por CNPJ. Tudo (leads, auditorias, pesquisas, alertas) é agregado por aqui."
-        breadcrumbs={[{ label: "Painel B4", href: "/admin" }, { label: "Empresas" }]}
-        accent="primary"
-        meta={
-          !loading && companies.length > 0 ? (
-            <span className="rounded-md bg-gray-100 px-2 py-0.5 font-mono text-xs font-semibold text-gray-700">
-              {companies.length}
-            </span>
-          ) : undefined
-        }
-      />
+    <div className="space-y-7">
+      {/* Header */}
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2
+            className="text-2xl font-bold text-secondary"
+            style={{ fontFamily: "var(--font-display), system-ui", letterSpacing: "-0.025em" }}
+          >
+            Empresas
+          </h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Espinha dorsal do CRM · identificadas e unificadas por CNPJ.
+          </p>
+        </div>
+      </div>
+
+      {/* KPIs · somente quando dados reais existem */}
+      {!loading && companies.length > 0 && (
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+          <KpiTile
+            label="Total de empresas"
+            value={kpis.total}
+            icon={<HiOutlineOfficeBuilding />}
+            featured
+            loading={loading}
+          />
+          <KpiTile
+            label="Com localidade"
+            value={kpis.comCidade}
+            icon={<HiOutlineOfficeBuilding />}
+            tone="emerald"
+            loading={loading}
+          />
+          <KpiTile
+            label="Sem localidade"
+            value={kpis.semCidade}
+            icon={<HiOutlineOfficeBuilding />}
+            tone="amber"
+            loading={loading}
+          />
+        </div>
+      )}
 
       {/* Search */}
-      <div className="relative mb-6">
+      <div className="relative">
         <HiOutlineSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-xl text-gray-400" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar por nome (tolera typo/acento) ou parte do CNPJ..."
-          className="w-full rounded-xl border border-gray-200 bg-white py-3.5 pl-12 pr-4 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+          className="w-full rounded-xl border border-gray-200 bg-white py-3.5 pl-12 pr-4 text-sm shadow-sm outline-none transition-all focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
         />
         {query && (
           <button
             onClick={() => setQuery("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500 hover:bg-gray-200"
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-xl border border-gray-200 bg-white px-2 py-0.5 text-xs font-medium text-gray-500 hover:bg-gray-50"
           >
             Limpar
           </button>
@@ -107,17 +148,19 @@ function Inner() {
       </div>
 
       {hasFuzzy && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">
-          <HiOutlineSparkles /> Busca fuzzy ativa — resultados ordenados por similaridade
+        <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+          <HiOutlineSparkles /> Busca fuzzy ativa · resultados ordenados por similaridade
         </div>
       )}
 
-      {/* Grid */}
+      {/* Tabela / Grid */}
       {loading ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-32 animate-pulse rounded-xl border border-gray-200 bg-white p-4" />
-          ))}
+        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <div className="space-y-px">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="h-16 animate-pulse bg-gray-50" />
+            ))}
+          </div>
         </div>
       ) : companies.length === 0 ? (
         query ? (
@@ -126,46 +169,73 @@ function Inner() {
           <EmptyState variant="no-companies" />
         )
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {companies.map((c) => (
-            <Link
-              key={c.id}
-              href={`/admin/companies/${c.id}`}
-              className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg"
-            >
-              {/* Top color bar (gradient on hover) */}
-              <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-primary/0 via-primary to-primary/0 opacity-0 transition-opacity group-hover:opacity-100" />
-
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary group-hover:from-primary/20 group-hover:to-primary/10 transition-colors">
-                  <HiOutlineOfficeBuilding className="text-2xl" />
-                </div>
-                {c.score !== undefined && c.score < 1 && (
-                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">
-                    {Math.round(c.score * 100)}% match
-                  </span>
-                )}
-              </div>
-              <h3 className="mt-3 truncate text-sm font-bold text-secondary group-hover:text-primary transition-colors">
-                {c.name}
-              </h3>
-              <p className="mt-0.5 font-mono text-xs text-gray-500">{c.cnpj_formatted}</p>
-              {(c.city || c.state) && (
-                <p className="mt-1 truncate text-xs text-gray-400">
-                  📍 {[c.city, c.state].filter(Boolean).join(" · ")}
-                </p>
-              )}
-              <p className="mt-3 text-[10px] uppercase tracking-wider text-gray-400">
-                Atualizada {new Date(c.updated_at).toLocaleDateString("pt-BR")}
-              </p>
-            </Link>
-          ))}
+        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+            <h3 className="text-sm font-bold text-gray-900">Todas as empresas</h3>
+            <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-500">
+              {companies.length}
+            </span>
+          </div>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-100 text-left text-[11px] uppercase tracking-wider text-gray-400">
+                <th className="px-5 py-3 font-semibold">Empresa</th>
+                <th className="hidden px-5 py-3 font-semibold md:table-cell">CNPJ</th>
+                <th className="hidden px-5 py-3 font-semibold lg:table-cell">Localidade</th>
+                <th className="hidden px-5 py-3 font-semibold lg:table-cell">Atualizada</th>
+                <th className="px-5 py-3" />
+              </tr>
+            </thead>
+            <tbody>
+              {companies.map((c) => (
+                <tr
+                  key={c.id}
+                  className="group border-b border-gray-50 transition-colors last:border-0 hover:bg-primary/[0.03]"
+                >
+                  <td className="px-5 py-3.5">
+                    <Link
+                      href={`/admin/companies/${c.id}`}
+                      className="flex items-center gap-3"
+                    >
+                      <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-bold text-primary">
+                        {initials(c.name)}
+                      </span>
+                      <span className="font-semibold text-gray-900 group-hover:text-primary transition-colors">
+                        {c.name}
+                      </span>
+                      {c.score !== undefined && c.score < 1 && (
+                        <span className="rounded-xl bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                          {Math.round(c.score * 100)}% match
+                        </span>
+                      )}
+                    </Link>
+                  </td>
+                  <td className="hidden px-5 py-3.5 font-mono text-xs text-gray-500 md:table-cell">
+                    {c.cnpj_formatted}
+                  </td>
+                  <td className="hidden px-5 py-3.5 text-xs text-gray-500 lg:table-cell">
+                    {c.city || c.state
+                      ? [c.city, c.state].filter(Boolean).join(" · ")
+                      : <span className="text-gray-300">-</span>}
+                  </td>
+                  <td className="hidden px-5 py-3.5 text-xs text-gray-500 lg:table-cell">
+                    {new Date(c.updated_at).toLocaleDateString("pt-BR")}
+                  </td>
+                  <td className="px-5 py-3.5 text-right">
+                    <Link href={`/admin/companies/${c.id}`}>
+                      <HiOutlineChevronRight className="text-gray-300 transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
       {/* Info card */}
       {!loading && companies.length > 0 && (
-        <div className="mt-6 flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50/50 p-4 text-xs text-blue-900">
+        <div className="flex items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50/50 p-4 text-xs text-blue-900">
           <HiOutlineInformationCircle className="mt-0.5 flex-shrink-0 text-lg" />
           <p>
             <strong>Dica:</strong> a busca tolera diferenças de acento, espaço e digitação. Empresas com mesmo CNPJ

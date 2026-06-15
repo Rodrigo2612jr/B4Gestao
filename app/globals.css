@@ -386,3 +386,30 @@ h1, h2, h3, h4 {
   background-color: #021a52;
 }
 /* cache-bust: 1776290869 */
+
+/* ============================================================
+   ADMIN — MOTIONS & MICRO-INTERAÇÕES
+   ============================================================ */
+
+/* Transição de página (conteúdo entra suave ao navegar) */
+@keyframes pageFade {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.admin-page-enter { animation: pageFade 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* Feedback de toque em botões e links do painel */
+.admin-root button:not(:disabled):active {
+  transform: scale(0.97);
+  transition: transform 0.07s ease;
+}
+.admin-root a:active { transform: scale(0.99); transition: transform 0.07s ease; }
+
+/* Linhas de tabela e itens clicáveis: realce suave */
+.admin-root tbody tr { transition: background-color 0.15s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-page-enter { animation: none; }
+  .admin-root button:active,
+  .admin-root a:active { transform: none; }
+}

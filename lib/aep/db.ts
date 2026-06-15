@@ -565,7 +565,7 @@ export async function deleteFunction(functionId: string): Promise<void> {
 }
 
 // ============================================================
-// FOTOS (Vercel Blob — URL é gerada na rota)
+// FOTOS (Vercel Blob · URL é gerada na rota)
 // ============================================================
 
 export async function addPhoto(input: {

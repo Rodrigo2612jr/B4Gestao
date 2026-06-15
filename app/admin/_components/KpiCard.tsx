@@ -50,7 +50,7 @@ const ACCENT: Record<NonNullable<Props["accent"]>, { bg: string; text: string; r
 };
 
 /**
- * Card de KPI premium — usado no dashboard.
+ * Card de KPI premium · usado no dashboard.
  *
  *  ┌─────────────────────────────────────┐
  *  │ [icon]               24            │

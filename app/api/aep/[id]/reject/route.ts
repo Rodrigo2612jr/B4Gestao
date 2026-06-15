@@ -40,7 +40,7 @@ export async function POST(
     authorEmail: auth.user.email,
     authorName: auth.user.name,
     authorRole: "SUPERVISOR",
-    body: `Reprovado — ajustes necessários:\n${parsed.data.reason}`,
+    body: `Reprovado · ajustes necessários:\n${parsed.data.reason}`,
     kind: "rejection",
   });
   await logAudit(auth.user.email, "aep_reject", id, auth.ip);

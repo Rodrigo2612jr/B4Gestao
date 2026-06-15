@@ -63,7 +63,7 @@ export default function LeadsTable({ rows, filters, setFilters, onRowClick }: Pr
                   <span className="ml-1 text-xs text-gray-400">{formatTime(s.criadoEm)}</span>
                 </td>
                 <td className="px-4 py-3 font-medium text-gray-900">{s.empresa}</td>
-                <td className="px-4 py-3 text-gray-500">{s.cnpj || "—"}</td>
+                <td className="px-4 py-3 text-gray-500">{s.cnpj || "-"}</td>
                 <td className="px-4 py-3 text-gray-700">{s.nome}</td>
                 <td className="px-4 py-3">
                   <a

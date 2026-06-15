@@ -30,12 +30,12 @@ export const RELEASES: ReleaseEntry[] = [
   {
     id: "2026-05-14-visual-pro",
     date: "2026-05-14",
-    title: "Painel repaginado — visual profissional com profundidade",
+    title: "Painel repaginado · visual profissional com profundidade",
     tone: "release",
     intro:
       "Reformulamos a interface do painel inteira para destacar cada parte da operação, sem poluição. Cada módulo agora tem identidade visual própria e a hierarquia de informações ficou clara.",
     highlights: [
-      "Sidebar dark navy com logo destacada — separa visualmente da área de trabalho",
+      "Sidebar dark navy com logo destacada · separa visualmente da área de trabalho",
       "Dashboard com hero em gradient, KPIs grandes e seções coloridas por contexto",
       "PageHeader padronizado com faixa de cor única por módulo",
       "Alert bar automático quando há eventos críticos do eSocial",
@@ -55,7 +55,7 @@ export const RELEASES: ReleaseEntry[] = [
       {
         heading: "Componentes novos",
         items: [
-          "ReleaseModal — esta janela que você está vendo agora",
+          "ReleaseModal · esta janela que você está vendo agora",
           "EmptyState com 6 ilustrações SVG inline",
           "PageHeader com breadcrumbs + accent bar + slot de metadata",
           "Avatar com cor determinística por nome",
@@ -66,7 +66,7 @@ export const RELEASES: ReleaseEntry[] = [
   {
     id: "2026-05-14-briefing-v3",
     date: "2026-05-14",
-    title: "Briefing v3 — 7 blocos entregues",
+    title: "Briefing v3 · 7 blocos entregues",
     tone: "feature",
     intro:
       "Implementação completa do briefing oficial v3 do cliente. Tudo o que estava na especificação agora roda em produção.",
@@ -121,7 +121,7 @@ export const RELEASES: ReleaseEntry[] = [
   },
 ];
 
-/** Versão mais recente — para comparação com localStorage. */
+/** Versão mais recente · para comparação com localStorage. */
 export const CURRENT_RELEASE_ID = RELEASES[0]?.id ?? "";
 
 const STORAGE_KEY = "b4_admin_lastSeenRelease";
@@ -147,8 +147,8 @@ export function markReleaseAsSeen(id: string = CURRENT_RELEASE_ID) {
 /** Releases que o usuário ainda não viu. */
 export function getUnseenReleases(): ReleaseEntry[] {
   const lastSeen = getLastSeenReleaseId();
-  if (!lastSeen) return RELEASES; // primeira vez — mostra todas
+  if (!lastSeen) return RELEASES; // primeira vez · mostra todas
   const idx = RELEASES.findIndex((r) => r.id === lastSeen);
-  if (idx === -1) return RELEASES; // id desconhecido (release apagado?) — mostra todas
+  if (idx === -1) return RELEASES; // id desconhecido (release apagado?) · mostra todas
   return RELEASES.slice(0, idx); // tudo mais novo que o último visto
 }

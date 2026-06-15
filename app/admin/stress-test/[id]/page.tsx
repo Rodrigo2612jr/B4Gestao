@@ -2,7 +2,13 @@
 
 import { useState, useEffect, useCallback, use } from "react";
 import Link from "next/link";
-import { HiOutlineArrowLeft, HiOutlineTrash, HiOutlineUser, HiOutlineDownload } from "react-icons/hi";
+import {
+  HiOutlineArrowLeft,
+  HiOutlineTrash,
+  HiOutlineUser,
+  HiOutlineDownload,
+  HiOutlineChevronDown,
+} from "react-icons/hi";
 import AdminShell from "../../_components/AdminShell";
 import { useToast } from "../../_components/ToastProvider";
 import type { ScoreResult } from "@/lib/stress-test/scoring";
@@ -20,15 +26,21 @@ interface AuditDetail {
   createdBy: string | null;
 }
 
-const SEMAFORO_COLOR: Record<string, string> = {
-  VERDE: "bg-emerald-500",
-  AMARELO: "bg-yellow-400",
-  VERMELHO: "bg-red-500",
+/* Semaforo · cores semanticas mantidas */
+const SEMAFORO_GRADIENT: Record<string, string> = {
+  VERDE:    "from-emerald-500 to-emerald-600",
+  AMARELO:  "from-amber-400 to-amber-500",
+  VERMELHO: "from-red-500 to-red-600",
 };
-const SEMAFORO_BG: Record<string, string> = {
-  VERDE: "bg-emerald-50 border-emerald-200 text-emerald-900",
-  AMARELO: "bg-yellow-50 border-yellow-200 text-yellow-900",
-  VERMELHO: "bg-red-50 border-red-200 text-red-900",
+const SEMAFORO_PILL: Record<string, string> = {
+  VERDE:    "bg-emerald-50 text-emerald-800 border-emerald-200",
+  AMARELO:  "bg-amber-50 text-amber-800 border-amber-200",
+  VERMELHO: "bg-red-50 text-red-800 border-red-200",
+};
+const SEMAFORO_DOT: Record<string, string> = {
+  VERDE:    "bg-emerald-500",
+  AMARELO:  "bg-amber-400",
+  VERMELHO: "bg-red-500",
 };
 
 export default function StressTestDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -85,49 +97,93 @@ function Inner({ id }: { id: string }) {
     }
   };
 
-  if (loading) return <div className="rounded-xl bg-white p-12 text-center text-sm text-gray-500">Carregando...</div>;
-  if (!data) return <div className="rounded-xl bg-white p-12 text-center text-sm text-gray-500">Não encontrado.</div>;
+  if (loading)
+    return (
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-sm">
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+        <p className="mt-4 text-sm text-gray-500">Carregando auditoria...</p>
+      </div>
+    );
+
+  if (!data)
+    return (
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-sm">
+        <p className="text-sm text-gray-500">Auditoria não encontrada.</p>
+      </div>
+    );
 
   const r = data.result;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <Link href="/admin/stress-test" className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary">
-          <HiOutlineArrowLeft /> Voltar
+      {/* Breadcrumb + ações */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link
+          href="/admin/stress-test"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-primary"
+        >
+          <HiOutlineArrowLeft /> Stress Test NR-1
         </Link>
         <div className="flex flex-wrap gap-2">
           <a
             href={`/api/stress-test/${id}/report`}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-dark"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs font-semibold text-white shadow-sm shadow-primary/20 hover:bg-primary-dark"
           >
             <HiOutlineDownload /> PPTX Executivo
           </a>
           <a
             href={`/api/stress-test/${id}/report?variant=dashboard`}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5 text-xs font-semibold text-white hover:bg-secondary/90"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50"
           >
             <HiOutlineDownload /> PPTX Dashboard
           </a>
           <button
             onClick={() => setDeleteOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-red-200 bg-white px-3.5 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
           >
             <HiOutlineTrash /> Excluir
           </button>
         </div>
       </div>
 
-      {/* Big card: Score + Semáforo */}
-      <div className={`rounded-2xl border-2 p-6 ${SEMAFORO_BG[r.semaforo]}`}>
-        <div className="flex items-center gap-5">
-          <div className={`flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-full ${SEMAFORO_COLOR[r.semaforo]} text-3xl font-bold text-white`}>
-            {r.total}
+      {/* Card principal: Score + Semáforo */}
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className={`bg-gradient-to-r ${SEMAFORO_GRADIENT[r.semaforo]} p-6`}>
+          <div className="flex items-center gap-5">
+            <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-2xl bg-white/20 text-3xl font-bold text-white shadow-inner">
+              {r.total}
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-white/70">Semáforo NR-1</p>
+              <h2
+                className="text-2xl font-bold text-white"
+                style={{ fontFamily: "var(--font-display), system-ui", letterSpacing: "-0.02em" }}
+              >
+                {r.semaforoLabel}
+              </h2>
+              <p className="mt-1 text-sm text-white/80">
+                Score {r.total}/100 · Faixa de exposição:{" "}
+                <strong className="text-white">{r.faixaLabel}</strong>
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Semáforo NR-1</p>
-            <h2 className="text-2xl font-bold">{r.semaforoLabel}</h2>
-            <p className="mt-1 text-sm opacity-80">Score {r.total}/100 · Faixa de exposição: <strong>{r.faixaLabel}</strong></p>
+        </div>
+        {/* Metadados do respondente dentro do card principal */}
+        <div className="flex flex-wrap items-center gap-4 border-t border-gray-100 px-6 py-4">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <HiOutlineUser className="text-base" />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-gray-900">{data.respondentName}</p>
+              {data.respondentRole && (
+                <p className="text-xs text-gray-500">{data.respondentRole}</p>
+              )}
+            </div>
+          </div>
+          <div className="ml-auto text-right text-xs text-gray-500">
+            <p>Realizado em {new Date(data.createdAt).toLocaleString("pt-BR")}</p>
+            {data.createdBy && <p className="mt-0.5">por {data.createdBy}</p>}
           </div>
         </div>
       </div>
@@ -135,61 +191,92 @@ function Inner({ id }: { id: string }) {
       {/* Sub-scores grid */}
       <div className="grid gap-4 md:grid-cols-2">
         {/* Engavetamento */}
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">Risco de Engavetamento</h3>
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+            Risco de Engavetamento
+          </p>
           <div className="mt-3 flex items-end gap-2">
-            <span className="text-3xl font-bold text-gray-900">{r.engavetamento.score}</span>
-            <span className="pb-1 text-sm text-gray-500">/ {r.engavetamento.max}</span>
+            <span className="text-4xl font-bold tabular-nums text-secondary">{r.engavetamento.score}</span>
+            <span className="pb-1 text-sm text-gray-400">/ {r.engavetamento.max}</span>
           </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-200">
-            <div className="h-full bg-primary" style={{ width: `${(r.engavetamento.score / r.engavetamento.max) * 100}%` }} />
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-100">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-primary to-primary-dark"
+              style={{ width: `${(r.engavetamento.score / r.engavetamento.max) * 100}%` }}
+            />
           </div>
-          <p className="mt-3 text-sm font-semibold text-gray-900">Classificação: {r.engavetamento.classification}</p>
-          <p className="mt-1 text-sm text-gray-700">{r.engavetamento.label}</p>
-          <p className="mt-1 text-xs text-gray-500">Perguntas núcleo: Q01, Q12-Q16, Q21, Q25. Faixas: Baixo 24-32 / Médio 14-23 / Alto 0-13.</p>
+          <p className="mt-3 text-sm font-semibold text-gray-900">
+            Classificação:{" "}
+            <span className="font-normal text-gray-700">{r.engavetamento.classification}</span>
+          </p>
+          <p className="mt-1 text-sm text-gray-600">{r.engavetamento.label}</p>
+          <p className="mt-2 text-xs text-gray-400">
+            Perguntas núcleo: Q01, Q12-Q16, Q21, Q25. Faixas: Baixo 24-32 / Médio 14-23 / Alto 0-13.
+          </p>
         </div>
 
         {/* Coerência psicossocial */}
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">Coerência psicossocial</h3>
-          <p className="mt-3 text-2xl font-bold text-gray-900">{r.coerencia.label}</p>
-          <p className="mt-2 text-sm text-gray-700">{r.coerencia.description}</p>
-          <p className="mt-2 text-xs text-gray-500">Cruzamento Q18A (afirmação) × Q18B (evidência).</p>
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+            Coerência psicossocial
+          </p>
+          <p className="mt-3 text-2xl font-bold text-secondary">{r.coerencia.label}</p>
+          <p className="mt-2 text-sm text-gray-600">{r.coerencia.description}</p>
+          <p className="mt-3 text-xs text-gray-400">
+            Cruzamento Q18A (afirmação) × Q18B (evidência).
+          </p>
         </div>
       </div>
 
       {/* Por categoria */}
-      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">Por categoria</h3>
-        <div className="mt-4 space-y-3">
-          {Object.entries(r.byCategory).map(([cat, b]) => (
-            <div key={cat}>
-              <div className="flex items-center justify-between text-sm">
-                <span className="font-medium capitalize text-gray-700">{categoryLabel(cat)}</span>
-                <span className="font-mono text-gray-500">{b.score}/{b.max} · {b.pct}%</span>
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Por categoria</p>
+        <div className="mt-4 space-y-4">
+          {Object.entries(r.byCategory).map(([cat, b]) => {
+            const barColor =
+              b.pct >= 75 ? "from-emerald-400 to-emerald-500" :
+              b.pct >= 50 ? "from-amber-400 to-amber-500"   :
+              "from-red-400 to-red-500";
+            return (
+              <div key={cat}>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-gray-700">{categoryLabel(cat)}</span>
+                  <span className="font-mono text-xs text-gray-500">
+                    {b.score}/{b.max} · {b.pct}%
+                  </span>
+                </div>
+                <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-gray-100">
+                  <div
+                    className={`h-full rounded-full bg-gradient-to-r ${barColor}`}
+                    style={{ width: `${b.pct}%` }}
+                  />
+                </div>
               </div>
-              <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-gray-200">
-                <div className={`h-full ${b.pct >= 75 ? "bg-emerald-500" : b.pct >= 50 ? "bg-yellow-400" : "bg-red-500"}`} style={{ width: `${b.pct}%` }} />
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
-      {/* Weak spots */}
+      {/* Pontos críticos */}
       {r.weakSpots.length > 0 && (
-        <div className="rounded-xl border border-yellow-200 bg-yellow-50/50 p-5">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-yellow-900">Pontos críticos a priorizar</h3>
-          <p className="mt-1 text-xs text-yellow-800">Perguntas onde a resposta foi C, D ou E (peso ≤ 2):</p>
+        <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-700">
+            Pontos críticos a priorizar
+          </p>
+          <p className="mt-1 text-xs text-amber-700/80">
+            Perguntas onde a resposta foi C, D ou E (peso ≤ 2):
+          </p>
           <ul className="mt-3 space-y-2">
             {r.weakSpots.map((w) => (
-              <li key={w.id} className="flex items-start gap-3 rounded-lg bg-white p-3">
-                <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-yellow-200 text-xs font-bold text-yellow-900">
+              <li key={w.id} className="flex items-start gap-3 rounded-xl bg-white p-3 shadow-sm">
+                <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-800">
                   {w.chosen}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-gray-900">{w.id} — {w.text}</p>
-                  <p className="text-xs text-gray-500">Peso: {w.weight}/4</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {w.id} · {w.text}
+                  </p>
+                  <p className="mt-0.5 text-xs text-gray-500">Peso: {w.weight}/4</p>
                 </div>
               </li>
             ))}
@@ -197,69 +284,81 @@ function Inner({ id }: { id: string }) {
         </div>
       )}
 
-      {/* Respostas completas — collapsible */}
-      <details className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-        <summary className="cursor-pointer text-sm font-semibold uppercase tracking-wider text-gray-500">
-          Ver todas as 25 respostas
+      {/* Respostas completas · collapsible */}
+      <details className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-gray-700 hover:bg-gray-50/60">
+          <span>Ver todas as 25 respostas</span>
+          <HiOutlineChevronDown className="text-gray-400 transition-transform group-open:rotate-180" />
         </summary>
-        <div className="mt-4 grid gap-2 sm:grid-cols-2">
-          {QUESTIONS.map((q) => {
-            const a = data.answers[q.id];
-            return (
-              <div key={q.id} className="flex items-start gap-2 rounded-lg bg-gray-50 p-2.5">
-                <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-700">
-                  {q.id.replace("Q", "")}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs text-gray-700 line-clamp-2">{q.text}</p>
-                  <p className="text-xs font-mono font-semibold text-primary">{a}</p>
+        <div className="border-t border-gray-100 px-5 pb-5 pt-4">
+          <div className="grid gap-2 sm:grid-cols-2">
+            {QUESTIONS.map((q) => {
+              const a = data.answers[q.id];
+              return (
+                <div key={q.id} className="flex items-start gap-2.5 rounded-xl bg-gray-50 p-3">
+                  <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-700">
+                    {q.id.replace("Q", "")}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="line-clamp-2 text-xs text-gray-600">{q.text}</p>
+                    <p className="mt-1 font-mono text-xs font-bold text-primary">{a}</p>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </details>
 
-      {/* Disclaimer obrigatório */}
-      <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-4 text-sm">
-        <p className="font-semibold text-amber-900">⚠ Disclaimer técnico</p>
-        <p className="mt-1 text-amber-800">{r.disclaimer ?? "Estimativa preliminar — depende de enquadramento e fiscalização. Recomenda-se validação técnica in loco."}</p>
-      </div>
-
-      {/* Metadados */}
-      <div className="rounded-xl border border-gray-200 bg-white p-5 text-sm shadow-sm">
-        <div className="flex items-center gap-2 text-gray-700">
-          <HiOutlineUser className="text-gray-400" /> <strong>{data.respondentName}</strong>
-          {data.respondentRole && <span className="text-gray-500">· {data.respondentRole}</span>}
-        </div>
-        <p className="mt-1 text-xs text-gray-500">
-          Realizado em {new Date(data.createdAt).toLocaleString("pt-BR")}
-          {data.createdBy && ` por ${data.createdBy}`}
+      {/* Disclaimer */}
+      <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+        <p className="text-sm font-semibold text-amber-900">Disclaimer técnico</p>
+        <p className="mt-1 text-sm text-amber-800">
+          {r.disclaimer ?? "Estimativa preliminar · depende de enquadramento e fiscalização. Recomenda-se validação técnica in loco."}
         </p>
-        {data.notes && (
-          <div className="mt-3 rounded-lg bg-gray-50 p-3 text-sm text-gray-700">
-            <strong className="text-xs uppercase tracking-wider text-gray-500">Notas:</strong>
-            <p className="mt-1">{data.notes}</p>
-          </div>
-        )}
       </div>
 
+      {/* Notas */}
+      {data.notes && (
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Notas</p>
+          <p className="mt-2 text-sm text-gray-700">{data.notes}</p>
+        </div>
+      )}
+
+      {/* Modal exclusão */}
       {deleteOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-secondary">Excluir auditoria</h3>
-            <p className="mt-2 text-sm text-gray-600">Esta ação remove a auditoria. Confirme sua senha:</p>
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <h3
+              className="text-lg font-bold text-secondary"
+              style={{ fontFamily: "var(--font-display), system-ui" }}
+            >
+              Excluir auditoria
+            </h3>
+            <p className="mt-2 text-sm text-gray-600">
+              Esta ação remove a auditoria permanentemente. Confirme sua senha para continuar:
+            </p>
             <input
               type="password"
               value={pwd}
               onChange={(e) => setPwd(e.target.value)}
-              className="mt-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="mt-3 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition-all focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
               autoFocus
             />
             {err && <p className="mt-2 text-xs text-red-600">{err}</p>}
-            <div className="mt-4 flex justify-end gap-2">
-              <button onClick={() => { setDeleteOpen(false); setPwd(""); setErr(""); }} className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancelar</button>
-              <button onClick={handleDelete} disabled={!pwd || busy} className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50">
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                onClick={() => { setDeleteOpen(false); setPwd(""); setErr(""); }}
+                className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={!pwd || busy}
+                className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+              >
                 {busy ? "Excluindo..." : "Excluir"}
               </button>
             </div>
@@ -272,10 +371,10 @@ function Inner({ id }: { id: string }) {
 
 function categoryLabel(cat: string): string {
   switch (cat) {
-    case "evidencia": return "Evidência documental";
-    case "psicossocial": return "Psicossocial";
-    case "estrutura": return "Estrutura/governança";
-    case "fiscalizacao": return "Exposição à fiscalização";
-    default: return cat;
+    case "evidencia":     return "Evidência documental";
+    case "psicossocial":  return "Psicossocial";
+    case "estrutura":     return "Estrutura/governança";
+    case "fiscalizacao":  return "Exposição à fiscalização";
+    default:              return cat;
   }
 }

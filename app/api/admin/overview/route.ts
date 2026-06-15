@@ -66,6 +66,34 @@ export async function GET(request: NextRequest) {
     semaforoBreakdown[row.semaforo] = row.n;
   }
 
+  // ---- Séries REAIS para os gráficos do dashboard ----
+  const sixMonths = new Date(now); sixMonths.setMonth(now.getMonth() - 5); sixMonths.setDate(1);
+  const sixMonthsStr = sixMonths.toISOString();
+
+  const [leadsMonthlyRaw, regiaoRaw, aepRaw] = await Promise.all([
+    sql`SELECT to_char(date_trunc('month', criado_em),'YYYY-MM') AS ym, COUNT(*)::int AS n
+        FROM submissions WHERE deleted_at IS NULL AND criado_em >= ${sixMonthsStr} GROUP BY 1`,
+    sql`SELECT regiao, COUNT(*)::int AS n FROM submissions
+        WHERE deleted_at IS NULL AND regiao IS NOT NULL AND regiao <> '' GROUP BY regiao ORDER BY n DESC`,
+    sql`SELECT status, COUNT(*)::int AS n FROM aep_assessments WHERE deleted_at IS NULL GROUP BY status`,
+  ]);
+
+  const monthMap: Record<string, number> = {};
+  for (const r of leadsMonthlyRaw as unknown as Array<{ ym: string; n: number }>) monthMap[r.ym] = r.n;
+  const MES = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+  const leadsByMonth: Array<{ label: string; n: number }> = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    leadsByMonth.push({ label: MES[d.getMonth()], n: monthMap[ym] ?? 0 });
+  }
+
+  const leadsByRegiao = (regiaoRaw as unknown as Array<{ regiao: string; n: number }>).map((r) => ({ regiao: r.regiao, n: r.n }));
+
+  const aepByStatus: Record<string, number> = {};
+  let aepTotal = 0;
+  for (const r of aepRaw as unknown as Array<{ status: string; n: number }>) { aepByStatus[r.status] = r.n; aepTotal += r.n; }
+
   // ---- Atividade recente (10 últimas) ----
   const recentLeads = await sql`
     SELECT empresa, nome, criado_em
@@ -96,7 +124,7 @@ export async function GET(request: NextRequest) {
     ...(recentStress as unknown as Array<{ respondent_name: string; score_total: number; semaforo: string; created_at: string }>)
       .map((r): RecentActivity => ({
         type: "stress",
-        label: `Stress Test — ${r.respondent_name}`,
+        label: `Stress Test · ${r.respondent_name}`,
         meta: `Score ${r.score_total}/100 · ${r.semaforo}`,
         at: new Date(r.created_at).toISOString(),
       })),
@@ -127,6 +155,9 @@ export async function GET(request: NextRequest) {
       pendingStressInvites: (pendingInvites[0] as { n: number }).n,
     },
     semaforoBreakdown,
+    leadsByMonth,
+    leadsByRegiao,
+    aep: { total: aepTotal, byStatus: aepByStatus },
     activity,
   });
 }

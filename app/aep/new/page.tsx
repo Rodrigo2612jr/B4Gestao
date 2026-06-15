@@ -3,17 +3,17 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { HiOutlineCheck } from "react-icons/hi";
-import AdminShell from "../../_components/AdminShell";
-import CompanyPickerOrCreate, { type SelectableCompany as Company } from "../../_components/CompanyPickerOrCreate";
-import { useToast } from "../../_components/ToastProvider";
+import AepShell from "../_components/AepShell";
+import CompanyPickerOrCreate, { type SelectableCompany as Company } from "../../admin/_components/CompanyPickerOrCreate";
+import { useToast } from "../../admin/_components/ToastProvider";
 
 interface UserOpt { id: string; name: string; email: string }
 
 export default function AepNewPage() {
   return (
-    <AdminShell title="Nova AEP">
+    <AepShell title="Nova AEP">
       <Inner />
-    </AdminShell>
+    </AepShell>
   );
 }
 
@@ -56,7 +56,7 @@ function Inner() {
       const d = await res.json();
       if (!res.ok) throw new Error(d.error || "Erro ao criar");
       push("Avaliação criada!");
-      router.push(`/admin/aep/${d.id}`);
+      router.push(`/aep/${d.id}`);
     } catch (e) {
       push(e instanceof Error ? e.message : "Erro", "error");
       setSubmitting(false);
@@ -74,7 +74,7 @@ function Inner() {
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Ex: AEP — Canteiro Obra Central / 2026"
+            placeholder="Ex: AEP · Canteiro Obra Central / 2026"
             className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </div>

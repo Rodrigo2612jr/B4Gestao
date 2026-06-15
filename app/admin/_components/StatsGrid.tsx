@@ -18,8 +18,8 @@ export default function StatsGrid({ submissions }: { submissions: Submission[] }
     const total = submissions.length;
     const today = submissions.filter((s) => isToday(s.criadoEm)).length;
     const week = submissions.filter((s) => isWithinDays(s.criadoEm, 7)).length;
-    const topRegiao = mode(submissions.map((s) => s.regiao)) ?? "—";
-    const topNecessidade = mode(submissions.map((s) => s.necessidade)) ?? "—";
+    const topRegiao = mode(submissions.map((s) => s.regiao)) ?? "-";
+    const topNecessidade = mode(submissions.map((s) => s.necessidade)) ?? "-";
     return { total, today, week, topRegiao, topNecessidade };
   }, [submissions]);
 

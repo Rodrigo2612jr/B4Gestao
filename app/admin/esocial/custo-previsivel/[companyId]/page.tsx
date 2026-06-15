@@ -8,8 +8,10 @@ import {
   HiOutlineShieldExclamation,
   HiOutlineAdjustments,
   HiOutlineExclamation,
+  HiOutlineCheckCircle,
 } from "react-icons/hi";
 import AdminShell from "../../../_components/AdminShell";
+import KpiTile from "../../../_components/KpiTile";
 
 type Faixa = "BAIXA" | "MODERADA" | "ELEVADA";
 
@@ -37,21 +39,27 @@ interface Result {
   };
 }
 
+// Cores semanticas de faixa de custo · mantidas intencionalmente
 const FAIXA_BG: Record<Faixa, string> = {
-  BAIXA: "bg-emerald-50 border-emerald-200 text-emerald-900",
-  MODERADA: "bg-yellow-50 border-yellow-200 text-yellow-900",
-  ELEVADA: "bg-red-50 border-red-200 text-red-900",
+  BAIXA: "bg-emerald-50 border-emerald-200",
+  MODERADA: "bg-yellow-50 border-yellow-200",
+  ELEVADA: "bg-red-50 border-red-200",
 };
 const FAIXA_TAG: Record<Faixa, string> = {
-  BAIXA: "bg-emerald-500 text-white",
-  MODERADA: "bg-yellow-500 text-white",
-  ELEVADA: "bg-red-600 text-white",
+  BAIXA: "bg-emerald-100 text-emerald-800",
+  MODERADA: "bg-yellow-100 text-yellow-800",
+  ELEVADA: "bg-red-100 text-red-800",
+};
+const FAIXA_LABEL_COLOR: Record<Faixa, string> = {
+  BAIXA: "text-emerald-900",
+  MODERADA: "text-yellow-900",
+  ELEVADA: "text-red-900",
 };
 
 export default function CostPanelPage({ params }: { params: Promise<{ companyId: string }> }) {
   const { companyId } = use(params);
   return (
-    <AdminShell title="Custo Previsível (FAIXAS)">
+    <AdminShell title="Custo Previsivel (FAIXAS)">
       <Inner companyId={companyId} />
     </AdminShell>
   );
@@ -86,103 +94,194 @@ function Inner({ companyId }: { companyId: string }) {
 
   useEffect(() => { load(); }, [load]);
 
-  if (loading || !data) return <div className="rounded-xl bg-white p-12 text-center text-sm text-gray-500">Carregando...</div>;
+  if (loading || !data) {
+    return (
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="space-y-px">
+          {[0, 1, 2].map((i) => <div key={i} className="h-20 animate-pulse bg-gray-50" />)}
+        </div>
+      </div>
+    );
+  }
 
   const fmtRange = (low: number, high: number) =>
-    `R$ ${low.toLocaleString("pt-BR")} — R$ ${high.toLocaleString("pt-BR")}`;
+    `R$ ${low.toLocaleString("pt-BR")} · R$ ${high.toLocaleString("pt-BR")}`;
+
+  const integrityBg =
+    data.integrityScore >= 80
+      ? "border-emerald-200 bg-emerald-50"
+      : data.integrityScore >= 50
+      ? "border-yellow-200 bg-yellow-50"
+      : "border-red-200 bg-red-50";
+  const integrityCircle =
+    data.integrityScore >= 80
+      ? "bg-emerald-500 text-white"
+      : data.integrityScore >= 50
+      ? "bg-yellow-500 text-white"
+      : "bg-red-500 text-white";
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <Link href={`/admin/companies/${companyId}`} className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary">
-          <HiOutlineArrowLeft /> Voltar para empresa
+    <div className="space-y-7">
+      {/* Navegacao */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link
+          href={`/admin/companies/${companyId}`}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-primary"
+        >
+          <HiOutlineArrowLeft className="text-base" /> Voltar para empresa
         </Link>
         <div className="flex gap-2">
           <a
             href={`/api/esocial/dashboard-pptx/${companyId}`}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5 text-xs font-semibold text-white hover:bg-secondary/90"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-primary/20 transition-colors hover:bg-primary-dark"
           >
-            📥 PPTX Dashboard
+            PPTX Dashboard
           </a>
           <button
             onClick={() => setShowConfig(!showConfig)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
           >
             <HiOutlineAdjustments /> Premissas
           </button>
         </div>
       </div>
 
-      {/* Card integridade */}
-      <div className={`rounded-2xl border-2 p-6 ${
-        data.integrityScore >= 80 ? "border-emerald-200 bg-emerald-50" :
-        data.integrityScore >= 50 ? "border-yellow-200 bg-yellow-50" :
-        "border-red-200 bg-red-50"
-      }`}>
+      {/* Header da pagina */}
+      <div>
+        <h2
+          className="text-2xl font-bold text-secondary"
+          style={{ fontFamily: "var(--font-display), system-ui", letterSpacing: "-0.025em" }}
+        >
+          Custo Previsivel · Faixas de Exposicao
+        </h2>
+        <p className="mt-1 text-sm text-gray-500">
+          Projecao de passivos trabalhistas e previdenciarios baseada nos dados do eSocial.
+        </p>
+      </div>
+
+      {/* KPIs resumo */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <KpiTile
+          label="Score de integridade"
+          value={`${data.integrityScore}/100`}
+          icon={<HiOutlineCheckCircle />}
+          featured
+        />
+        <KpiTile
+          label="Alertas ativos"
+          value={data.totalAlertsActive}
+          icon={<HiOutlineExclamation />}
+          tone="amber"
+        />
+        <KpiTile
+          label="Alertas criticos"
+          value={data.criticalAlerts}
+          icon={<HiOutlineExclamation />}
+          tone="rose"
+        />
+        <KpiTile
+          label="Faixas calculadas"
+          value={data.bands.length}
+          icon={<HiOutlineCash />}
+          tone="blue"
+        />
+      </div>
+
+      {/* Card de integridade SST · cores semanticas mantidas */}
+      <div className={`rounded-2xl border-2 p-6 ${integrityBg}`}>
         <div className="flex items-center gap-5">
-          <div className={`flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-full text-3xl font-bold text-white ${
-            data.integrityScore >= 80 ? "bg-emerald-500" :
-            data.integrityScore >= 50 ? "bg-yellow-500" :
-            "bg-red-500"
-          }`}>
+          <div className={`flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-full text-3xl font-bold ${integrityCircle}`}>
             {data.integrityScore}
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Integridade de dados SST</p>
-            <h2 className="text-2xl font-bold text-secondary">{data.integrityLabel}</h2>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 opacity-70">
+              Integridade de dados SST
+            </p>
+            <h3
+              className="text-2xl font-bold text-secondary"
+              style={{ fontFamily: "var(--font-display), system-ui", letterSpacing: "-0.02em" }}
+            >
+              {data.integrityLabel}
+            </h3>
             <p className="mt-1 text-sm text-gray-600">
-              {data.totalAlertsActive} alerta(s) ativo(s) · {data.criticalAlerts} crítico(s)
+              {data.totalAlertsActive} alerta(s) ativo(s) &middot; {data.criticalAlerts} critico(s)
             </p>
           </div>
         </div>
       </div>
 
-      {/* Premissas (config) */}
+      {/* Premissas parametrizaveis */}
       {showConfig && (
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-3">Premissas parametrizáveis</h3>
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <h3 className="mb-4 text-sm font-bold text-gray-900">Premissas parametrizaveis</h3>
           <div className="grid gap-4 sm:grid-cols-3">
             <div>
-              <label className="text-xs font-medium text-gray-700">Salário base (R$)</label>
-              <input type="number" value={salary} onChange={(e) => setSalary(parseFloat(e.target.value) || 0)} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm" />
+              <label className="text-xs font-medium text-gray-700">Salario base (R$)</label>
+              <input
+                type="number"
+                value={salary}
+                onChange={(e) => setSalary(parseFloat(e.target.value) || 0)}
+                className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+              />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-700">Alíquota FAE (decimal)</label>
-              <input type="number" step="0.01" value={aliquot} onChange={(e) => setAliquot(parseFloat(e.target.value) || 0)} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm" />
+              <label className="text-xs font-medium text-gray-700">Aliquota FAE (decimal)</label>
+              <input
+                type="number"
+                step="0.01"
+                value={aliquot}
+                onChange={(e) => setAliquot(parseFloat(e.target.value) || 0)}
+                className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+              />
             </div>
             <div>
               <label className="text-xs font-medium text-gray-700">Janela (meses)</label>
-              <input type="number" value={months} onChange={(e) => setMonths(parseInt(e.target.value) || 12)} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm" />
+              <input
+                type="number"
+                value={months}
+                onChange={(e) => setMonths(parseInt(e.target.value) || 12)}
+                className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+              />
             </div>
           </div>
           <button
             onClick={() => load({ salary, aliquot, months })}
-            className="mt-3 rounded-lg bg-primary px-4 py-1.5 text-sm font-semibold text-white hover:bg-primary-dark"
+            className="mt-4 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark"
           >
             Recalcular
           </button>
         </div>
       )}
 
-      {/* Cards de faixa */}
+      {/* Cards de faixa de custo · cores semanticas mantidas */}
       <div className="grid gap-4 lg:grid-cols-3">
         {data.bands.map((b) => (
-          <div key={b.category} className={`rounded-xl border-2 p-5 ${FAIXA_BG[b.faixa]}`}>
+          <div
+            key={b.category}
+            className={`rounded-2xl border-2 p-5 ${FAIXA_BG[b.faixa]}`}
+          >
             <div className="flex items-start justify-between">
-              <HiOutlineCash className="text-3xl" />
-              <span className={`rounded-full px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider ${FAIXA_TAG[b.faixa]}`}>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/70 text-gray-600 shadow-sm">
+                <HiOutlineCash className="text-xl" />
+              </div>
+              <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${FAIXA_TAG[b.faixa]}`}>
                 {b.faixa}
               </span>
             </div>
-            <h3 className="mt-3 text-sm font-semibold uppercase tracking-wider opacity-80">{b.label}</h3>
-            <p className="mt-2 text-2xl font-bold text-secondary">{fmtRange(b.rangeLow, b.rangeHigh)}</p>
-            <p className="mt-1 text-xs opacity-70">FAIXA estimada / projeção</p>
+            <h3 className={`mt-3 text-sm font-semibold uppercase tracking-wider ${FAIXA_LABEL_COLOR[b.faixa]} opacity-80`}>
+              {b.label}
+            </h3>
+            <p className="mt-2 text-xl font-bold text-secondary">{fmtRange(b.rangeLow, b.rangeHigh)}</p>
+            <p className="mt-0.5 text-xs text-gray-500">Faixa estimada / projecao</p>
 
-            <div className="mt-4 border-t border-current/20 pt-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Premissas</p>
-              <ul className="mt-1 space-y-0.5 text-xs">
+            <div className="mt-4 border-t border-gray-200/60 pt-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">Premissas</p>
+              <ul className="mt-1.5 space-y-0.5 text-xs text-gray-600">
                 {b.assumptions.map((a, i) => (
-                  <li key={i}>• {a}</li>
+                  <li key={i} className="flex items-start gap-1">
+                    <span className="mt-0.5 text-gray-400">•</span>
+                    <span>{a}</span>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -190,22 +289,32 @@ function Inner({ companyId }: { companyId: string }) {
         ))}
       </div>
 
-      {/* Disclaimer */}
-      <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-4 text-sm">
-        <p className="font-semibold text-amber-900 flex items-center gap-2">
-          <HiOutlineShieldExclamation /> Disclaimer técnico
+      {/* Disclaimer · cor amber mantida por ser semantica (aviso legal) */}
+      <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-5">
+        <p className="flex items-center gap-2 text-sm font-semibold text-amber-900">
+          <HiOutlineShieldExclamation className="text-lg" /> Disclaimer tecnico
         </p>
-        <p className="mt-1 text-amber-800">{data.disclaimer}</p>
+        <p className="mt-1.5 text-sm text-amber-800">{data.disclaimer}</p>
       </div>
 
-      {/* CTA acompanhamento */}
-      <div className="rounded-xl bg-gradient-to-br from-primary-dark to-primary p-6 text-white shadow-lg">
-        <h3 className="text-lg font-bold">Próximos passos com a B4</h3>
-        <p className="mt-2 text-sm opacity-90">
-          Diagnóstico aprofundado dos programas legais (PGR/NR-17/PCMSO) + validação in loco.
+      {/* CTA B4 */}
+      <div className="rounded-2xl bg-gradient-to-br from-primary to-primary-dark p-6 text-white shadow-md shadow-primary/20">
+        <h3
+          className="text-lg font-bold"
+          style={{ fontFamily: "var(--font-display), system-ui", letterSpacing: "-0.02em" }}
+        >
+          Proximos passos com a B4
+        </h3>
+        <p className="mt-2 text-sm text-white/80">
+          Diagnostico aprofundado dos programas legais (PGR/NR-17/PCMSO) + validacao in loco.
           Acompanhamento mensal para manter o GRO vivo e reduzir o risco de engavetamento.
         </p>
-        <a href="/" target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex rounded-lg bg-white px-4 py-2 text-sm font-semibold text-primary hover:bg-gray-100">
+        <a
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex rounded-xl bg-white px-4 py-2 text-sm font-semibold text-primary shadow-sm hover:bg-gray-50"
+        >
           Falar com especialista B4
         </a>
       </div>

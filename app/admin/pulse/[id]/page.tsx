@@ -8,8 +8,12 @@ import {
   HiOutlineLockClosed,
   HiOutlineRefresh,
   HiOutlineDownload,
+  HiOutlineChartBar,
+  HiOutlineCheckCircle,
+  HiOutlineClock,
 } from "react-icons/hi";
 import AdminShell from "../../_components/AdminShell";
+import KpiTile from "../../_components/KpiTile";
 import { useToast } from "../../_components/ToastProvider";
 
 interface Data {
@@ -80,83 +84,98 @@ function Inner({ id }: { id: string }) {
     if (res.ok) { push(next === "open" ? "Pesquisa reaberta" : "Pesquisa encerrada"); load(); }
   };
 
-  if (loading) return <div className="rounded-xl bg-white p-12 text-center text-sm text-gray-500">Carregando...</div>;
-  if (!data) return <div className="rounded-xl bg-white p-12 text-center text-sm text-gray-500">Não encontrada.</div>;
+  if (loading) return (
+    <div className="space-y-4">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="h-28 animate-pulse rounded-2xl border border-gray-200 bg-white shadow-sm" />
+      ))}
+    </div>
+  );
+  if (!data) return (
+    <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center text-sm text-gray-500 shadow-sm">
+      Pesquisa não encontrada.
+    </div>
+  );
 
   const publicUrl = typeof window !== "undefined" ? `${window.location.origin}/pulse/${data.campaign.token}` : "";
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <Link href="/admin/pulse" className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary">
-          <HiOutlineArrowLeft /> Voltar
+      {/* Navegacao e acoes */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link href="/admin/pulse" className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-primary">
+          <HiOutlineArrowLeft /> Voltar para Pulse
         </Link>
         <div className="flex flex-wrap gap-2">
           <a
             href={`/api/pulse/${id}/report`}
-            className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-dark"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/20 hover:bg-primary-dark"
           >
             <HiOutlineDownload /> PPTX Executivo
           </a>
           <a
             href={`/api/pulse/${id}/report?variant=dashboard`}
-            className="inline-flex items-center gap-1 rounded-lg bg-secondary px-3 py-1.5 text-xs font-semibold text-white hover:bg-secondary/90"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             <HiOutlineDownload /> PPTX Dashboard
           </a>
-          <button onClick={load} className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">
+          <button
+            onClick={load}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
             <HiOutlineRefresh /> Atualizar
           </button>
-          <button onClick={toggleStatus} className={`inline-flex rounded-lg px-3 py-1.5 text-xs font-semibold ${
-            data.campaign.status === "open" ? "bg-red-100 text-red-700 hover:bg-red-200" : "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-          }`}>
-            {data.campaign.status === "open" ? "Encerrar" : "Reabrir"}
+          <button
+            onClick={toggleStatus}
+            className={`inline-flex items-center rounded-xl px-4 py-2 text-sm font-semibold transition ${
+              data.campaign.status === "open"
+                ? "bg-red-50 text-red-700 hover:bg-red-100"
+                : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+            }`}
+          >
+            {data.campaign.status === "open" ? "Encerrar pesquisa" : "Reabrir pesquisa"}
           </button>
         </div>
       </div>
 
-      {/* Header */}
+      {/* Header da campanha */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-bold text-secondary">{data.campaign.title}</h2>
-        <p className="mt-1 text-sm text-gray-500">
-          {data.aggregate.totalResponses} resposta{data.aggregate.totalResponses !== 1 ? "s" : ""} · {data.campaign.areas.length} áreas · threshold {data.campaign.threshold}
-        </p>
-
-        {/* Índice global */}
-        <div className={`mt-4 rounded-xl border-2 p-4 ${
-          data.aggregate.globalIndex >= 4.0 ? "border-emerald-200 bg-emerald-50" :
-          data.aggregate.globalIndex >= 3.0 ? "border-yellow-200 bg-yellow-50" :
-          "border-red-200 bg-red-50"
-        }`}>
-          <div className="flex items-center gap-4">
-            <div className={`flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full text-2xl font-bold text-white ${
-              data.aggregate.globalIndex >= 4.0 ? "bg-emerald-500" :
-              data.aggregate.globalIndex >= 3.0 ? "bg-yellow-500" :
-              "bg-red-500"
-            }`}>
-              {data.aggregate.globalIndex.toFixed(1)}
-            </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Índice global Pulse (1-5)</p>
-              <p className="text-lg font-bold text-secondary">{data.aggregate.globalLabel}</p>
-              <p className="mt-0.5 text-xs text-gray-500">Média ponderada por n das áreas válidas</p>
-            </div>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2
+              className="text-2xl font-bold text-secondary"
+              style={{ fontFamily: "var(--font-display), system-ui", letterSpacing: "-0.025em" }}
+            >
+              {data.campaign.title}
+            </h2>
+            <p className="mt-1 text-sm text-gray-500">
+              {data.campaign.areas.length} áreas · threshold {data.campaign.threshold}
+            </p>
           </div>
+          <span className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1 text-xs font-semibold ${
+            data.campaign.status === "open"
+              ? "bg-emerald-50 text-emerald-700"
+              : "bg-gray-100 text-gray-600"
+          }`}>
+            <span className={`h-1.5 w-1.5 rounded-full ${data.campaign.status === "open" ? "bg-emerald-500" : "bg-gray-400"}`} />
+            {data.campaign.status === "open" ? "Aberta" : "Encerrada"}
+          </span>
         </div>
 
-        {/* Public URL */}
-        <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-3">
-          <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Link público para respondentes</p>
-          <div className="mt-1 flex items-center gap-2">
+        {/* Link publico */}
+        <div className="mt-5 rounded-xl border border-gray-200 bg-gray-50 p-3.5">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Link público para respondentes</p>
+          <div className="mt-1.5 flex items-center gap-2">
             <input
               readOnly
               value={publicUrl}
-              className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 font-mono text-xs"
+              className="flex-1 rounded-xl border border-gray-200 bg-white px-3 py-1.5 font-mono text-xs outline-none"
             />
             <button
               onClick={() => { navigator.clipboard.writeText(publicUrl); push("Link copiado"); }}
-              className="rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-xs font-medium hover:bg-gray-100"
+              className="rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium hover:bg-gray-100"
               title="Copiar link"
+              aria-label="Copiar link público"
             >
               <HiOutlineClipboardCopy />
             </button>
@@ -164,19 +183,45 @@ function Inner({ id }: { id: string }) {
         </div>
       </div>
 
+      {/* KPIs */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+        <KpiTile
+          label="Respostas coletadas"
+          value={data.aggregate.totalResponses}
+          icon={<HiOutlineChartBar />}
+          featured
+        />
+        <KpiTile
+          label="Índice global (1-5)"
+          value={data.aggregate.globalIndex.toFixed(1)}
+          hint={data.aggregate.globalLabel}
+          icon={<HiOutlineCheckCircle />}
+          tone={data.aggregate.globalIndex >= 4.0 ? "emerald" : data.aggregate.globalIndex >= 3.0 ? "amber" : "rose"}
+        />
+        <KpiTile
+          label="Áreas monitoradas"
+          value={data.campaign.areas.length}
+          icon={<HiOutlineClock />}
+          tone="sky"
+        />
+      </div>
+
       {/* Quick wins */}
       {data.aggregate.quickWins.length > 0 && (
-        <div className="rounded-xl border border-yellow-200 bg-yellow-50/50 p-5">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-yellow-900">Quick wins recomendados (30 dias)</h3>
-          <ul className="mt-3 space-y-2">
+        <div className="overflow-hidden rounded-2xl border border-amber-200 bg-amber-50/40 shadow-sm">
+          <div className="border-b border-amber-100 px-5 py-4">
+            <h3 className="text-sm font-bold text-amber-900">Quick wins recomendados (30 dias)</h3>
+            <p className="mt-0.5 text-xs text-amber-700/70">Dimensoes com maior potencial de melhoria imediata.</p>
+          </div>
+          <ul className="divide-y divide-amber-100/60 p-2">
             {data.aggregate.quickWins.map((w) => (
-              <li key={w.dimension} className="flex items-center justify-between gap-3 rounded-lg bg-white p-3">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{w.label}</p>
+              <li key={w.dimension} className="flex items-center justify-between gap-3 rounded-xl bg-white p-3.5 my-1 mx-0">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-gray-900">{w.label}</p>
                   <p className="text-xs text-gray-500">{w.reason}</p>
                 </div>
-                <span className={`rounded-full px-2.5 py-0.5 text-xs font-mono font-bold ${
-                  w.pct < 40 ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-800"
+                <span className={`flex-shrink-0 rounded-xl px-2.5 py-0.5 text-xs font-mono font-bold ${
+                  w.pct < 40 ? "bg-red-50 text-red-700" : "bg-amber-50 text-amber-800"
                 }`}>
                   {w.pct}%
                 </span>
@@ -186,26 +231,26 @@ function Inner({ id }: { id: string }) {
         </div>
       )}
 
-      {/* Drivers — top 5 perguntas mais críticas */}
+      {/* Drivers */}
       {data.aggregate.drivers && data.aggregate.drivers.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">
-            Drivers — perguntas que mais puxam o score pra baixo
-          </h3>
-          <p className="mt-1 text-xs text-gray-500">Top 5 com menor média de concordância (1-5).</p>
-          <ul className="mt-3 space-y-2">
+        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <div className="border-b border-gray-100 px-5 py-4">
+            <h3 className="text-sm font-bold text-gray-900">Drivers · perguntas que mais puxam o score pra baixo</h3>
+            <p className="mt-0.5 text-xs text-gray-500">Top 5 com menor média de concordância (1-5).</p>
+          </div>
+          <ul className="divide-y divide-gray-50 p-4 space-y-2">
             {data.aggregate.drivers.map((d) => (
-              <li key={d.questionId} className="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
-                <span className={`flex h-10 w-12 flex-shrink-0 items-center justify-center rounded text-sm font-bold ${
+              <li key={d.questionId} className="flex items-center gap-3 rounded-xl bg-gray-50 p-3.5">
+                <span className={`flex h-10 w-14 flex-shrink-0 items-center justify-center rounded-xl text-sm font-bold ${
                   d.avgScore < 2.5 ? "bg-red-500 text-white" :
-                  d.avgScore < 3.5 ? "bg-yellow-500 text-white" :
+                  d.avgScore < 3.5 ? "bg-amber-400 text-white" :
                   "bg-emerald-500 text-white"
                 }`}>
                   {d.avgScore.toFixed(1)}
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-gray-900">{d.text}</p>
-                  <p className="text-xs text-gray-500">Dimensão: {d.dimension}</p>
+                  <p className="text-xs text-gray-400">Dimensão: {d.dimension}</p>
                 </div>
               </li>
             ))}
@@ -213,18 +258,25 @@ function Inner({ id }: { id: string }) {
         </div>
       )}
 
-      {/* By dimension (global) */}
-      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">Score por dimensão (global)</h3>
-        <div className="mt-4 space-y-3">
+      {/* Score por dimensao */}
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="border-b border-gray-100 px-5 py-4">
+          <h3 className="text-sm font-bold text-gray-900">Score por dimensão (global)</h3>
+        </div>
+        <div className="space-y-4 p-5">
           {Object.entries(data.aggregate.byDimension).map(([k, v]) => (
             <div key={k}>
               <div className="flex items-center justify-between text-sm">
                 <span className="font-medium text-gray-700">{v.label}</span>
-                <span className="font-mono text-gray-500">{v.score.toFixed(1)} · {v.pct}%</span>
+                <span className="font-mono text-xs text-gray-400">{v.score.toFixed(1)} · {v.pct}%</span>
               </div>
-              <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-gray-200">
-                <div className={`h-full ${v.pct >= 75 ? "bg-emerald-500" : v.pct >= 50 ? "bg-yellow-400" : "bg-red-500"}`} style={{ width: `${v.pct}%` }} />
+              <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-gray-100">
+                <div
+                  className={`h-full rounded-full transition-all ${
+                    v.pct >= 75 ? "bg-emerald-500" : v.pct >= 50 ? "bg-amber-400" : "bg-red-500"
+                  }`}
+                  style={{ width: `${v.pct}%` }}
+                />
               </div>
             </div>
           ))}
@@ -232,40 +284,43 @@ function Inner({ id }: { id: string }) {
       </div>
 
       {/* Heatmap */}
-      <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-        <div className="border-b border-gray-200 p-4">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">Heatmap por área × dimensão</h3>
-          <p className="mt-1 text-xs text-gray-500">
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="border-b border-gray-100 px-5 py-4">
+          <h3 className="text-sm font-bold text-gray-900">Heatmap por área x dimensão</h3>
+          <p className="mt-0.5 text-xs text-gray-500">
             Áreas com menos de {data.aggregate.threshold} respostas ficam bloqueadas (anonimato).
           </p>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500">Área</th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500">N</th>
+            <thead>
+              <tr className="border-b border-gray-100 text-left text-[11px] uppercase tracking-wider text-gray-400">
+                <th className="px-5 py-3 font-semibold">Área</th>
+                <th className="px-5 py-3 font-semibold">N</th>
                 {data.aggregate.heatmap[0]?.cells.map((c) => (
-                  <th key={c.dimension} className="px-2 py-2 text-center text-xs font-semibold text-gray-500" title={c.label}>
+                  <th key={c.dimension} className="px-2 py-3 text-center font-semibold" title={c.label}>
                     {abbreviate(c.label)}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody>
               {data.aggregate.heatmap.map((row) => (
-                <tr key={row.area}>
-                  <td className="px-4 py-2 text-sm font-medium text-gray-700">{row.area}</td>
-                  <td className="px-4 py-2 text-xs text-gray-500">{row.count}</td>
+                <tr key={row.area} className="border-b border-gray-50 last:border-0 hover:bg-primary/[0.03]">
+                  <td className="px-5 py-3 text-sm font-semibold text-gray-900">{row.area}</td>
+                  <td className="px-5 py-3 text-xs text-gray-400">{row.count}</td>
                   {row.cells.map((c) => (
                     <td key={c.dimension} className="px-2 py-2 text-center">
                       {c.pct === null ? (
-                        <span className="inline-flex h-8 w-12 items-center justify-center rounded text-gray-400" title="Anonimato">
+                        <span
+                          className="inline-flex h-8 w-12 items-center justify-center rounded-xl text-gray-300"
+                          title="Anonimato"
+                        >
                           <HiOutlineLockClosed />
                         </span>
                       ) : (
                         <span
-                          className={`inline-flex h-8 w-12 items-center justify-center rounded text-xs font-bold ${cellColor(c.pct)}`}
+                          className={`inline-flex h-8 w-12 items-center justify-center rounded-xl text-xs font-bold ${cellColor(c.pct)}`}
                           title={`${c.label}: ${c.pct}%`}
                         >
                           {c.pct}
@@ -286,7 +341,7 @@ function Inner({ id }: { id: string }) {
 function cellColor(pct: number): string {
   if (pct >= 80) return "bg-emerald-500 text-white";
   if (pct >= 65) return "bg-emerald-200 text-emerald-900";
-  if (pct >= 50) return "bg-yellow-200 text-yellow-900";
+  if (pct >= 50) return "bg-amber-200 text-amber-900";
   if (pct >= 35) return "bg-orange-300 text-orange-900";
   return "bg-red-500 text-white";
 }

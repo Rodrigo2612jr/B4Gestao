@@ -122,7 +122,7 @@ export default function ReleaseModal({ userName, forceOpen, onClose, showAll }: 
           </div>
         </div>
 
-        {/* Body — lista de releases */}
+        {/* Body · lista de releases */}
         <div className="max-h-[55vh] overflow-y-auto px-6 py-5 sm:px-8 sm:py-6">
           <ol className="space-y-7">
             {releases.map((r, idx) => {

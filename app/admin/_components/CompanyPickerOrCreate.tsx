@@ -211,7 +211,7 @@ function CreateMode({ onSelect }: { onSelect: (c: SelectableCompany) => void }) 
         <div className={`rounded-lg p-3 text-xs ${info.created ? "bg-emerald-50 text-emerald-900" : "bg-blue-50 text-blue-900"}`}>
           {info.created
             ? "✓ Empresa cadastrada agora."
-            : "✓ CNPJ já existia no sistema — vinculado ao cadastro existente."}
+            : "✓ CNPJ já existia no sistema · vinculado ao cadastro existente."}
           {info.suggestions?.length > 0 && (
             <p className="mt-1 text-yellow-700">
               ⚠ {info.suggestions.length} possível duplicata por nome detectada. Verifique depois na tela da empresa.

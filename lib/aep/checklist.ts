@@ -1,12 +1,13 @@
 /**
- * Checklist FO-SST.013 — "Diretrizes ergonômicas para a otimização das cargas
+ * Checklist FO-SST.013 - "Diretrizes ergonômicas para a otimização das cargas
  * de trabalho sobre o sistema musculoesquelético" (NR-17 e ABNT ISO 20646:2017).
  *
- * Extraído do formulário oficial da B4. Cada item é respondido SIM / NÃO / N/A.
- * Alguns itens têm subopções (faixas de tempo) ou campos (frequência/peso).
+ * Transcrição FIEL do formulário oficial da B4 (revisão 00), pergunta por pergunta,
+ * na ordem e nas categorias do documento. Cada item é respondido SIM / NÃO / N/A.
+ * Alguns itens têm subopções (faixas) ou campos (frequência/peso).
  *
- * IDs são ESTÁVEIS — não renomear, pois as respostas são gravadas por id no
- * JSONB `aep_assessments.checklist`.
+ * IDs são ESTÁVEIS - não renomear (as respostas são gravadas por id no JSONB
+ * aep_assessments.checklist).
  */
 
 export interface ChecklistOption {
@@ -23,7 +24,7 @@ export interface ChecklistField {
 export interface ChecklistQuestion {
   id: string;
   label: string;
-  /** Subopções de seleção (aparecem ao marcar SIM). multi=true → várias. */
+  /** Subopções de seleção (aparecem ao marcar SIM). multi=true => várias. */
   options?: ChecklistOption[];
   multi?: boolean;
   /** Campos de texto livre (ex.: frequência / peso). */
@@ -38,10 +39,25 @@ export interface ChecklistCategory {
 
 export const AEP_CHECKLIST: ChecklistCategory[] = [
   {
+    id: "mobiliarios",
+    label: "Mobiliários e Equipamentos",
+    questions: [
+      { id: "mob_assento", label: "Assento inadequado?" },
+      { id: "mob_encosto", label: "Encosto do assento inadequado ou ausente?" },
+      { id: "mob_sem_regulagem_equip", label: "Equipamentos e/ou máquinas sem meios de regulagem de ajuste ou sem condições de uso?" },
+      { id: "mob_antropometria", label: "Equipamentos ou mobiliários não adaptados à antropometria do trabalhador?" },
+      { id: "mob_sem_espaco", label: "Mobiliário ou equipamento sem espaço para movimentação dos segmentos corporais?" },
+      { id: "mob_sem_regulagem", label: "Mobiliários sem meios de regulagem de ajuste?" },
+      { id: "mob_alcance", label: "Trabalho com necessidade de alcançar objetos, documentos, controles ou qualquer ponto além das zonas de alcance ideais para as características antropométricas do trabalhador (Alcance ótimo: 35 a 45cm para uso frequente; Alcance máximo: 55 a 65cm para uso eventual)?" },
+      { id: "mob_improvisado", label: "Posto de trabalho improvisado?" },
+      { id: "mob_falta_equip", label: "Falta de outros equipamentos (suporte de notebook, teclado, mouse, mousepad, apoio de pé)?" },
+      { id: "mob_nao_planejado", label: "Posto de trabalho não planejado/adaptado para a posição sentada?" },
+    ],
+  },
+  {
     id: "biomecanicos",
     label: "Biomecânicos",
     questions: [
-      { id: "bio_forca", label: "Exigência de uso frequente de força, pressão, preensão, flexão, extensão ou torção dos segmentos corporais?" },
       { id: "bio_posturas_incomodas", label: "Exigência de posturas incômodas ou pouco confortáveis por longos períodos (acima de 2 horas)?" },
       { id: "bio_sentado", label: "Postura sentada por longos períodos (acima de 2 horas contínuas)?" },
       { id: "bio_em_pe", label: "Postura de pé por longos períodos (acima de 2 horas contínuas)?" },
@@ -74,71 +90,17 @@ export const AEP_CHECKLIST: ChecklistCategory[] = [
           { id: "palmar", label: ">3kg em preensão palmar acima de 2h por dia" },
         ],
       },
+      { id: "bio_forca", label: "Exigência de uso frequente de força, pressão, preensão, flexão, extensão ou torção dos segmentos corporais?" },
+      { id: "bio_compressao", label: "Compressão de partes do corpo por superfícies rígidas ou com quinas?" },
       { id: "bio_flexoes_coluna", label: "Exigência de flexões de coluna vertebral frequentes?" },
       { id: "bio_pedais", label: "Uso frequente de pedais?" },
-      { id: "bio_elevacao_mmss", label: "Exigência de elevação frequente de membros superiores?" },
-      { id: "bio_elevacao_mmss_1h", label: "Exigência de elevação frequente de membros superiores (mais de 1h/dia)?" },
+      { id: "bio_elevacao_mmss", label: "Exigência de elevação frequentes de membros superiores?" },
       { id: "bio_alavancas", label: "Uso frequente de alavancas?" },
+      { id: "bio_elevacao_mmss_1h", label: "Exigência de elevação frequentes de membros superiores (mais de 1h/dia)?" },
       { id: "bio_pega_pobre", label: "Manuseio ou movimentação de cargas sem pega ou com “pega pobre”?" },
       { id: "bio_vibracao_corpo", label: "Exposição a vibração de corpo inteiro (por tempo prolongado)?" },
       { id: "bio_vibracao_local", label: "Exposição a vibração localizada (por tempo prolongado)?" },
-    ],
-  },
-  {
-    id: "mobiliarios",
-    label: "Mobiliários e Equipamentos",
-    questions: [
-      { id: "mob_alcance", label: "Trabalho com necessidade de alcançar objetos, documentos, controles ou qualquer ponto além das zonas de alcance ideais para as características antropométricas do trabalhador? (Alcance ótimo: 35–45cm; máximo: 55–65cm)" },
-      { id: "mob_falta_equip", label: "Falta de outros equipamentos (suporte de notebook, teclado, mouse, mousepad, apoio de pé)?" },
-      { id: "mob_nao_planejado", label: "Posto de trabalho não planejado/adaptado para a posição sentada?" },
-      { id: "mob_sem_regulagem", label: "Equipamentos e/ou máquinas sem meios de regulagem de ajuste ou sem condições de uso?" },
-      { id: "mob_antropometria", label: "Equipamentos ou mobiliários não adaptados à antropometria do trabalhador?" },
-      { id: "mob_sem_espaco", label: "Mobiliário ou equipamento sem espaço para movimentação dos segmentos corporais?" },
-      { id: "mob_mobiliario_sem_regulagem", label: "Mobiliários sem meios de regulagem de ajuste?" },
-      { id: "mob_improvisado", label: "Posto de trabalho improvisado?" },
-      { id: "mob_compressao", label: "Compressão de partes do corpo por superfícies rígidas ou com quinas?" },
-      { id: "mob_escadas", label: "Uso frequente de escadas?" },
-      { id: "mob_assento", label: "Assento inadequado?" },
-      { id: "mob_encosto", label: "Encosto do assento inadequado ou ausente?" },
-    ],
-  },
-  {
-    id: "psicossociais",
-    label: "Psicossociais / Cognitivos",
-    questions: [
-      { id: "psi_multitarefa", label: "Exigência de realização de múltiplas tarefas, com alta demanda cognitiva?" },
-      { id: "psi_ritmo_intenso", label: "Necessidade de manter ritmos intensos de trabalho?" },
-      { id: "psi_variacao_turnos", label: "Trabalho com necessidade de variação de turnos?" },
-      {
-        id: "psi_monotonia",
-        label: "Monotonia?",
-        options: [
-          { id: "2_3", label: "Mesmas ações técnicas 2/3 do tempo de ciclo (51–80%)" },
-          { id: "gt80", label: "Mesmas ações técnicas quase o tempo todo do ciclo (>80%)" },
-        ],
-      },
-      { id: "psi_estresse", label: "Excesso de situações de estresse?" },
-      { id: "psi_sobrecarga_mental", label: "Situações de sobrecarga de trabalho mental?" },
-      { id: "psi_concentracao", label: "Exigência de alto nível de concentração, atenção e memória?" },
-      { id: "psi_dificil_comunicacao", label: "Trabalho em condições de difícil comunicação?" },
-      { id: "psi_conflitos", label: "Excesso de conflitos hierárquicos no trabalho?" },
-      { id: "psi_insatisfacao", label: "Insatisfação no trabalho?" },
-      { id: "psi_demandas_divergentes", label: "Trabalho com demandas divergentes (ordens divergentes, metas incompatíveis, qualidade x quantidade, etc.)?" },
-      { id: "psi_autonomia", label: "Falta de autonomia no trabalho?" },
-      { id: "psi_demandas_emocionais", label: "Excesso de demandas emocionais/afetivas no trabalho?" },
-      { id: "psi_assedio", label: "Assédio de qualquer natureza no trabalho?" },
-    ],
-  },
-  {
-    id: "ambientais",
-    label: "Ambientais",
-    questions: [
-      { id: "amb_ilum_diurna", label: "Condições de trabalho com iluminação diurna inadequada?" },
-      { id: "amb_ilum_noturna", label: "Condições de trabalho com iluminação noturna inadequada?" },
-      { id: "amb_piso", label: "Piso escorregadio e/ou irregular?" },
-      { id: "amb_reflexos", label: "Presença de reflexos em telas, painéis, vidros, monitores ou qualquer superfície que cause desconforto ou prejudique a visualização?" },
-      { id: "amb_ruido", label: "Condições de trabalho com níveis de pressão sonora fora dos parâmetros de conforto?" },
-      { id: "amb_temperatura", label: "Condições de trabalho com índice de temperatura efetiva fora dos parâmetros de conforto? (18 a 25 °C para ambientes climatizados)" },
+      { id: "bio_escadas", label: "Uso frequente de escadas?" },
     ],
   },
   {
@@ -146,14 +108,59 @@ export const AEP_CHECKLIST: ChecklistCategory[] = [
     label: "Organizacionais",
     questions: [
       { id: "org_sem_pausas", label: "Trabalho realizado sem pausas pré-definidas para descanso?" },
+      { id: "org_ritmos_intensos", label: "Necessidade de manter ritmos intensos de trabalho?" },
+      { id: "org_variacao_turnos", label: "Trabalho com necessidade de variação de turnos?" },
+      {
+        id: "org_monotonia",
+        label: "Monotonia?",
+        options: [
+          { id: "2_3", label: "Mesmas ações técnicas 2/3 do tempo de ciclo (51 a 80%)" },
+          { id: "gt80", label: "Mesmas ações técnicas quase o tempo todo do ciclo (acima de 80%)" },
+        ],
+      },
       { id: "org_noturno", label: "Trabalho noturno?" },
-      { id: "org_desequilibrio", label: "Desequilíbrio entre tempo de trabalho e tempo de repouso?" },
+      { id: "org_capacitacao", label: "Insuficiência de capacitação para execução da tarefa?" },
+      { id: "org_metas", label: "Trabalho com utilização rigorosa de metas de produção?" },
       { id: "org_producao", label: "Trabalho remunerado por produção?" },
       { id: "org_ritmo_equipamento", label: "Ritmo do trabalho imposto por um equipamento?" },
-      { id: "org_metas", label: "Trabalho com utilização rigorosa de metas de produção?" },
-      { id: "org_capacitacao", label: "Insuficiência de capacitação para execução da tarefa?" },
+      { id: "org_desequilibrio", label: "Desequilíbrio entre tempo de trabalho e tempo de repouso?" },
     ],
   },
+  {
+    id: "ambientais",
+    label: "Ambientais",
+    questions: [
+      { id: "amb_ruido", label: "Condições de trabalho com níveis de pressão sonora fora dos parâmetros de conforto?" },
+      { id: "amb_temperatura", label: "Condições de trabalho com índice de temperatura efetiva fora dos parâmetros de conforto? (temperatura do ar entre 18 e 25 °C para ambientes climatizados)" },
+      { id: "amb_ilum_diurna", label: "Condições de trabalho com iluminação diurna inadequada?" },
+      { id: "amb_ilum_noturna", label: "Condições de trabalho com iluminação noturna inadequada?" },
+      { id: "amb_reflexos", label: "Presença de reflexos em telas, painéis, vidros, monitores ou qualquer superfície, que causem desconforto ou prejudiquem a visualização?" },
+      { id: "amb_piso", label: "Piso escorregadio e/ou irregular?" },
+    ],
+  },
+  {
+    id: "psicossociais",
+    label: "Psicossociais / Cognitivos",
+    questions: [
+      { id: "psi_estresse", label: "Excesso de situações de estresse?" },
+      { id: "psi_sobrecarga_mental", label: "Situações de sobrecarga de trabalho mental?" },
+      { id: "psi_concentracao", label: "Exigência de alto nível de concentração, atenção e memória?" },
+      { id: "psi_dificil_comunicacao", label: "Trabalho em condições de difícil comunicação?" },
+      { id: "psi_conflitos", label: "Excesso de conflitos hierárquicos no trabalho?" },
+      { id: "psi_demandas_emocionais", label: "Excesso de demandas emocionais/afetivas no trabalho?" },
+      { id: "psi_assedio", label: "Assédio de qualquer natureza no trabalho?" },
+      { id: "psi_demandas_divergentes", label: "Trabalho com demandas divergentes (ordens divergentes, metas incompatíveis entre si, exigência de qualidade x quantidade, entre outras)?" },
+      { id: "psi_multitarefa", label: "Exigência de realização de múltiplas tarefas, com alta demanda cognitiva?" },
+      { id: "psi_autonomia", label: "Falta de autonomia no trabalho?" },
+      { id: "psi_insatisfacao", label: "Insatisfação no trabalho?" },
+    ],
+  },
+];
+
+/** Orientações oficiais do rodapé do formulário FO-SST.013. */
+export const AEP_ORIENTACOES: string[] = [
+  "Fotografar o posto de trabalho (3 a 4 fotos) com o colaborador no posto, identificando mesa, cadeira, bancada, equipamento de trabalho, etc.",
+  "Descrever a atividade, se de rotina, intermitente ou eventual, concomitante com outras atividades.",
 ];
 
 export type ChecklistResposta = "SIM" | "NAO" | "NA";
@@ -166,6 +173,8 @@ export interface ChecklistAnswer {
   opts?: string[];
   /** campos livres (fieldId -> valor) */
   fields?: Record<string, string>;
+  /** observação opcional do avaliador para o item */
+  nota?: string;
 }
 
 export type ChecklistAnswers = Record<string, ChecklistAnswer>;

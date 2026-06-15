@@ -43,12 +43,19 @@ export function middleware(req: NextRequest) {
       newUrl.pathname = `/admin${url.pathname === "/" ? "" : url.pathname}`;
       return NextResponse.rewrite(newUrl);
     }
+
+    // aep.b4gestao.com.br/* → /aep/*  (portal do técnico/supervisor)
+    if (sub === "aep" && !url.pathname.startsWith("/aep")) {
+      const newUrl = url.clone();
+      newUrl.pathname = `/aep${url.pathname === "/" ? "" : url.pathname}`;
+      return NextResponse.rewrite(newUrl);
+    }
   }
 
   const res = NextResponse.next();
 
-  // Admin não pode ser indexado
-  if (req.nextUrl.pathname.startsWith("/admin")) {
+  // Áreas internas não podem ser indexadas
+  if (req.nextUrl.pathname.startsWith("/admin") || req.nextUrl.pathname.startsWith("/aep")) {
     res.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
   }
 

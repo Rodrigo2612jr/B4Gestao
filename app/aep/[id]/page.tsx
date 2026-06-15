@@ -11,12 +11,13 @@ import {
   HiOutlineCheckCircle,
   HiOutlineXCircle,
   HiOutlineClock,
+  HiOutlineAnnotation,
 } from "react-icons/hi";
-import AdminShell from "../../_components/AdminShell";
-import { useToast } from "../../_components/ToastProvider";
+import AepShell from "../_components/AepShell";
+import { useToast } from "../../admin/_components/ToastProvider";
 import AepChat from "../_components/AepChat";
 import StatusBadge from "../_components/StatusBadge";
-import { AEP_CHECKLIST, type ChecklistAnswers, type ChecklistResposta } from "@/lib/aep/checklist";
+import { AEP_CHECKLIST, type ChecklistAnswers, type ChecklistAnswer, type ChecklistResposta } from "@/lib/aep/checklist";
 import { calcRiskLevel, riskLabel, type AepStatus } from "@/lib/aep/scoring";
 import type { AepFull } from "@/lib/aep/db";
 
@@ -42,9 +43,9 @@ const RISK_FACTORS = ["Ambiental", "Biomecânicos", "Mobiliário e equipamentos"
 
 export default function AepAssessmentPage() {
   return (
-    <AdminShell title="Avaliação Ergonômica Preliminar">
+    <AepShell title="Avaliação Ergonômica Preliminar">
       <Inner />
-    </AdminShell>
+    </AepShell>
   );
 }
 
@@ -181,7 +182,7 @@ function Inner() {
     return (
       <div className="space-y-4">
         <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error || "Não encontrado"}</div>
-        <button onClick={() => router.push("/admin/aep")} className="text-sm text-primary hover:underline">← Voltar para a lista</button>
+        <button onClick={() => router.push("/aep")} className="text-sm text-primary hover:underline">← Voltar para a lista</button>
       </div>
     );
   }
@@ -194,7 +195,7 @@ function Inner() {
       {/* Cabeçalho */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <button onClick={() => router.push("/admin/aep")} className="mb-1 flex items-center gap-1 text-xs text-gray-500 hover:text-primary">
+          <button onClick={() => router.push("/aep")} className="mb-1 flex items-center gap-1 text-xs text-gray-500 hover:text-primary">
             <HiOutlineArrowLeft /> AEP
           </button>
           <h2 className="text-xl font-bold text-secondary">{data.title}</h2>
@@ -203,10 +204,10 @@ function Inner() {
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-500">
             <StatusBadge status={status} />
-            <span>Técnico: <b className="text-gray-700">{data.avaliador_name ?? "—"}</b></span>
+            <span>Técnico: <b className="text-gray-700">{data.avaliador_name ?? "-"}</b></span>
             {presence.tecnico && <span className="inline-flex items-center gap-1 text-emerald-600"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />preenchendo</span>}
             <span className="text-gray-300">·</span>
-            <span>Supervisor: <b className="text-gray-700">{data.supervisor_name ?? "—"}</b></span>
+            <span>Supervisor: <b className="text-gray-700">{data.supervisor_name ?? "-"}</b></span>
             {presence.supervisor && <span className="inline-flex items-center gap-1 text-emerald-600"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />online</span>}
           </div>
         </div>
@@ -238,7 +239,7 @@ function Inner() {
       {/* Banners de estado */}
       {status === "aguardando_aprovacao" && (data.viewer.isAvaliador) && (
         <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          <HiOutlineClock className="text-lg" /> Avaliação enviada. Aguardando aprovação do supervisor — edição bloqueada até a resposta.
+          <HiOutlineClock className="text-lg" /> Avaliação enviada. Aguardando aprovação do supervisor · edição bloqueada até a resposta.
         </div>
       )}
       {status === "reprovado" && (
@@ -320,7 +321,7 @@ function Inner() {
               if (!res.ok) {
                 push(d.error || "Erro", "error");
               } else {
-                push("Avaliação reprovada — técnico notificado.");
+                push("Avaliação reprovada · técnico notificado.");
                 setShowReject(false);
                 await load();
               }
@@ -357,8 +358,19 @@ function GeralStep({ data, readOnly, onPatch }: { data: FullData; readOnly: bool
 // ============================================================
 // STEP: CHECKLIST
 // ============================================================
+const CAT_COLORS: Record<string, { band: string; text: string; bar: string; ring: string }> = {
+  mobiliarios: { band: "bg-blue-50", text: "text-blue-700", bar: "bg-blue-500", ring: "ring-blue-100" },
+  biomecanicos: { band: "bg-indigo-50", text: "text-indigo-700", bar: "bg-indigo-500", ring: "ring-indigo-100" },
+  organizacionais: { band: "bg-amber-50", text: "text-amber-700", bar: "bg-amber-500", ring: "ring-amber-100" },
+  ambientais: { band: "bg-cyan-50", text: "text-cyan-700", bar: "bg-cyan-500", ring: "ring-cyan-100" },
+  psicossociais: { band: "bg-violet-50", text: "text-violet-700", bar: "bg-violet-500", ring: "ring-violet-100" },
+};
+
 function ChecklistStep({ data, readOnly, onPatch }: { data: FullData; readOnly: boolean; onPatch: (b: Record<string, unknown>) => void }) {
   const [answers, setAnswers] = useState<ChecklistAnswers>(data.checklist || {});
+  const [notesOpen, setNotesOpen] = useState<Set<string>>(
+    () => new Set(Object.entries(data.checklist || {}).filter(([, v]) => (v as ChecklistAnswer)?.nota).map(([k]) => k))
+  );
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const queueSave = useCallback(
@@ -372,7 +384,8 @@ function ChecklistStep({ data, readOnly, onPatch }: { data: FullData; readOnly: 
 
   const setResp = (qid: string, resp: ChecklistResposta) => {
     setAnswers((prev) => {
-      const next = { ...prev, [qid]: { ...prev[qid], resp } };
+      const cur = prev[qid] || {};
+      const next = { ...prev, [qid]: { ...cur, resp: cur.resp === resp ? null : resp } };
       queueSave(next);
       return next;
     });
@@ -401,88 +414,144 @@ function ChecklistStep({ data, readOnly, onPatch }: { data: FullData; readOnly: 
       return next;
     });
   };
+  const setNota = (qid: string, val: string) => {
+    setAnswers((prev) => {
+      const next = { ...prev, [qid]: { ...(prev[qid] || {}), nota: val } };
+      queueSave(next);
+      return next;
+    });
+  };
+  const toggleNote = (qid: string) => {
+    setNotesOpen((prev) => {
+      const n = new Set(prev);
+      if (n.has(qid)) n.delete(qid); else n.add(qid);
+      return n;
+    });
+  };
 
   const total = AEP_CHECKLIST.reduce((a, c) => a + c.questions.length, 0);
   const answered = AEP_CHECKLIST.reduce((a, c) => a + c.questions.filter((q) => answers[q.id]?.resp).length, 0);
+  const pct = total ? Math.round((answered / total) * 100) : 0;
 
   return (
     <div className="space-y-5">
-      <div className="rounded-xl border border-gray-200 bg-white p-3 text-xs text-gray-500">
-        {answered}/{total} respondidas — responda SIM, NÃO ou N/A em cada item.
-        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-gray-200">
-          <div className="h-full bg-primary transition-all" style={{ width: `${total ? (answered / total) * 100 : 0}%` }} />
+      {/* Progresso geral */}
+      <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-secondary to-primary p-4 text-white shadow-sm">
+        <div className="flex items-center justify-between text-sm">
+          <span className="font-semibold">Checklist FO-SST.013</span>
+          <span className="tabular-nums text-white/90">{answered}/{total} · {pct}%</span>
         </div>
+        <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/20">
+          <div className="h-full rounded-full bg-accent transition-all duration-500" style={{ width: `${pct}%` }} />
+        </div>
+        <p className="mt-2 text-xs text-white/70">Marque SIM, NÃO ou N/A em cada item. Toque em “observação” para detalhar quando precisar.</p>
       </div>
 
-      {AEP_CHECKLIST.map((cat) => (
-        <div key={cat.id} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h4 className="mb-3 text-sm font-bold uppercase tracking-wide text-primary">{cat.label}</h4>
-          <div className="space-y-3">
-            {cat.questions.map((q) => {
-              const a = answers[q.id] || {};
-              return (
-                <div key={q.id} className="border-b border-gray-50 pb-3 last:border-0 last:pb-0">
-                  <p className="text-sm text-gray-800">{q.label}</p>
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    {(["SIM", "NAO", "NA"] as ChecklistResposta[]).map((r) => {
-                      const sel = a.resp === r;
-                      const colorOn = r === "SIM" ? "bg-red-500" : r === "NAO" ? "bg-emerald-600" : "bg-gray-400";
-                      return (
-                        <button
-                          key={r}
-                          type="button"
-                          disabled={readOnly}
-                          onClick={() => setResp(q.id, r)}
-                          className={`rounded-lg px-3 py-1 text-xs font-semibold transition-colors ${
-                            sel ? `${colorOn} text-white` : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                          } ${readOnly ? "cursor-default opacity-80" : ""}`}
-                        >
-                          {r === "NAO" ? "NÃO" : r === "NA" ? "N/A" : "SIM"}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {/* Subopções quando SIM */}
-                  {a.resp === "SIM" && q.options && (
-                    <div className="mt-2 flex flex-wrap gap-2 pl-1">
-                      {q.options.map((o) => {
-                        const sel = q.multi ? (a.opts || []).includes(o.id) : a.opt === o.id;
-                        return (
-                          <button
-                            key={o.id}
-                            type="button"
+      {AEP_CHECKLIST.map((cat) => {
+        const c = CAT_COLORS[cat.id] ?? CAT_COLORS.mobiliarios;
+        const catAns = cat.questions.filter((q) => answers[q.id]?.resp).length;
+        return (
+          <div key={cat.id} className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <div className={`flex items-center justify-between gap-2 ${c.band} px-5 py-3`}>
+              <h4 className={`text-sm font-bold uppercase tracking-wide ${c.text}`}>{cat.label}</h4>
+              <span className={`rounded-full bg-white/70 px-2 py-0.5 text-[11px] font-semibold tabular-nums ${c.text}`}>{catAns}/{cat.questions.length}</span>
+            </div>
+            <div className="divide-y divide-gray-100">
+              {cat.questions.map((q) => {
+                const a = answers[q.id] || {};
+                const accent =
+                  a.resp === "SIM" ? "border-l-red-400 bg-red-50/40"
+                  : a.resp === "NAO" ? "border-l-emerald-400 bg-emerald-50/40"
+                  : a.resp === "NA" ? "border-l-gray-300 bg-gray-50/50"
+                  : "border-l-transparent";
+                const noteOpen = notesOpen.has(q.id);
+                return (
+                  <div key={q.id} className={`border-l-[3px] px-4 py-3.5 transition-colors ${accent}`}>
+                    <div className="flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                      <p className="text-sm leading-snug text-gray-800 sm:flex-1">{q.label}</p>
+                      <div className="inline-flex flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                        {(["SIM", "NAO", "NA"] as ChecklistResposta[]).map((r) => {
+                          const sel = a.resp === r;
+                          const on = r === "SIM" ? "bg-red-500 text-white" : r === "NAO" ? "bg-emerald-600 text-white" : "bg-gray-500 text-white";
+                          return (
+                            <button
+                              key={r}
+                              type="button"
+                              disabled={readOnly}
+                              onClick={() => setResp(q.id, r)}
+                              className={`min-w-[44px] px-3 py-1.5 text-xs font-bold transition-colors ${sel ? on : "text-gray-500 hover:bg-gray-100"} ${readOnly ? "cursor-default" : ""}`}
+                            >
+                              {r === "NAO" ? "NÃO" : r === "NA" ? "N/A" : "SIM"}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {a.resp === "SIM" && q.options && (
+                      <div className="mt-2.5 flex flex-wrap gap-2">
+                        {q.options.map((o) => {
+                          const sel = q.multi ? (a.opts || []).includes(o.id) : a.opt === o.id;
+                          return (
+                            <button
+                              key={o.id}
+                              type="button"
+                              disabled={readOnly}
+                              onClick={() => setOpt(q.id, o.id, !!q.multi)}
+                              className={`rounded-full border px-3 py-1 text-[11px] transition-colors ${sel ? "border-primary bg-primary/10 font-medium text-primary" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+                            >
+                              {o.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                    {a.resp === "SIM" && q.fields && (
+                      <div className="mt-2.5 flex flex-wrap gap-2">
+                        {q.fields.map((f) => (
+                          <input
+                            key={f.id}
                             disabled={readOnly}
-                            onClick={() => setOpt(q.id, o.id, !!q.multi)}
-                            className={`rounded-full border px-3 py-1 text-[11px] transition-colors ${
-                              sel ? "border-primary bg-primary/10 text-primary" : "border-gray-200 text-gray-600 hover:bg-gray-50"
-                            }`}
-                          >
-                            {o.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                  {a.resp === "SIM" && q.fields && (
-                    <div className="mt-2 flex flex-wrap gap-2 pl-1">
-                      {q.fields.map((f) => (
-                        <input
-                          key={f.id}
-                          disabled={readOnly}
-                          defaultValue={a.fields?.[f.id] ?? ""}
-                          onBlur={(e) => setFieldVal(q.id, f.id, e.target.value)}
-                          placeholder={f.label}
-                          className="w-32 rounded-lg border border-gray-300 px-2 py-1 text-xs outline-none focus:border-primary"
+                            defaultValue={a.fields?.[f.id] ?? ""}
+                            onBlur={(e) => setFieldVal(q.id, f.id, e.target.value)}
+                            placeholder={f.label}
+                            className="w-36 rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Observação */}
+                    {!readOnly && (
+                      <button
+                        type="button"
+                        onClick={() => toggleNote(q.id)}
+                        className={`mt-2 inline-flex items-center gap-1 text-[11px] font-medium transition-colors ${a.nota || noteOpen ? "text-primary" : "text-gray-400 hover:text-primary"}`}
+                      >
+                        <HiOutlineAnnotation className="text-sm" />
+                        {a.nota ? "Editar observação" : noteOpen ? "Fechar observação" : "Adicionar observação"}
+                      </button>
+                    )}
+                    {(noteOpen || a.nota) && (
+                      readOnly ? (
+                        a.nota ? <p className="mt-1.5 rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-600"><span className="font-semibold text-gray-500">Obs.: </span>{a.nota}</p> : null
+                      ) : (
+                        <textarea
+                          defaultValue={a.nota ?? ""}
+                          onBlur={(e) => setNota(q.id, e.target.value)}
+                          rows={2}
+                          placeholder="Observação do avaliador para este item…"
+                          className="mt-1.5 w-full rounded-lg border border-gray-200 px-3 py-2 text-xs outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
                         />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                      )
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -771,7 +840,7 @@ function RiscosStep({
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border border-gray-200 bg-white p-4 text-xs text-gray-500 shadow-sm">
-        Inventário de perigos e riscos por GHE/função. <b>P</b> = probabilidade, <b>S</b> = severidade (1–5), <b>N</b> = nível (calculado).
+        Inventário de perigos e riscos por GHE/função. <b>P</b> = probabilidade, <b>S</b> = severidade (1-5), <b>N</b> = nível (calculado).
       </div>
 
       {!readOnly && (
@@ -855,7 +924,7 @@ function RiskRow({
         <ScoreSelect label="S" value={s} readOnly={readOnly} onChange={(v) => { setS(v); save({ p, s: v }); }} />
         <div className="flex items-center gap-2">
           <span className="text-xs font-medium text-gray-500">Nível</span>
-          <span className={`rounded-lg px-2.5 py-1 text-xs font-bold ${nColor}`}>{n ?? "—"} {n ? `· ${riskLabel(n)}` : ""}</span>
+          <span className={`rounded-lg px-2.5 py-1 text-xs font-bold ${nColor}`}>{n ?? "-"} {n ? `· ${riskLabel(n)}` : ""}</span>
         </div>
       </div>
     </div>
@@ -872,7 +941,7 @@ function ScoreSelect({ label, value, readOnly, onChange }: { label: string; valu
         onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)}
         className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-xs outline-none focus:border-primary disabled:bg-gray-50"
       >
-        <option value="">—</option>
+        <option value="">-</option>
         {[1, 2, 3, 4, 5].map((v) => <option key={v} value={v}>{v}</option>)}
       </select>
     </div>
@@ -886,7 +955,7 @@ function ReadField({ label, value }: { label: string; value: string | null }) {
   return (
     <div>
       <label className="text-xs font-medium text-gray-500">{label}</label>
-      <p className="mt-1 text-sm font-medium text-gray-900">{value || "—"}</p>
+      <p className="mt-1 text-sm font-medium text-gray-900">{value || "-"}</p>
     </div>
   );
 }

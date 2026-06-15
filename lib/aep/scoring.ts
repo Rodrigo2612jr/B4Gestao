@@ -1,12 +1,12 @@
 /**
  * Cálculo do nível de risco do inventário do AEP e máquina de estados.
  *
- * NÍVEL DO RISCO (N): derivado de Probabilidade (P) e Severidade (S), ambos 1–5.
- * Fórmula provisória N = arredonda((P+S)/2) para cima — reproduz exatamente os
+ * NÍVEL DO RISCO (N): derivado de Probabilidade (P) e Severidade (S), ambos 1-5.
+ * Fórmula provisória N = arredonda((P+S)/2) para cima · reproduz exatamente os
  * exemplos do documento oficial da B4 (ex.: P3/S3→3, P3/S1→2, P2/S2→2, P5/S1→3).
  *
  * TODO(B4): substituir pela matriz de risco oficial da B4 quando recebida
- * (decisão pendente — Rodrigo vai fornecer a tabela normativa).
+ * (decisão pendente · Rodrigo vai fornecer a tabela normativa).
  */
 
 export function calcRiskLevel(p: number | null | undefined, s: number | null | undefined): number | null {
@@ -24,7 +24,7 @@ export function riskLabel(n: number | null | undefined): string {
     case 3: return "Moderado";
     case 4: return "Substancial";
     case 5: return "Intolerável";
-    default: return "—";
+    default: return "-";
   }
 }
 

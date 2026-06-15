@@ -2,8 +2,15 @@
 
 import { useState, useEffect, useCallback, use } from "react";
 import Link from "next/link";
-import { HiOutlineArrowLeft, HiOutlineExclamation, HiOutlineDocumentReport } from "react-icons/hi";
+import {
+  HiOutlineArrowLeft,
+  HiOutlineExclamation,
+  HiOutlineDocumentReport,
+  HiOutlineCheckCircle,
+  HiOutlineClock,
+} from "react-icons/hi";
 import AdminShell from "../../../_components/AdminShell";
+import KpiTile from "../../../_components/KpiTile";
 import { useToast } from "../../../_components/ToastProvider";
 
 interface Alert {
@@ -33,15 +40,21 @@ interface Upload {
   createdAt: string;
 }
 
+// Cores semanticas mantidas: severidade e faixa de custo
 const SEVERITY_STYLE: Record<string, string> = {
   info: "border-blue-200 bg-blue-50",
   warn: "border-yellow-200 bg-yellow-50",
   critical: "border-red-300 bg-red-50",
 };
 const SEVERITY_TAG: Record<string, string> = {
-  info: "bg-blue-200 text-blue-900",
-  warn: "bg-yellow-200 text-yellow-900",
-  critical: "bg-red-200 text-red-900",
+  info: "bg-blue-100 text-blue-800",
+  warn: "bg-yellow-100 text-yellow-800",
+  critical: "bg-red-100 text-red-800",
+};
+const SEVERITY_ICON: Record<string, string> = {
+  info: "text-blue-500",
+  warn: "text-yellow-500",
+  critical: "text-red-600",
 };
 const FAIXA_TAG: Record<string, string> = {
   LOW: "bg-emerald-100 text-emerald-800",
@@ -81,59 +94,144 @@ function Inner({ id }: { id: string }) {
 
   useEffect(() => { load(); }, [load]);
 
-  if (loading) return <div className="rounded-xl bg-white p-12 text-center text-sm text-gray-500">Carregando...</div>;
-  if (!upload) return <div className="rounded-xl bg-white p-12 text-center text-sm text-gray-500">Não encontrado.</div>;
+  if (loading) {
+    return (
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="space-y-px">
+          {[0, 1, 2].map((i) => <div key={i} className="h-16 animate-pulse bg-gray-50" />)}
+        </div>
+      </div>
+    );
+  }
+
+  if (!upload) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center text-sm text-gray-500 shadow-sm">
+        Upload nao encontrado.
+      </div>
+    );
+  }
+
+  const criticalCount = alerts.filter((a) => a.severity === "critical").length;
+  const warnCount = alerts.filter((a) => a.severity === "warn").length;
 
   return (
-    <div className="space-y-6">
-      <Link href="/admin/esocial" className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary">
-        <HiOutlineArrowLeft /> Voltar
+    <div className="space-y-7">
+      {/* Breadcrumb / voltar */}
+      <Link
+        href="/admin/esocial"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-primary"
+      >
+        <HiOutlineArrowLeft className="text-base" /> Voltar para uploads
       </Link>
 
-      {/* Header */}
+      {/* Card de identidade do arquivo */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <HiOutlineDocumentReport className="text-2xl" />
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="truncate text-lg font-bold text-secondary">{upload.filename}</h2>
-            <p className="text-xs text-gray-500">
-              {(upload.sizeBytes / 1024).toFixed(1)} KB · {new Date(upload.createdAt).toLocaleString("pt-BR")}
+            <div className="flex flex-wrap items-center gap-2">
+              <h2
+                className="truncate text-xl font-bold text-secondary"
+                style={{ fontFamily: "var(--font-display), system-ui", letterSpacing: "-0.02em" }}
+              >
+                {upload.filename}
+              </h2>
+              <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                upload.status === "done"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : upload.status === "error"
+                  ? "bg-red-100 text-red-700"
+                  : "bg-amber-100 text-amber-700"
+              }`}>
+                {upload.status === "done" ? "Processado" : upload.status === "error" ? "Erro" : upload.status === "processing" ? "Processando" : "Pendente"}
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-gray-500">
+              {(upload.sizeBytes / 1024).toFixed(1)} KB &middot; {new Date(upload.createdAt).toLocaleString("pt-BR")}
             </p>
-            {upload.error && <p className="mt-2 text-sm text-red-600">{upload.error}</p>}
+            {upload.error && (
+              <p className="mt-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+                {upload.error}
+              </p>
+            )}
           </div>
         </div>
 
-        {upload.meta?.byType && (
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        {/* Eventos por tipo */}
+        {upload.meta?.byType && Object.keys(upload.meta.byType).length > 0 && (
+          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {Object.entries(upload.meta.byType).map(([k, v]) => (
-              <div key={k} className="rounded-lg bg-gray-50 p-3 text-center">
-                <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">{k}</p>
-                <p className="mt-1 text-xl font-bold text-gray-900">{v}</p>
+              <div key={k} className="rounded-xl border border-gray-100 bg-gray-50 p-3 text-center">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">{k}</p>
+                <p className="mt-1 text-2xl font-bold text-secondary">{v}</p>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Alerts */}
-      <div>
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">
-          Alertas detectados ({alerts.length})
-        </h3>
+      {/* KPIs dos alertas */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <KpiTile
+          label="Total de alertas"
+          value={alerts.length}
+          icon={<HiOutlineExclamation />}
+          loading={loading}
+          featured
+        />
+        <KpiTile
+          label="Criticos"
+          value={criticalCount}
+          icon={<HiOutlineExclamation />}
+          loading={loading}
+          tone="rose"
+        />
+        <KpiTile
+          label="Atencao"
+          value={warnCount}
+          icon={<HiOutlineClock />}
+          loading={loading}
+          tone="amber"
+        />
+        <KpiTile
+          label="Eventos processados"
+          value={upload.eventsCount}
+          icon={<HiOutlineCheckCircle />}
+          loading={loading}
+          tone="emerald"
+        />
+      </div>
+
+      {/* Lista de alertas */}
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+          <h3 className="text-sm font-bold text-gray-900">Alertas detectados</h3>
+          {alerts.length > 0 && (
+            <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-500">
+              {alerts.length}
+            </span>
+          )}
+        </div>
+
         {alerts.length === 0 ? (
-          <p className="mt-3 rounded-xl bg-white p-6 text-center text-sm text-gray-500 shadow-sm">
-            Nenhum alerta gerado neste upload.
-          </p>
+          <div className="px-6 py-14 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+              <HiOutlineCheckCircle className="text-2xl" />
+            </div>
+            <p className="mt-4 text-sm font-semibold text-gray-800">Nenhum alerta gerado</p>
+            <p className="mt-1 text-xs text-gray-500">O processamento nao identificou irregularidades neste upload.</p>
+          </div>
         ) : (
-          <div className="mt-3 space-y-3">
+          <div className="divide-y divide-gray-50">
             {alerts.map((a) => (
-              <div key={a.id} className={`rounded-xl border p-4 ${SEVERITY_STYLE[a.severity]}`}>
+              <div key={a.id} className={`p-5 ${SEVERITY_STYLE[a.severity]} border-l-4 ${
+                a.severity === "critical" ? "border-l-red-500" : a.severity === "warn" ? "border-l-yellow-400" : "border-l-blue-400"
+              }`}>
                 <div className="flex items-start gap-3">
-                  <HiOutlineExclamation className={`mt-0.5 flex-shrink-0 text-xl ${
-                    a.severity === "critical" ? "text-red-600" : a.severity === "warn" ? "text-yellow-600" : "text-blue-600"
-                  }`} />
+                  <HiOutlineExclamation className={`mt-0.5 flex-shrink-0 text-xl ${SEVERITY_ICON[a.severity]}`} />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       {a.alertCode && (
@@ -143,28 +241,30 @@ function Inner({ id }: { id: string }) {
                       )}
                       <h4 className="text-sm font-semibold text-gray-900">{a.title}</h4>
                       <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${SEVERITY_TAG[a.severity]}`}>
-                        {a.severity}
+                        {a.severity === "critical" ? "Critico" : a.severity === "warn" ? "Atencao" : "Info"}
                       </span>
                       {a.custoFaixa && (
-                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${FAIXA_TAG[a.custoFaixa] ?? "bg-gray-200 text-gray-700"}`}>
+                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${FAIXA_TAG[a.custoFaixa] ?? "bg-gray-100 text-gray-700"}`}>
                           Custo {a.custoFaixa}
                         </span>
                       )}
                     </div>
-                    <p className="mt-1 text-sm text-gray-700">{a.description}</p>
+                    <p className="mt-1.5 text-sm text-gray-700">{a.description}</p>
                     {a.recommendedAction && (
-                      <div className="mt-2 rounded-lg bg-white p-2 border border-gray-200">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Ação recomendada</p>
+                      <div className="mt-3 rounded-xl border border-gray-200 bg-white p-3">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">Acao recomendada</p>
                         <p className="mt-0.5 text-sm text-gray-800">{a.recommendedAction}</p>
                       </div>
                     )}
                     {(a.periodStart || a.relatedEvents) && (
-                      <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-gray-500">
+                      <div className="mt-2.5 flex flex-wrap gap-2 text-[11px] text-gray-500">
                         {a.periodStart && (
-                          <span>📅 {a.periodStart}{a.periodEnd ? ` → ${a.periodEnd}` : ""}</span>
+                          <span className="rounded-lg bg-white/80 px-2 py-0.5 font-mono">
+                            {a.periodStart}{a.periodEnd ? ` -> ${a.periodEnd}` : ""}
+                          </span>
                         )}
                         {a.relatedEvents && Object.entries(a.relatedEvents).map(([k, ids]) => (
-                          <span key={k} className="rounded bg-gray-100 px-2 py-0.5 font-mono">
+                          <span key={k} className="rounded-lg bg-white/80 px-2 py-0.5 font-mono">
                             {k}: {Array.isArray(ids) ? ids.length : 0}
                           </span>
                         ))}

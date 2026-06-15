@@ -10,7 +10,7 @@ export const runtime = "nodejs";
  * - Se tem CNPJ válido → resolveCompany cria/vincula.
  * - Se não → fica sem vínculo (admin pode editar manualmente no futuro).
  *
- * Endpoint protegido por sessão. Idempotente — pode ser rodado várias vezes.
+ * Endpoint protegido por sessão. Idempotente · pode ser rodado várias vezes.
  */
 export async function POST(request: NextRequest) {
   const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;

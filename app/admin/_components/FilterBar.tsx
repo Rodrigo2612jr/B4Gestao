@@ -44,7 +44,7 @@ export default function FilterBar({
 
   // Register "/" hotkey via ref
   if (typeof window !== "undefined") {
-    // noop — handled globally in layout
+    // noop · handled globally in layout
   }
 
   return (
