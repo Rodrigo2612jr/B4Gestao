@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE_NAME, getClientIp, verifySessionToken } from "@/lib/auth";
+import { requireAdmin } from "@/lib/guard";
 import { sql, initDb, logAudit } from "@/lib/db";
 import { isValidCnpj, resolveCompany } from "@/lib/companies";
 
@@ -13,16 +13,13 @@ export const runtime = "nodejs";
  * Endpoint protegido por sessão. Idempotente · pode ser rodado várias vezes.
  */
 export async function POST(request: NextRequest) {
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-  }
+  const s = await requireAdmin(request);
+  if (!s.ok) return s.res;
   if (!sql) {
     return NextResponse.json({ error: "DB não configurado" }, { status: 500 });
   }
 
-  const ip = getClientIp(request);
+  const ip = s.ip;
   await initDb();
 
   const rows = (await sql`
@@ -60,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  await logAudit(session.email, "backfill_companies", `linked:${linked} skipped:${skipped}`, ip);
+  await logAudit(s.user.email, "backfill_companies", `linked:${linked} skipped:${skipped}`, ip);
 
   return NextResponse.json({
     ok: true,

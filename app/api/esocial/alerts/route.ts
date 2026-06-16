@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
+import { requireModule } from "@/lib/guard";
 import { listAlerts } from "@/lib/esocial/db";
 
 export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  const s = await requireModule(request, "esocial");
+  if (!s.ok) return s.res;
 
   const url = new URL(request.url);
   const companyId = url.searchParams.get("companyId") || undefined;

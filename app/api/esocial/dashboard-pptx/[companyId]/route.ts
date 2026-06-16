@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
+import { requireModule } from "@/lib/guard";
+import { logAudit } from "@/lib/db";
 import { findCompanyById } from "@/lib/companies";
 import { listAlerts } from "@/lib/esocial/db";
 import { calculateCostPanel } from "@/lib/esocial/custo-previsivel";
@@ -12,11 +13,11 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ companyId: string }> }
 ) {
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  const s = await requireModule(request, "esocial");
+  if (!s.ok) return s.res;
 
   const { companyId } = await params;
+  await logAudit(s.user.email, "esocial_export_pptx", companyId, s.ip);
   const company = await findCompanyById(companyId);
   if (!company) return NextResponse.json({ error: "Empresa não encontrada" }, { status: 404 });
 

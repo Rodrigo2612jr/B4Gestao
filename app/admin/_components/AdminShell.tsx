@@ -19,6 +19,7 @@ import {
   HiOutlineChevronDown,
   HiOutlineSearch,
   HiOutlineSparkles,
+  HiOutlineUsers,
 } from "react-icons/hi";
 import LoginCard from "./LoginCard";
 import ChangePasswordDialog from "./ChangePasswordDialog";
@@ -54,6 +55,12 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
     label: "ESOCIAL",
     items: [
       { href: "/admin/esocial", label: "Analytics", Icon: HiOutlineDocumentReport, module: "esocial" },
+    ],
+  },
+  {
+    label: "ADMINISTRAÇÃO",
+    items: [
+      { href: "/admin/usuarios", label: "Equipe & Acessos", Icon: HiOutlineUsers, module: "users" },
     ],
   },
 ];

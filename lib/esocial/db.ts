@@ -143,7 +143,7 @@ export async function listAlerts(filter: {
       SELECT id, upload_id, company_id, kind, severity, worker_key_hash, title, description, evidence, custo_faixa, resolved,
              to_char(created_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS created_at
       FROM esocial_alerts WHERE upload_id = ${filter.uploadId}
-      ORDER BY severity DESC, created_at DESC
+      ORDER BY CASE severity WHEN 'critical' THEN 0 WHEN 'warn' THEN 1 ELSE 2 END, created_at DESC
     `;
     return rows as unknown as ESocialAlert[];
   }
@@ -152,7 +152,7 @@ export async function listAlerts(filter: {
       SELECT id, upload_id, company_id, kind, severity, worker_key_hash, title, description, evidence, custo_faixa, resolved,
              to_char(created_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS created_at
       FROM esocial_alerts WHERE company_id = ${filter.companyId}
-      ORDER BY severity DESC, created_at DESC LIMIT 500
+      ORDER BY CASE severity WHEN 'critical' THEN 0 WHEN 'warn' THEN 1 ELSE 2 END, created_at DESC LIMIT 500
     `;
     return rows as unknown as ESocialAlert[];
   }

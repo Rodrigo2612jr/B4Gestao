@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE_NAME, getClientIp, verifySessionToken } from "@/lib/auth";
+import { requireModule } from "@/lib/guard";
 import { logAudit } from "@/lib/db";
 import { createUpload, finishUpload, listUploads } from "@/lib/esocial/db";
 import { processESocial } from "@/lib/esocial/parser";
@@ -9,12 +9,12 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 export async function GET(request: NextRequest) {
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  const s = await requireModule(request, "esocial");
+  if (!s.ok) return s.res;
 
   const url = new URL(request.url);
   const companyId = url.searchParams.get("companyId") || undefined;
+  await logAudit(s.user.email, "esocial_list_uploads", companyId ?? null, s.ip);
   const list = await listUploads(companyId);
   return NextResponse.json(list.map((u) => ({
     id: u.id,
@@ -31,11 +31,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  const s = await requireModule(request, "esocial");
+  if (!s.ok) return s.res;
 
-  const ip = getClientIp(request);
+  const ip = s.ip;
 
   const formData = await request.formData();
   const file = formData.get("file");
@@ -47,6 +46,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Arquivo maior que 10MB" }, { status: 413 });
   }
 
+  // Só XML do eSocial (evita upload de binário/script arbitrário)
+  const nameLower = file.name.toLowerCase();
+  const isXml =
+    nameLower.endsWith(".xml") || file.type === "text/xml" || file.type === "application/xml";
+  if (!isXml) {
+    return NextResponse.json({ error: "Envie um arquivo XML do eSocial (.xml)" }, { status: 415 });
+  }
+
   const buf = Buffer.from(await file.arrayBuffer());
   const text = buf.toString("utf8");
 
@@ -54,10 +61,10 @@ export async function POST(request: NextRequest) {
     companyId,
     filename: file.name,
     sizeBytes: file.size,
-    createdBy: session.email,
+    createdBy: s.user.email,
   });
 
-  await logAudit(session.email, "esocial_upload", uploadId, ip);
+  await logAudit(s.user.email, "esocial_upload", uploadId, ip);
 
   try {
     const result = await processESocial({

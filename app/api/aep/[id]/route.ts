@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { logAudit } from "@/lib/db";
+import { logAudit, getUserRoleById } from "@/lib/db";
 import { requireAep, canView, canEditContent, canDecide, actorRoleFor } from "@/lib/aep/guard";
+import { isEditable } from "@/lib/aep/scoring";
 import {
   getAssessmentAccess,
   getAssessmentFull,
@@ -72,6 +73,24 @@ export async function PATCH(
     return NextResponse.json({ error: "Dados inválidos", details: parsed.error.format() }, { status: 400 });
   }
 
+  // Atribuição de supervisor: o alvo PRECISA ter perfil de supervisor (ou admin/SST)
+  // e não pode ser o próprio avaliador. Fecha a auto-aprovação (técnico vira supervisor de si).
+  if (parsed.data.supervisorUserId) {
+    const targetRole = await getUserRoleById(parsed.data.supervisorUserId);
+    if (targetRole !== "SUPERVISOR" && targetRole !== "ADMIN" && targetRole !== "SST") {
+      return NextResponse.json(
+        { error: "Supervisor inválido: o usuário precisa ter perfil de Supervisor." },
+        { status: 400 }
+      );
+    }
+    if (parsed.data.supervisorUserId === access.avaliador_user_id) {
+      return NextResponse.json(
+        { error: "O avaliador e o supervisor não podem ser a mesma pessoa." },
+        { status: 400 }
+      );
+    }
+  }
+
   try {
     const d = parsed.data;
     if (d.checklist !== undefined) {
@@ -92,6 +111,8 @@ export async function PATCH(
         supervisorUserId: d.supervisorUserId ?? null,
       });
     }
+    // Trilha LGPD: registra edição de conteúdo (inclusive supervisor mexendo no trabalho do técnico)
+    await logAudit(auth.user.email, "aep_edit", id, auth.ip);
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("[aep] patch error:", err);
@@ -110,9 +131,12 @@ export async function DELETE(
   const access = await getAssessmentAccess(id);
   if (!access) return NextResponse.json({ error: "Não encontrado" }, { status: 404 });
 
-  const isOwner = auth.user.id === access.avaliador_user_id;
-  if (auth.user.role !== "ADMIN" && !(isOwner && access.status !== "aprovado")) {
-    return NextResponse.json({ error: "Sem permissão para excluir" }, { status: 403 });
+  // ADMIN/SST excluem em qualquer estado. O técnico dono só enquanto editável
+  // (não pode excluir o que já enviou para aprovação — trava de imutabilidade).
+  const isAdmin = auth.user.role === "ADMIN" || auth.user.role === "SST";
+  const ownerCanDelete = auth.user.id === access.avaliador_user_id && isEditable(access.status);
+  if (!isAdmin && !ownerCanDelete) {
+    return NextResponse.json({ error: "Sem permissão para excluir neste estado" }, { status: 403 });
   }
 
   const ok = await softDeleteAssessment(id);

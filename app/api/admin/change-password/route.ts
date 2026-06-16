@@ -6,6 +6,7 @@ import {
   verifySessionToken,
 } from "@/lib/auth";
 import { logAudit, updateUserPassword, verifyUserPassword } from "@/lib/db";
+import { validatePasswordPolicy } from "@/lib/password";
 
 export const runtime = "nodejs";
 
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Rate limit password changes: 5 per hour
-  const rl = checkRateLimit(`pwd:${ip}`, {
+  const rl = await checkRateLimit(`pwd:${ip}`, {
     max: 5,
     windowMs: 60 * 60 * 1000,
     blockMs: 60 * 60 * 1000,
@@ -41,17 +42,22 @@ export async function POST(request: NextRequest) {
   const current = (body.currentPassword ?? "").toString();
   const next = (body.newPassword ?? "").toString();
 
-  if (next.length < 8) {
-    return NextResponse.json(
-      { ok: false, error: "A nova senha deve ter no mínimo 8 caracteres" },
-      { status: 400 }
-    );
-  }
-
-  // Verify current password
+  // Verify current password first
   const user = await verifyUserPassword(session.email, current);
   if (!user) {
     return NextResponse.json({ ok: false, error: "Senha atual incorreta" }, { status: 403 });
+  }
+
+  // Política de senha (mín. 12, sem e-mail, sem senhas óbvias) + não pode repetir a atual
+  const policyErr = validatePasswordPolicy(next, { email: user.email, name: user.name });
+  if (policyErr) {
+    return NextResponse.json({ ok: false, error: policyErr }, { status: 400 });
+  }
+  if (next === current) {
+    return NextResponse.json(
+      { ok: false, error: "A nova senha precisa ser diferente da atual." },
+      { status: 400 }
+    );
   }
 
   await updateUserPassword(user.id, next);

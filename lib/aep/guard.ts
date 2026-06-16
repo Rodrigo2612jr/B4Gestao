@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE_NAME, getClientIp, verifySessionToken } from "@/lib/auth";
-import { findUserByEmail, type AdminUser } from "@/lib/db";
-import { canAccess } from "@/lib/acl";
-import { isEditable, type AepStatus } from "./scoring";
+import { requireModule } from "@/lib/guard";
+import { type AdminUser } from "@/lib/db";
+import { isEditable, isEditableForSupervisor, type AepStatus } from "./scoring";
 
 export interface AepActor {
   user: AdminUser;
@@ -13,17 +12,12 @@ type GuardResult =
   | { ok: true; user: AdminUser; ip: string }
   | { ok: false; res: NextResponse };
 
-/** Exige sessão válida + acesso ao módulo AEP. */
+/**
+ * Exige sessão válida + conta ativa/não-expirada/senha trocada + acesso ao módulo AEP.
+ * Delega ao guard compartilhado (lib/guard.ts) para reutilizar o ciclo de vida da conta.
+ */
 export async function requireAep(req: NextRequest): Promise<GuardResult> {
-  const token = req.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) return { ok: false, res: NextResponse.json({ error: "Não autorizado" }, { status: 401 }) };
-  const user = await findUserByEmail(session.email);
-  if (!user) return { ok: false, res: NextResponse.json({ error: "Não autorizado" }, { status: 401 }) };
-  if (!canAccess(user.role, "aep")) {
-    return { ok: false, res: NextResponse.json({ error: "Sem permissão para o módulo AEP" }, { status: 403 }) };
-  }
-  return { ok: true, user, ip: getClientIp(req) };
+  return requireModule(req, "aep");
 }
 
 export interface AssessmentAccess {
@@ -41,22 +35,36 @@ export function canView(user: AdminUser, a: AssessmentAccess): boolean {
   return isAdminLike(user) || user.id === a.avaliador_user_id || user.id === a.supervisor_user_id;
 }
 
-/** Pode editar conteúdo (só técnico dono ou admin, e enquanto editável). */
+/**
+ * Pode editar conteúdo. Regra por papel:
+ *  - ADMIN/SST: editam em qualquer estado não-terminal.
+ *  - SUPERVISOR designado: edita o trabalho do técnico inclusive em "aguardando_aprovacao".
+ *  - TÉCNICO dono: edita só enquanto editável (trava após enviar — isEditable).
+ */
 export function canEditContent(user: AdminUser, a: AssessmentAccess): boolean {
-  const owner = user.role === "ADMIN" || user.id === a.avaliador_user_id;
-  return owner && isEditable(a.status);
+  if (isAdminLike(user)) return a.status !== "aprovado" && a.status !== "cancelado";
+  if (user.id === a.supervisor_user_id) return isEditableForSupervisor(a.status);
+  if (user.id === a.avaliador_user_id) return isEditable(a.status);
+  return false;
 }
 
-/** Pode concluir/enviar para aprovação. */
+/** Pode concluir/enviar para aprovação (técnico dono ou admin, enquanto editável). */
 export function canSubmit(user: AdminUser, a: AssessmentAccess): boolean {
-  const owner = user.role === "ADMIN" || user.id === a.avaliador_user_id;
+  const owner = isAdminLike(user) || user.id === a.avaliador_user_id;
   return owner && isEditable(a.status);
 }
 
-/** Pode aprovar/reprovar (supervisor designado ou admin, no estado certo). */
+/**
+ * Pode aprovar/reprovar. Segregação de funções (corrige auto-aprovação):
+ *  - só em "aguardando_aprovacao";
+ *  - NUNCA quem é o avaliador (nem que vire supervisor de si mesmo);
+ *  - ADMIN/SST (override) ou o SUPERVISOR designado com papel real SUPERVISOR.
+ */
 export function canDecide(user: AdminUser, a: AssessmentAccess): boolean {
-  const sup = user.role === "ADMIN" || user.id === a.supervisor_user_id;
-  return sup && a.status === "aguardando_aprovacao";
+  if (a.status !== "aguardando_aprovacao") return false;
+  if (user.id === a.avaliador_user_id) return false;
+  if (isAdminLike(user)) return true;
+  return user.role === "SUPERVISOR" && user.id === a.supervisor_user_id;
 }
 
 /** Qual papel o usuário exerce nesta avaliação (para chat/presença). */

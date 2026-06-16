@@ -267,8 +267,9 @@ export async function listAssessments(scope: {
   const role = scope.role;
   const seesAll = role === "ADMIN" || role === "SST";
 
+  const uid = scope.userId ?? "";
   let rows;
-  if (scope.companyId) {
+  if (scope.companyId && seesAll) {
     rows = await sql`
       SELECT a.id, a.company_id, c.name AS company_name, a.title, a.status,
              a.avaliador_user_id, av.name AS avaliador_name,
@@ -280,6 +281,22 @@ export async function listAssessments(scope: {
       LEFT JOIN admin_users av ON av.id = a.avaliador_user_id
       LEFT JOIN admin_users sup ON sup.id = a.supervisor_user_id
       WHERE a.deleted_at IS NULL AND a.company_id = ${scope.companyId}
+      ORDER BY a.updated_at DESC LIMIT 500
+    `;
+  } else if (scope.companyId) {
+    // técnico/supervisor: só as próprias avaliações DENTRO da empresa (não vê as de colegas)
+    rows = await sql`
+      SELECT a.id, a.company_id, c.name AS company_name, a.title, a.status,
+             a.avaliador_user_id, av.name AS avaliador_name,
+             a.supervisor_user_id, sup.name AS supervisor_name,
+             to_char(a.updated_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS updated_at,
+             to_char(a.created_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS created_at
+      FROM aep_assessments a
+      LEFT JOIN companies c ON c.id = a.company_id
+      LEFT JOIN admin_users av ON av.id = a.avaliador_user_id
+      LEFT JOIN admin_users sup ON sup.id = a.supervisor_user_id
+      WHERE a.deleted_at IS NULL AND a.company_id = ${scope.companyId}
+        AND (a.avaliador_user_id = ${uid} OR a.supervisor_user_id = ${uid})
       ORDER BY a.updated_at DESC LIMIT 500
     `;
   } else if (seesAll) {
@@ -297,7 +314,6 @@ export async function listAssessments(scope: {
       ORDER BY a.updated_at DESC LIMIT 500
     `;
   } else {
-    const uid = scope.userId ?? "";
     rows = await sql`
       SELECT a.id, a.company_id, c.name AS company_name, a.title, a.status,
              a.avaliador_user_id, av.name AS avaliador_name,
@@ -411,45 +427,60 @@ async function recordEvent(
   `;
 }
 
+/**
+ * Transições atômicas: o estado de origem entra na cláusula WHERE, então
+ * cliques duplos / requisições concorrentes (TOCTOU) não gravam transição inválida.
+ * Retornam `false` quando a avaliação já não está no estado esperado (rota responde 409).
+ */
 export async function submitAssessment(
   id: string,
   from: AepStatus,
   actor: { id?: string | null; email?: string | null }
-): Promise<void> {
+): Promise<boolean> {
   if (!sql) throw new Error("DB not configured");
-  await sql`
+  const r = await sql`
     UPDATE aep_assessments
     SET status = 'aguardando_aprovacao', submitted_at = NOW(), updated_at = NOW(), rejection_reason = NULL
     WHERE id = ${id} AND deleted_at IS NULL
+      AND status IN ('rascunho', 'em_preenchimento', 'reprovado')
+    RETURNING id
   `;
+  if (r.length === 0) return false;
   await recordEvent(id, actor, from, "aguardando_aprovacao");
+  return true;
 }
 
 export async function approveAssessment(
   id: string,
   actor: { id?: string | null; email?: string | null }
-): Promise<void> {
+): Promise<boolean> {
   if (!sql) throw new Error("DB not configured");
-  await sql`
+  const r = await sql`
     UPDATE aep_assessments
     SET status = 'aprovado', approved_at = NOW(), updated_at = NOW()
-    WHERE id = ${id} AND deleted_at IS NULL
+    WHERE id = ${id} AND deleted_at IS NULL AND status = 'aguardando_aprovacao'
+    RETURNING id
   `;
+  if (r.length === 0) return false;
   await recordEvent(id, actor, "aguardando_aprovacao", "aprovado");
+  return true;
 }
 
 export async function rejectAssessment(
   id: string,
   reason: string,
   actor: { id?: string | null; email?: string | null }
-): Promise<void> {
+): Promise<boolean> {
   if (!sql) throw new Error("DB not configured");
-  await sql`
+  const r = await sql`
     UPDATE aep_assessments
     SET status = 'reprovado', rejection_reason = ${reason}, updated_at = NOW()
-    WHERE id = ${id} AND deleted_at IS NULL
+    WHERE id = ${id} AND deleted_at IS NULL AND status = 'aguardando_aprovacao'
+    RETURNING id
   `;
+  if (r.length === 0) return false;
   await recordEvent(id, actor, "aguardando_aprovacao", "reprovado", reason);
+  return true;
 }
 
 // ============================================================

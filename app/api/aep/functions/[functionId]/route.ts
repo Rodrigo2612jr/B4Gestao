@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAep, canEditContent } from "@/lib/aep/guard";
+import { logAudit } from "@/lib/db";
 import {
   getAssessmentAccess,
   assessmentIdOfFunction,
@@ -20,7 +21,7 @@ async function authorize(request: NextRequest, functionId: string) {
   if (!canEditContent(auth.user, access)) {
     return { error: NextResponse.json({ error: "Edição não permitida neste estado" }, { status: 409 }) };
   }
-  return { ok: true as const };
+  return { ok: true as const, auth, assessmentId };
 }
 
 const schema = z.object({
@@ -56,6 +57,7 @@ export async function PATCH(
   }
 
   await updateFunction(functionId, parsed.data);
+  await logAudit(a.auth.user.email, "aep_edit_function", a.assessmentId, a.auth.ip);
   return NextResponse.json({ ok: true });
 }
 
@@ -68,5 +70,6 @@ export async function DELETE(
   if ("error" in a) return a.error;
 
   await deleteFunction(functionId);
+  await logAudit(a.auth.user.email, "aep_delete_function", a.assessmentId, a.auth.ip);
   return NextResponse.json({ ok: true });
 }

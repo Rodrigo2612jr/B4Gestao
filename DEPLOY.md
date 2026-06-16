@@ -62,3 +62,36 @@ Subdomínios não funcionam em `localhost:3000`, mas o roteamento interno funcio
 - **HTTPS**: Vercel emite cert SSL automaticamente para cada subdomínio (~30s após DNS propagar)
 - **Robôs**: `/admin/*` tem `X-Robots-Tag: noindex` — Google não vai indexar a área administrativa
 - **Cookies de sessão**: o cookie do admin é `Secure` + `HttpOnly`. Funciona em `admin.b4gestao.com.br` porque está no mesmo domínio raiz. Não funciona cross-domain.
+
+---
+
+## 🔐 Segurança & acessos (revisão 2026-06)
+
+Hardening completo aplicado (ver `../REVISAO_SEGURANCA_E_ESTRUTURA.md`). Pontos de DEPLOY:
+
+### Variáveis de ambiente (Vercel → Project Settings → Environment Variables)
+| Variável | Obrigatória | Observação |
+|---|---|---|
+| `ADMIN_SESSION_SECRET` | **SIM (≥32 chars)** | **O app agora ABORTA o boot em produção se faltar/curta** (era um fallback inseguro). Garantir em **Production E Preview**. |
+| `DATABASE_URL` | Sim | Neon. Já existia. |
+| `BLOB_READ_WRITE_TOKEN` | Sim (fotos AEP) | Já existia. |
+| `RESEND_API_KEY` / `FROM_EMAIL` / `NOTIFY_EMAILS` | Sim (e-mail de lead) | Já existia. |
+| `APP_URL` | Opcional | Base do link de ativação de usuário. Se ausente, deriva do host da requisição (funciona com os subdomínios). |
+
+### Migrações de banco
+- **Rodam sozinhas** no 1º request via `initDb()` (idempotente). Adicionam colunas de ciclo de vida em `admin_users` (`is_active`, `access_expires_at`, `failed_attempts`, `locked_until`, etc.) + tabelas `admin_invites` e `rate_limits`. **Nada manual a rodar.**
+
+### Fluxo de acessos temporários (técnicos/supervisores)
+1. Admin logado → menu **Equipe & Acessos** (`/admin/usuarios`) → **Novo acesso** (nome, e-mail, papel, validade em dias).
+2. Sistema gera **link de ativação de uso único** → admin copia e envia (WhatsApp/pessoalmente). O admin nunca vê a senha.
+3. Colaborador abre o link (`/admin/ativar?token=...`) → define a própria senha (mín. 12 chars).
+4. Admin pode **Desativar** / **Reativar** / renovar validade (**+90d** / **Sem exp.**) / **Gerar link** novo — efeito no próximo request.
+
+### Papéis (AEP)
+- **TÉCNICO**: preenche; **trava após enviar** (não edita nem exclui o que enviou).
+- **SUPERVISOR**: edita o conteúdo do técnico (inclusive em "aguardando aprovação") + aprova/reprova. **Não pode aprovar avaliação onde ele é o avaliador** (separação de funções).
+- **ADMIN/SST**: veem e revisam tudo; gerenciam usuários.
+
+### Itens deixados para depois (P1 — decisão de produto)
+- Fotos do AEP no Blob continuam públicas com URL aleatória (privá-las exige URL assinada + ajuste de UI).
+- MFA/TOTP para admin; mover DDL do `initDb` para migrations versionadas.

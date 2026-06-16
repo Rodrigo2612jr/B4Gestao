@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
+import { requireSession } from "@/lib/guard";
 import { sql, initDb } from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -12,9 +12,12 @@ interface RecentActivity {
 }
 
 export async function GET(request: NextRequest) {
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  const s = await requireSession(request);
+  if (!s.ok) return s.res;
+  // O dashboard agrega dados de TODOS os módulos — restrito a quem vê tudo.
+  if (s.user.role !== "ADMIN" && s.user.role !== "SST") {
+    return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
+  }
   if (!sql) return NextResponse.json({ error: "DB não configurado" }, { status: 500 });
 
   await initDb();

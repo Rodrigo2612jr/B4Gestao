@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import {
-  SESSION_COOKIE_NAME,
-  checkRateLimit,
-  getClientIp,
-  verifySessionToken,
-} from "@/lib/auth";
+import { checkRateLimit } from "@/lib/auth";
+import { requireAdmin } from "@/lib/guard";
 import { verifyUserPassword } from "@/lib/db";
 import { mergeCompanies } from "@/lib/companies";
 
@@ -18,15 +14,12 @@ const mergeSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const ip = getClientIp(request);
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-  }
+  const s = await requireAdmin(request);
+  if (!s.ok) return s.res;
+  const ip = s.ip;
 
   // Rate limit (merge é operação sensível)
-  const rl = checkRateLimit(`merge:${ip}`, {
+  const rl = await checkRateLimit(`merge:${ip}`, {
     max: 10,
     windowMs: 60 * 1000,
     blockMs: 5 * 60 * 1000,
@@ -51,13 +44,13 @@ export async function POST(request: NextRequest) {
   }
 
   // Re-confirmação de senha (mesma proteção do delete)
-  const user = await verifyUserPassword(session.email, parsed.data.password);
+  const user = await verifyUserPassword(s.user.email, parsed.data.password);
   if (!user) {
     return NextResponse.json({ error: "Senha incorreta" }, { status: 403 });
   }
 
   try {
-    await mergeCompanies(parsed.data.sourceId, parsed.data.targetId, session.email, ip);
+    await mergeCompanies(parsed.data.sourceId, parsed.data.targetId, s.user.email, ip);
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("[companies/merge] error:", err);

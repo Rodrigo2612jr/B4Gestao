@@ -36,8 +36,8 @@ export default function ChangePasswordDialog({ open, forced, onClose, onSuccess 
       setErro("A confirmação não confere");
       return;
     }
-    if (next.length < 8) {
-      setErro("A nova senha deve ter no mínimo 8 caracteres");
+    if (next.length < 12) {
+      setErro("A nova senha deve ter no mínimo 12 caracteres");
       return;
     }
     setLoading(true);
@@ -94,8 +94,8 @@ export default function ChangePasswordDialog({ open, forced, onClose, onSuccess 
             </div>
             <p className="mt-1 text-sm text-gray-600">
               {forced
-                ? "É o seu primeiro acesso. Defina uma senha segura (mínimo 8 caracteres)."
-                : "Troque sua senha por uma nova (mínimo 8 caracteres)."}
+                ? "É o seu primeiro acesso. Defina uma senha segura (mínimo 12 caracteres)."
+                : "Troque sua senha por uma nova (mínimo 12 caracteres)."}
             </p>
           </div>
         </div>
@@ -125,7 +125,7 @@ export default function ChangePasswordDialog({ open, forced, onClose, onSuccess 
               onChange={(e) => setNext(e.target.value)}
               autoComplete="new-password"
               required
-              minLength={8}
+              minLength={12}
               className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
           </div>
@@ -139,7 +139,7 @@ export default function ChangePasswordDialog({ open, forced, onClose, onSuccess 
               onChange={(e) => setConfirm(e.target.value)}
               autoComplete="new-password"
               required
-              minLength={8}
+              minLength={12}
               className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
           </div>

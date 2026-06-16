@@ -14,6 +14,8 @@ export const maxDuration = 60;
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8MB
 const MAX_PER_FUNCTION = 4;
+// Só imagens raster. SVG é REJEITADO de propósito (vetor de XSS via <script> embutido).
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/heic", "image/heif"];
 
 export async function POST(
   request: NextRequest,
@@ -36,8 +38,8 @@ export async function POST(
 
   if (!functionId) return NextResponse.json({ error: "functionId requerido" }, { status: 400 });
   if (!(file instanceof File)) return NextResponse.json({ error: "Arquivo requerido" }, { status: 400 });
-  if (!file.type.startsWith("image/")) {
-    return NextResponse.json({ error: "Apenas imagens são aceitas" }, { status: 415 });
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    return NextResponse.json({ error: "Formato não aceito. Use JPG, PNG, WEBP ou HEIC." }, { status: 415 });
   }
   if (file.size > MAX_BYTES) {
     return NextResponse.json({ error: "Imagem maior que 8MB" }, { status: 413 });

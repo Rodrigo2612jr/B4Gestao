@@ -22,6 +22,8 @@ export async function GET(request: NextRequest) {
       mustChangePassword: user.must_change_password,
       lastLogin: user.last_login,
       role: user.role ?? "ADMIN",
+      isActive: user.is_active,
+      accessExpiresAt: user.access_expires_at,
     },
   });
 }

@@ -155,6 +155,27 @@ export async function consumeStressInvite(token: string, auditId: string): Promi
   return result.length > 0;
 }
 
+/**
+ * Reserva o convite ANTES de criar a auditoria (fecha a corrida de duplo-submit):
+ * marca como 'used' atomicamente. Retorna o id do convite, ou null se já não estava aberto.
+ */
+export async function reserveStressInvite(token: string): Promise<string | null> {
+  if (!sql) return null;
+  const r = await sql`
+    UPDATE stress_test_invites
+    SET status = 'used', used_at = NOW()
+    WHERE token = ${token} AND status = 'open'
+    RETURNING id
+  `;
+  return (r[0] as unknown as { id: string } | undefined)?.id ?? null;
+}
+
+/** Vincula a auditoria criada ao convite já reservado. */
+export async function attachAuditToInvite(inviteId: string, auditId: string): Promise<void> {
+  if (!sql) return;
+  await sql`UPDATE stress_test_invites SET audit_id = ${auditId} WHERE id = ${inviteId}`;
+}
+
 export async function listStressInvites(companyId: string): Promise<StressInvite[]> {
   if (!sql) return [];
   await initDb();

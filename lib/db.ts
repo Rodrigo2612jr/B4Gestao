@@ -1,5 +1,7 @@
 import { neon, neonConfig } from "@neondatabase/serverless";
 import bcrypt from "bcryptjs";
+import { createHash, randomBytes } from "node:crypto";
+import { validatePasswordPolicy } from "./password";
 
 // Cache connection across serverless invocations
 neonConfig.fetchConnectionCache = true;
@@ -40,6 +42,14 @@ export interface AdminUser {
   created_at: string;
   last_login: string | null;
   role: AdminRole;
+  // Ciclo de vida da conta + lockout (revisão de segurança 2026-06)
+  is_active: boolean;
+  access_expires_at: string | null;
+  password_changed_at: string | null;
+  deactivated_at: string | null;
+  invited_by: string | null;
+  failed_attempts: number;
+  locked_until: string | null;
 }
 
 /**
@@ -136,6 +146,60 @@ export async function initDb(): Promise<void> {
           ALTER TABLE admin_users ADD COLUMN role TEXT NOT NULL DEFAULT 'ADMIN';
         END IF;
       END $$
+    `;
+
+    // Ciclo de vida da conta + lockout persistente (revisão de segurança 2026-06)
+    await sql`
+      DO $$ BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='admin_users' AND column_name='is_active') THEN
+          ALTER TABLE admin_users ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='admin_users' AND column_name='access_expires_at') THEN
+          ALTER TABLE admin_users ADD COLUMN access_expires_at TIMESTAMPTZ;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='admin_users' AND column_name='password_changed_at') THEN
+          ALTER TABLE admin_users ADD COLUMN password_changed_at TIMESTAMPTZ;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='admin_users' AND column_name='deactivated_at') THEN
+          ALTER TABLE admin_users ADD COLUMN deactivated_at TIMESTAMPTZ;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='admin_users' AND column_name='invited_by') THEN
+          ALTER TABLE admin_users ADD COLUMN invited_by UUID REFERENCES admin_users(id);
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='admin_users' AND column_name='failed_attempts') THEN
+          ALTER TABLE admin_users ADD COLUMN failed_attempts INTEGER NOT NULL DEFAULT 0;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='admin_users' AND column_name='locked_until') THEN
+          ALTER TABLE admin_users ADD COLUMN locked_until TIMESTAMPTZ;
+        END IF;
+      END $$
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_admin_active ON admin_users(is_active)`;
+
+    // Convites/ativação de conta — token de USO ÚNICO e HASHEADO (nunca o token em claro)
+    await sql`
+      CREATE TABLE IF NOT EXISTS admin_invites (
+        id UUID PRIMARY KEY,
+        user_id UUID NOT NULL REFERENCES admin_users(id) ON DELETE CASCADE,
+        token_hash TEXT NOT NULL,
+        purpose TEXT NOT NULL DEFAULT 'invite',
+        expires_at TIMESTAMPTZ NOT NULL,
+        used_at TIMESTAMPTZ,
+        created_by UUID REFERENCES admin_users(id),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+    await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_admin_invites_token ON admin_invites(token_hash)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_admin_invites_user ON admin_invites(user_id)`;
+
+    // Rate limiting / lockout durável (substitui o Map em memória — funciona em serverless)
+    await sql`
+      CREATE TABLE IF NOT EXISTS rate_limits (
+        key TEXT PRIMARY KEY,
+        count INTEGER NOT NULL DEFAULT 0,
+        window_start TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        blocked_until TIMESTAMPTZ
+      )
     `;
 
     // ============================================================
@@ -601,6 +665,11 @@ export async function findUserByEmail(email: string): Promise<AdminUser | null> 
   await initDb();
   const rows = await sql`
     SELECT id, email, password_hash, name, must_change_password, role,
+           COALESCE(is_active, TRUE) AS is_active, COALESCE(failed_attempts, 0) AS failed_attempts, invited_by,
+           to_char(access_expires_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS access_expires_at,
+           to_char(locked_until, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS locked_until,
+           to_char(password_changed_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS password_changed_at,
+           to_char(deactivated_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS deactivated_at,
            to_char(created_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS created_at,
            to_char(last_login, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS last_login
     FROM admin_users
@@ -629,13 +698,57 @@ export async function updateUserPassword(
   newPassword: string
 ): Promise<void> {
   if (!sql) throw new Error("Database not configured");
-  if (newPassword.length < 8) throw new Error("Senha deve ter no mínimo 8 caracteres");
+  if (Buffer.byteLength(newPassword, "utf8") < 12) {
+    throw new Error("Senha deve ter no mínimo 12 caracteres");
+  }
   const hash = await bcrypt.hash(newPassword, 12);
+  // Trocar a senha zera lockout e marca a data (encerra o estado de "senha temporária").
   await sql`
     UPDATE admin_users
-    SET password_hash = ${hash}, must_change_password = FALSE
+    SET password_hash = ${hash}, must_change_password = FALSE,
+        password_changed_at = NOW(), failed_attempts = 0, locked_until = NULL
     WHERE id = ${userId}
   `;
+}
+
+/** Registra uma tentativa de login falha e bloqueia a conta após `maxAttempts`. */
+export async function recordLoginFailure(
+  userId: string,
+  maxAttempts: number,
+  lockMs: number
+): Promise<void> {
+  if (!sql) return;
+  await sql`
+    UPDATE admin_users
+    SET failed_attempts = failed_attempts + 1,
+        locked_until = CASE
+          WHEN failed_attempts + 1 >= ${maxAttempts}
+          THEN NOW() + (${lockMs}::bigint * interval '1 millisecond')
+          ELSE locked_until END
+    WHERE id = ${userId}
+  `;
+}
+
+/** Zera o contador de falhas (login bem-sucedido). */
+export async function clearLoginFailures(userId: string): Promise<void> {
+  if (!sql) return;
+  await sql`UPDATE admin_users SET failed_attempts = 0, locked_until = NULL WHERE id = ${userId}`;
+}
+
+/** Ativa/desativa uma conta (kill switch — vale no próximo request via guard). */
+export async function setUserActive(userId: string, active: boolean): Promise<void> {
+  if (!sql) return;
+  await sql`
+    UPDATE admin_users
+    SET is_active = ${active}, deactivated_at = ${active ? null : new Date().toISOString()}
+    WHERE id = ${userId}
+  `;
+}
+
+/** Define/renova a validade do acesso (NULL = sem expiração). */
+export async function setUserAccessExpiry(userId: string, expiresAt: string | null): Promise<void> {
+  if (!sql) return;
+  await sql`UPDATE admin_users SET access_expires_at = ${expiresAt}, is_active = TRUE WHERE id = ${userId}`;
 }
 
 export async function touchLastLogin(userId: string): Promise<void> {
@@ -660,6 +773,14 @@ export async function createUser(
   return id;
 }
 
+/** Papel de um usuário por id (validação de atribuição de supervisor no AEP). */
+export async function getUserRoleById(id: string): Promise<AdminRole | null> {
+  if (!sql) return null;
+  await initDb();
+  const rows = await sql`SELECT role FROM admin_users WHERE id = ${id} LIMIT 1`;
+  return (rows[0] as unknown as { role: AdminRole } | undefined)?.role ?? null;
+}
+
 /** Lista usuários por perfil (ex.: supervisores para o select do AEP). */
 export async function getUsersByRole(
   role: AdminRole
@@ -680,12 +801,136 @@ export async function listUsers(): Promise<Omit<AdminUser, "password_hash">[]> {
   await initDb();
   const rows = await sql`
     SELECT id, email, name, must_change_password, role,
+           COALESCE(is_active, TRUE) AS is_active, invited_by,
+           to_char(access_expires_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS access_expires_at,
+           to_char(locked_until, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS locked_until,
+           to_char(password_changed_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS password_changed_at,
+           to_char(deactivated_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS deactivated_at,
            to_char(created_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS created_at,
            to_char(last_login, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS last_login
     FROM admin_users
     ORDER BY created_at ASC
   `;
   return rows as unknown as Omit<AdminUser, "password_hash">[];
+}
+
+// ============================================================
+// CONVITES / ATIVAÇÃO DE CONTA (acessos temporários)
+// ============================================================
+const INVITE_TTL_MS = 48 * 60 * 60 * 1000; // 48h
+
+/**
+ * Cria o usuário (senha placeholder inutilizável) + um convite de uso único.
+ * Retorna o token BRUTO uma única vez (vai no link de ativação; no banco só o hash).
+ */
+export async function createUserWithInvite(opts: {
+  email: string;
+  name: string;
+  role: AdminRole;
+  invitedBy: string;
+  validDays?: number | null;
+}): Promise<{ userId: string; rawToken: string; expiresAt: string }> {
+  if (!sql) throw new Error("Database not configured");
+  await initDb();
+  const userId = crypto.randomUUID();
+  // Senha aleatória descartável — a conta só fica usável após a ativação.
+  const placeholder = randomBytes(32).toString("hex");
+  const hash = await bcrypt.hash(placeholder, 12);
+  const accessExpiresAt =
+    opts.validDays && opts.validDays > 0
+      ? new Date(Date.now() + opts.validDays * 86400000).toISOString()
+      : null;
+
+  await sql`
+    INSERT INTO admin_users
+      (id, email, password_hash, name, must_change_password, role, is_active, access_expires_at, invited_by)
+    VALUES
+      (${userId}, ${opts.email.toLowerCase()}, ${hash}, ${opts.name}, TRUE, ${opts.role}, TRUE, ${accessExpiresAt}, ${opts.invitedBy})
+  `;
+
+  const rawToken = randomBytes(32).toString("base64url");
+  const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+  const inviteExpires = new Date(Date.now() + INVITE_TTL_MS).toISOString();
+  await sql`
+    INSERT INTO admin_invites (id, user_id, token_hash, purpose, expires_at, created_by)
+    VALUES (${crypto.randomUUID()}, ${userId}, ${tokenHash}, 'invite', ${inviteExpires}, ${opts.invitedBy})
+  `;
+  return { userId, rawToken, expiresAt: inviteExpires };
+}
+
+/** Gera um novo convite (reenviar / resetar senha) para um usuário existente. */
+export async function createInviteForUser(
+  userId: string,
+  invitedBy: string,
+  purpose: "invite" | "reset" = "reset"
+): Promise<{ rawToken: string; expiresAt: string }> {
+  if (!sql) throw new Error("Database not configured");
+  await initDb();
+  // Invalida convites pendentes anteriores (uso único de verdade).
+  await sql`UPDATE admin_invites SET used_at = NOW() WHERE user_id = ${userId} AND used_at IS NULL`;
+  const rawToken = randomBytes(32).toString("base64url");
+  const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+  const ttl = purpose === "reset" ? 60 * 60 * 1000 : INVITE_TTL_MS; // reset: 1h
+  const expiresAt = new Date(Date.now() + ttl).toISOString();
+  await sql`
+    INSERT INTO admin_invites (id, user_id, token_hash, purpose, expires_at, created_by)
+    VALUES (${crypto.randomUUID()}, ${userId}, ${tokenHash}, ${purpose}, ${expiresAt}, ${invitedBy})
+  `;
+  return { rawToken, expiresAt };
+}
+
+/** Valida um convite SEM consumir (para a tela de ativação mostrar nome/e-mail). */
+export async function peekInvite(
+  rawToken: string
+): Promise<{ valid: boolean; email?: string; name?: string }> {
+  if (!sql) return { valid: false };
+  await initDb();
+  const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+  const rows = await sql`
+    SELECT u.email, u.name
+    FROM admin_invites i
+    JOIN admin_users u ON u.id = i.user_id
+    WHERE i.token_hash = ${tokenHash} AND i.used_at IS NULL AND i.expires_at > NOW()
+    LIMIT 1
+  `;
+  const row = rows[0] as unknown as { email: string; name: string } | undefined;
+  if (!row) return { valid: false };
+  return { valid: true, email: row.email, name: row.name };
+}
+
+/**
+ * Consome um convite (uso único): valida token/expiração, aplica a política de senha,
+ * grava a senha definitiva e marca o convite como usado. NÃO cria sessão (OWASP).
+ */
+export async function consumeInvite(
+  rawToken: string,
+  newPassword: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!sql) return { ok: false, error: "Banco não configurado" };
+  await initDb();
+  const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+  const rows = await sql`
+    SELECT i.id AS invite_id, i.user_id, u.email, u.name
+    FROM admin_invites i
+    JOIN admin_users u ON u.id = i.user_id
+    WHERE i.token_hash = ${tokenHash} AND i.used_at IS NULL AND i.expires_at > NOW()
+    LIMIT 1
+  `;
+  const row = rows[0] as unknown as { invite_id: string; user_id: string; email: string; name: string } | undefined;
+  if (!row) return { ok: false, error: "Convite inválido ou expirado." };
+
+  const policyErr = validatePasswordPolicy(newPassword, { email: row.email, name: row.name });
+  if (policyErr) return { ok: false, error: policyErr };
+
+  const hash = await bcrypt.hash(newPassword, 12);
+  await sql`
+    UPDATE admin_users
+    SET password_hash = ${hash}, must_change_password = FALSE, password_changed_at = NOW(),
+        failed_attempts = 0, locked_until = NULL, is_active = TRUE
+    WHERE id = ${row.user_id}
+  `;
+  await sql`UPDATE admin_invites SET used_at = NOW() WHERE id = ${row.invite_id}`;
+  return { ok: true };
 }
 
 // ============================================================

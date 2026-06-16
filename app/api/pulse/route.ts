@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { SESSION_COOKIE_NAME, getClientIp, verifySessionToken } from "@/lib/auth";
+import { requireModule } from "@/lib/guard";
 import { logAudit } from "@/lib/db";
 import { createCampaign, listCampaigns } from "@/lib/pulse/db";
 
@@ -23,9 +23,8 @@ const createSchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  const s = await requireModule(request, "pulse");
+  if (!s.ok) return s.res;
 
   const url = new URL(request.url);
   const companyId = url.searchParams.get("companyId") || undefined;
@@ -44,11 +43,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  const s = await requireModule(request, "pulse");
+  if (!s.ok) return s.res;
 
-  const ip = getClientIp(request);
+  const ip = s.ip;
 
   let body: unknown;
   try { body = await request.json(); }
@@ -65,9 +63,9 @@ export async function POST(request: NextRequest) {
       questions: parsed.data.questions,
       anonymityThreshold: parsed.data.anonymityThreshold,
       closesAt: parsed.data.closesAt ? new Date(parsed.data.closesAt) : null,
-      createdBy: session.email,
+      createdBy: s.user.email,
     });
-    await logAudit(session.email, "create_pulse_campaign", r.id, ip);
+    await logAudit(s.user.email, "create_pulse_campaign", r.id, ip);
     return NextResponse.json({ ok: true, id: r.id, token: r.token });
   } catch (err) {
     console.error("[pulse] create error:", err);
