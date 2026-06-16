@@ -1,16 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
+import { requireModule } from "@/lib/guard";
 import { listCompanies, fuzzyFindCompanies } from "@/lib/companies";
 
 export const runtime = "nodejs";
 
-// GET — lista de companies (auth)
+// GET — lista de companies (auth + módulo companies)
 export async function GET(request: NextRequest) {
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-  }
+  const s = await requireModule(request, "companies");
+  if (!s.ok) return s.res;
 
   const url = new URL(request.url);
   const q = url.searchParams.get("q");

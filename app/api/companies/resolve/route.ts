@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { SESSION_COOKIE_NAME, getClientIp, verifySessionToken } from "@/lib/auth";
+import { requireModule } from "@/lib/guard";
 import { logAudit } from "@/lib/db";
 import { isValidCnpj, resolveCompany } from "@/lib/companies";
 
@@ -25,11 +25,10 @@ const schema = z.object({
  * a empresa on-the-fly sem precisar pré-cadastrar.
  */
 export async function POST(request: NextRequest) {
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  const s = await requireModule(request, "companies");
+  if (!s.ok) return s.res;
 
-  const ip = getClientIp(request);
+  const ip = s.ip;
 
   let body: unknown;
   try { body = await request.json(); }
@@ -50,7 +49,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (created) {
-      await logAudit(session.email, "create_company_inline", company.id, ip);
+      await logAudit(s.user.email, "create_company_inline", company.id, ip);
     }
 
     return NextResponse.json({

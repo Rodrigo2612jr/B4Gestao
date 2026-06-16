@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAep, canEditContent } from "@/lib/aep/guard";
-import { getAssessmentAccess, addFunction } from "@/lib/aep/db";
+import { getAssessmentAccess, addFunction, assessmentIdOfSector } from "@/lib/aep/db";
 
 export const runtime = "nodejs";
 
@@ -33,6 +33,11 @@ export async function POST(
   }
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Setor requerido" }, { status: 400 });
+
+  // O setor precisa pertencer a ESTA avaliação (evita injetar função em avaliação/empresa alheia).
+  if ((await assessmentIdOfSector(parsed.data.sectorId)) !== id) {
+    return NextResponse.json({ error: "Setor não pertence a esta avaliação" }, { status: 400 });
+  }
 
   const functionId = await addFunction(id, parsed.data.sectorId, {
     funcaoParadigma: parsed.data.funcaoParadigma,

@@ -84,7 +84,16 @@ export function canTransition(from: AepStatus, to: AepStatus): boolean {
   return (AEP_TRANSITIONS[from] ?? []).includes(to);
 }
 
-/** Conteúdo é editável pelo técnico nestes estados. */
+/** Conteúdo é editável pelo técnico nestes estados (trava após enviar). */
 export function isEditable(status: AepStatus): boolean {
   return status === "rascunho" || status === "em_preenchimento" || status === "reprovado";
+}
+
+/**
+ * Conteúdo editável pelo SUPERVISOR — mais amplo que o do técnico: inclui
+ * "aguardando_aprovacao" (o supervisor corrige o trabalho do técnico antes de decidir).
+ * Só os estados terminais (aprovado/cancelado) ficam travados.
+ */
+export function isEditableForSupervisor(status: AepStatus): boolean {
+  return status !== "aprovado" && status !== "cancelado";
 }

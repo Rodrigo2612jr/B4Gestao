@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
+import { requireModule } from "@/lib/guard";
+import { logAudit } from "@/lib/db";
 import { calculateCostPanel, DEFAULT_COST_CONFIG } from "@/lib/esocial/custo-previsivel";
 
 export const runtime = "nodejs";
@@ -8,11 +9,11 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ companyId: string }> }
 ) {
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  const s = await requireModule(request, "esocial");
+  if (!s.ok) return s.res;
 
   const { companyId } = await params;
+  await logAudit(s.user.email, "esocial_view_custo", companyId, s.ip);
   const url = new URL(request.url);
 
   // Overrides opcionais via query (?salary=4000&faeAliquot=0.05)

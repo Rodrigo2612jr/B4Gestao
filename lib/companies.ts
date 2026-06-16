@@ -335,8 +335,21 @@ export async function mergeCompanies(
   if (!sql) throw new Error("Database not configured");
   if (sourceId === targetId) throw new Error("Não é possível mesclar a empresa nela mesma");
 
+  // Reparenteia TODOS os registros com company_id (antes só submissions — deixava órfãos).
   await sql`UPDATE submissions SET company_id = ${targetId} WHERE company_id = ${sourceId}`;
-  // Futuramente: idem para pulse, stress_test, esocial...
+  await sql`UPDATE stress_test_audits SET company_id = ${targetId} WHERE company_id = ${sourceId}`;
+  await sql`UPDATE stress_test_invites SET company_id = ${targetId} WHERE company_id = ${sourceId}`;
+  await sql`UPDATE pulse_campaigns SET company_id = ${targetId} WHERE company_id = ${sourceId}`;
+  await sql`UPDATE esocial_uploads SET company_id = ${targetId} WHERE company_id = ${sourceId}`;
+  await sql`UPDATE esocial_alerts SET company_id = ${targetId} WHERE company_id = ${sourceId}`;
+  await sql`UPDATE esocial_exposure_timeline SET company_id = ${targetId} WHERE company_id = ${sourceId}`;
+  await sql`UPDATE esocial_medical_events SET company_id = ${targetId} WHERE company_id = ${sourceId}`;
+  await sql`UPDATE esocial_leave_intervals SET company_id = ${targetId} WHERE company_id = ${sourceId}`;
+  await sql`UPDATE esocial_cat_events SET company_id = ${targetId} WHERE company_id = ${sourceId}`;
+  await sql`UPDATE aep_assessments SET company_id = ${targetId} WHERE company_id = ${sourceId}`;
+  await sql`UPDATE aep_sectors SET company_id = ${targetId} WHERE company_id = ${sourceId}`;
+  await sql`UPDATE aep_functions SET company_id = ${targetId} WHERE company_id = ${sourceId}`;
+  await sql`UPDATE aep_risk_items SET company_id = ${targetId} WHERE company_id = ${sourceId}`;
   await sql`UPDATE companies SET merged_into_id = ${targetId}, updated_at = NOW() WHERE id = ${sourceId}`;
 
   await logAudit(byUserEmail, "merge_companies", `${sourceId}->${targetId}`, ip);

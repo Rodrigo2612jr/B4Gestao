@@ -5,24 +5,30 @@ const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   // Previne MIME type sniffing
   { key: "X-Content-Type-Options", value: "nosniff" },
-  // Controla o Referrer
-  { key: "Referrer-Policy", value: "origin-when-cross-origin" },
+  // Controla o Referrer (mais restritivo)
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   // Permissões do navegador
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=()",
+    value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
   },
   // Força HTTPS
   {
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains; preload",
   },
-  // Content Security Policy (XSS defence in depth)
+  // Isolamento de janela / cross-domain
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
+  // Content Security Policy — removido 'unsafe-eval' (vetor de XSS mais perigoso).
+  // Mantém 'unsafe-inline' porque os scripts de bootstrap do Next em páginas
+  // pré-renderizadas não carregam nonce por-request. (Nonce/strict-dynamic exigiria
+  // renderização dinâmica em todo o painel — avaliado e descartado: quebrava o painel.)
   {
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "script-src 'self' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
@@ -31,6 +37,7 @@ const securityHeaders = [
       "base-uri 'self'",
       "form-action 'self'",
       "object-src 'none'",
+      "upgrade-insecure-requests",
     ].join("; "),
   },
 ];

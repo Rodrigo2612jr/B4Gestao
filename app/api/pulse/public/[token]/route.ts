@@ -14,7 +14,8 @@ export async function GET(
   const { token } = await params;
   const campaign = await getCampaignByToken(token);
   if (!campaign) return NextResponse.json({ error: "Pesquisa não encontrada" }, { status: 404 });
-  if (campaign.status !== "open") return NextResponse.json({ error: "Pesquisa encerrada" }, { status: 410 });
+  const isClosed = campaign.status !== "open" || (campaign.closes_at !== null && new Date(campaign.closes_at) < new Date());
+  if (isClosed) return NextResponse.json({ error: "Pesquisa encerrada" }, { status: 410 });
 
   return NextResponse.json({
     title: campaign.title,
@@ -35,14 +36,15 @@ export async function POST(
   const ip = getClientIp(request);
   const { token } = await params;
 
-  const rl = checkRateLimit(`pulse-resp:${ip}`, { max: 10, windowMs: 60_000, blockMs: 5 * 60_000 });
+  const rl = await checkRateLimit(`pulse-resp:${ip}`, { max: 10, windowMs: 60_000, blockMs: 5 * 60_000 });
   if (!rl.allowed) {
     return NextResponse.json({ error: "Muitas respostas. Aguarde." }, { status: 429 });
   }
 
   const campaign = await getCampaignByToken(token);
   if (!campaign) return NextResponse.json({ error: "Pesquisa não encontrada" }, { status: 404 });
-  if (campaign.status !== "open") return NextResponse.json({ error: "Pesquisa encerrada" }, { status: 410 });
+  const isClosed = campaign.status !== "open" || (campaign.closes_at !== null && new Date(campaign.closes_at) < new Date());
+  if (isClosed) return NextResponse.json({ error: "Pesquisa encerrada" }, { status: 410 });
 
   let body: unknown;
   try { body = await request.json(); }

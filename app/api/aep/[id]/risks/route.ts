@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAep, canEditContent } from "@/lib/aep/guard";
-import { getAssessmentAccess, addRisk } from "@/lib/aep/db";
+import { getAssessmentAccess, addRisk, assessmentIdOfFunction } from "@/lib/aep/db";
 
 export const runtime = "nodejs";
 
@@ -42,6 +42,10 @@ export async function POST(
   }
 
   const { functionId, ...rest } = parsed.data;
+  // Se vinculado a uma função, ela precisa pertencer a ESTA avaliação.
+  if (functionId && (await assessmentIdOfFunction(functionId)) !== id) {
+    return NextResponse.json({ error: "Função não pertence a esta avaliação" }, { status: 400 });
+  }
   const risk = await addRisk(id, functionId ?? null, rest);
   return NextResponse.json({ ok: true, risk });
 }

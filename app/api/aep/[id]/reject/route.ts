@@ -33,7 +33,10 @@ export async function POST(
     return NextResponse.json({ error: "Informe o motivo da reprovação (o que precisa mudar)." }, { status: 400 });
   }
 
-  await rejectAssessment(id, parsed.data.reason, { id: auth.user.id, email: auth.user.email });
+  const ok = await rejectAssessment(id, parsed.data.reason, { id: auth.user.id, email: auth.user.email });
+  if (!ok) {
+    return NextResponse.json({ error: "O estado da avaliação mudou. Recarregue e tente novamente." }, { status: 409 });
+  }
   await addChatMessage({
     assessmentId: id,
     authorUserId: auth.user.id,

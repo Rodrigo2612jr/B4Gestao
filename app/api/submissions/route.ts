@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import {
-  SESSION_COOKIE_NAME,
-  checkRateLimit,
-  getClientIp,
-  verifySessionToken,
-} from "@/lib/auth";
+import { checkRateLimit, getClientIp } from "@/lib/auth";
+import { requireModule } from "@/lib/guard";
 import { insertSubmission, listSubmissions, logAudit } from "@/lib/db";
 import { sendNewLeadEmail } from "@/lib/email";
 import { isValidCnpj, resolveCompany, stripCnpj } from "@/lib/companies";
@@ -52,7 +48,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Rate limit: 5 submissions per minute per IP
-  const rl = checkRateLimit(`submit:${ip}`, {
+  const rl = await checkRateLimit(`submit:${ip}`, {
     max: 5,
     windowMs: 60 * 1000,
     blockMs: 5 * 60 * 1000,
@@ -122,17 +118,12 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET — listar submissões (protegido por session cookie httpOnly)
+// GET — listar submissões (protegido por sessão + módulo leads)
 export async function GET(request: NextRequest) {
-  const ip = getClientIp(request);
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
+  const s = await requireModule(request, "leads");
+  if (!s.ok) return s.res;
 
-  if (!session) {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-  }
-
-  await logAudit(session.email, "list_leads", null, ip);
+  await logAudit(s.user.email, "list_leads", null, s.ip);
 
   try {
     const submissions = await listSubmissions();

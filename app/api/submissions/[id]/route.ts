@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  SESSION_COOKIE_NAME,
-  checkRateLimit,
-  getClientIp,
-  verifySessionToken,
-} from "@/lib/auth";
+import { checkRateLimit } from "@/lib/auth";
+import { requireModule } from "@/lib/guard";
 import { logAudit, softDeleteSubmission, verifyUserPassword } from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -13,17 +9,13 @@ export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const ip = getClientIp(request);
-
-  // Must have valid admin session
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) {
-    return NextResponse.json({ ok: false, error: "Não autorizado" }, { status: 401 });
-  }
+  // Sessão + módulo leads
+  const s = await requireModule(request, "leads");
+  if (!s.ok) return s.res;
+  const ip = s.ip;
 
   // Rate limit destructive actions: 10 per 5 min per IP
-  const rl = checkRateLimit(`delete:${ip}`, {
+  const rl = await checkRateLimit(`delete:${ip}`, {
     max: 10,
     windowMs: 5 * 60 * 1000,
     blockMs: 10 * 60 * 1000,
@@ -44,7 +36,7 @@ export async function DELETE(
 
   // Re-verify password against the logged-in user
   const senha = (body.senha ?? "").toString();
-  const user = await verifyUserPassword(session.email, senha);
+  const user = await verifyUserPassword(s.user.email, senha);
   if (!user) {
     return NextResponse.json({ ok: false, error: "Senha incorreta" }, { status: 403 });
   }
@@ -54,7 +46,7 @@ export async function DELETE(
     return NextResponse.json({ ok: false, error: "ID inválido" }, { status: 400 });
   }
 
-  await logAudit(session.email, "delete_lead", id, ip);
+  await logAudit(s.user.email, "delete_lead", id, ip);
 
   try {
     const ok = await softDeleteSubmission(id);

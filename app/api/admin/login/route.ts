@@ -6,15 +6,25 @@ import {
   getClientIp,
   resetRateLimit,
 } from "@/lib/auth";
-import { logAudit, touchLastLogin, verifyUserPassword } from "@/lib/db";
+import {
+  logAudit,
+  touchLastLogin,
+  verifyUserPassword,
+  findUserByEmail,
+  recordLoginFailure,
+  clearLoginFailures,
+} from "@/lib/db";
 
 export const runtime = "nodejs";
+
+const MAX_ATTEMPTS = 5;
+const LOCK_MS = 15 * 60 * 1000;
 
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request);
 
-  // 5 attempts per 15 min, then blocked for 15 min
-  const rl = checkRateLimit(`login:${ip}`, {
+  // 5 attempts per 15 min, then blocked for 15 min (durável em DB)
+  const rl = await checkRateLimit(`login:${ip}`, {
     max: 5,
     windowMs: 15 * 60 * 1000,
     blockMs: 15 * 60 * 1000,
@@ -40,12 +50,31 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "Credenciais inválidas" }, { status: 401 });
   }
 
+  // Lockout por CONTA (durável) — protege contra brute-force mesmo se o limite por IP for burlado.
+  const existing = await findUserByEmail(email);
+  if (existing?.locked_until && new Date(existing.locked_until) > new Date()) {
+    return NextResponse.json(
+      { ok: false, error: "Conta temporariamente bloqueada por tentativas. Tente novamente mais tarde." },
+      { status: 429 }
+    );
+  }
+
   const user = await verifyUserPassword(email, senha);
   if (!user) {
+    if (existing) await recordLoginFailure(existing.id, MAX_ATTEMPTS, LOCK_MS);
     return NextResponse.json({ ok: false, error: "Credenciais inválidas" }, { status: 401 });
   }
 
-  resetRateLimit(`login:${ip}`);
+  // Conta desativada / acesso expirado (acessos temporários + kill switch)
+  if (user.is_active === false) {
+    return NextResponse.json({ ok: false, error: "Conta desativada. Procure o administrador." }, { status: 403 });
+  }
+  if (user.access_expires_at && new Date(user.access_expires_at) < new Date()) {
+    return NextResponse.json({ ok: false, error: "Seu acesso expirou. Procure o administrador." }, { status: 403 });
+  }
+
+  await clearLoginFailures(user.id);
+  await resetRateLimit(`login:${ip}`);
   await touchLastLogin(user.id);
   await logAudit(user.email, "login", null, ip);
 

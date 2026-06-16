@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
+import { requireModule } from "@/lib/guard";
+import { logAudit } from "@/lib/db";
 import { getUpload, listAlerts } from "@/lib/esocial/db";
 
 export const runtime = "nodejs";
@@ -8,13 +9,13 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  const s = await requireModule(request, "esocial");
+  if (!s.ok) return s.res;
 
   const { id } = await params;
   const upload = await getUpload(id);
   if (!upload) return NextResponse.json({ error: "Não encontrado" }, { status: 404 });
+  await logAudit(s.user.email, "esocial_view_upload", id, s.ip);
   const alerts = await listAlerts({ uploadId: id });
   return NextResponse.json({
     upload: {

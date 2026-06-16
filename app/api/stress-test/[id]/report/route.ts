@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
+import { requireModule } from "@/lib/guard";
 import { getStressAudit } from "@/lib/stress-test/db";
 import { findCompanyById } from "@/lib/companies";
 import { generateStressTestPptx } from "@/lib/reports/stress-pptx";
@@ -12,9 +12,8 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  const s = await requireModule(request, "stress");
+  if (!s.ok) return s.res;
 
   const { id } = await params;
   const url = new URL(request.url);

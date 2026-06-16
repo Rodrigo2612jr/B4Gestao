@@ -19,7 +19,10 @@ export async function POST(
     return NextResponse.json({ error: "Apenas o supervisor pode aprovar (e só quando aguardando aprovação)" }, { status: 403 });
   }
 
-  await approveAssessment(id, { id: auth.user.id, email: auth.user.email });
+  const ok = await approveAssessment(id, { id: auth.user.id, email: auth.user.email });
+  if (!ok) {
+    return NextResponse.json({ error: "O estado da avaliação mudou. Recarregue e tente novamente." }, { status: 409 });
+  }
   await addChatMessage({
     assessmentId: id,
     authorUserId: auth.user.id,

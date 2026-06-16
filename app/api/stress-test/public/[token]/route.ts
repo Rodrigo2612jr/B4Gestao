@@ -3,7 +3,7 @@ import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/auth";
 import { findCompanyById } from "@/lib/companies";
 import { calculateScore, validateAnswers, type Answers } from "@/lib/stress-test/scoring";
-import { createStressAudit, getStressInviteByToken, consumeStressInvite } from "@/lib/stress-test/db";
+import { createStressAudit, getStressInviteByToken, reserveStressInvite, attachAuditToInvite } from "@/lib/stress-test/db";
 import { QUESTIONS } from "@/lib/stress-test/questions";
 
 export const runtime = "nodejs";
@@ -38,7 +38,7 @@ export async function POST(
   const ip = getClientIp(request);
   const { token } = await params;
 
-  const rl = checkRateLimit(`stress-public:${ip}`, { max: 5, windowMs: 60_000, blockMs: 5 * 60_000 });
+  const rl = await checkRateLimit(`stress-public:${ip}`, { max: 5, windowMs: 60_000, blockMs: 5 * 60_000 });
   if (!rl.allowed) return NextResponse.json({ error: "Muitas tentativas. Aguarde." }, { status: 429 });
 
   const invite = await getStressInviteByToken(token);
@@ -56,6 +56,12 @@ export async function POST(
   const v = validateAnswers(answers);
   if (!v.ok) return NextResponse.json({ error: "Respostas faltando", missing: v.missing }, { status: 400 });
 
+  // Reserva o convite ANTES de gravar (fecha a corrida de duplo-submit: um único uso real).
+  const inviteId = await reserveStressInvite(token);
+  if (!inviteId) {
+    return NextResponse.json({ error: "Este link já foi utilizado." }, { status: 410 });
+  }
+
   try {
     const result = calculateScore(answers);
     const auditId = await createStressAudit({
@@ -66,7 +72,7 @@ export async function POST(
       result,
       createdBy: "public-link",
     });
-    await consumeStressInvite(token, auditId);
+    await attachAuditToInvite(inviteId, auditId);
     return NextResponse.json({ ok: true, result });
   } catch (err) {
     console.error("[stress-public] error:", err);

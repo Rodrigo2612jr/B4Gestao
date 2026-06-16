@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { logAudit } from "@/lib/db";
+import { logAudit, getUserRoleById } from "@/lib/db";
 import { requireAep } from "@/lib/aep/guard";
 import { createAssessment, listAssessments } from "@/lib/aep/db";
 
@@ -59,6 +59,23 @@ export async function POST(request: NextRequest) {
   // Técnico cria sempre como avaliador dele mesmo (a menos que admin defina outro)
   const avaliadorUserId =
     auth.user.role === "TECNICO" ? auth.user.id : parsed.data.avaliadorUserId ?? auth.user.id;
+
+  // Supervisor (se informado) precisa ter perfil de supervisor e ser ≠ do avaliador.
+  if (parsed.data.supervisorUserId) {
+    const targetRole = await getUserRoleById(parsed.data.supervisorUserId);
+    if (targetRole !== "SUPERVISOR" && targetRole !== "ADMIN" && targetRole !== "SST") {
+      return NextResponse.json(
+        { error: "Supervisor inválido: o usuário precisa ter perfil de Supervisor." },
+        { status: 400 }
+      );
+    }
+    if (parsed.data.supervisorUserId === avaliadorUserId) {
+      return NextResponse.json(
+        { error: "O avaliador e o supervisor não podem ser a mesma pessoa." },
+        { status: 400 }
+      );
+    }
+  }
 
   try {
     const id = await createAssessment({

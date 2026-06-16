@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { SESSION_COOKIE_NAME, getClientIp, verifySessionToken } from "@/lib/auth";
+import { requireModule } from "@/lib/guard";
 import { logAudit } from "@/lib/db";
 import { calculateScore, validateAnswers, type Answers } from "@/lib/stress-test/scoring";
 import { createStressAudit, listStressAudits } from "@/lib/stress-test/db";
@@ -17,9 +17,8 @@ const createSchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  const s = await requireModule(request, "stress");
+  if (!s.ok) return s.res;
 
   const url = new URL(request.url);
   const companyId = url.searchParams.get("companyId") || undefined;
@@ -48,11 +47,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  const s = await requireModule(request, "stress");
+  if (!s.ok) return s.res;
 
-  const ip = getClientIp(request);
+  const ip = s.ip;
 
   let body: unknown;
   try {
@@ -81,9 +79,9 @@ export async function POST(request: NextRequest) {
       answers,
       result,
       notes: parsed.data.notes ?? null,
-      createdBy: session.email,
+      createdBy: s.user.email,
     });
-    await logAudit(session.email, "create_stress_audit", id, ip);
+    await logAudit(s.user.email, "create_stress_audit", id, ip);
     return NextResponse.json({ ok: true, id, result });
   } catch (err) {
     console.error("[stress-test] create error:", err);

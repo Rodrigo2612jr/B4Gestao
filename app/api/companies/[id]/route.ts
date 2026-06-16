@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE_NAME, getClientIp, verifySessionToken } from "@/lib/auth";
+import { requireModule } from "@/lib/guard";
 import { logAudit } from "@/lib/db";
 import { getCompanyAggregate, fuzzyFindCompanies } from "@/lib/companies";
 
@@ -9,14 +9,11 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
-  if (!session) {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-  }
+  const s = await requireModule(request, "companies");
+  if (!s.ok) return s.res;
 
   const { id } = await params;
-  const ip = getClientIp(request);
+  const ip = s.ip;
 
   try {
     const aggregate = await getCompanyAggregate(id);
@@ -28,7 +25,7 @@ export async function GET(
     const suggestions = await fuzzyFindCompanies(aggregate.company.name, 0.5, 5);
     const filteredSuggestions = suggestions.filter((s) => s.company.id !== id);
 
-    await logAudit(session.email, "view_company", id, ip);
+    await logAudit(s.user.email, "view_company", id, ip);
 
     return NextResponse.json({
       ...aggregate,

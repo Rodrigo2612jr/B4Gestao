@@ -32,7 +32,10 @@ export async function POST(
     return NextResponse.json({ error: "Avaliação incompleta", missing }, { status: 422 });
   }
 
-  await submitAssessment(id, access.status, { id: auth.user.id, email: auth.user.email });
+  const ok = await submitAssessment(id, access.status, { id: auth.user.id, email: auth.user.email });
+  if (!ok) {
+    return NextResponse.json({ error: "O estado da avaliação mudou. Recarregue e tente novamente." }, { status: 409 });
+  }
   await addChatMessage({
     assessmentId: id,
     authorUserId: auth.user.id,
