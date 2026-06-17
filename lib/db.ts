@@ -56,10 +56,20 @@ export interface AdminUser {
  * Initialize tables (idempotent).
  */
 let initPromise: Promise<void> | null = null;
+// Versão do schema. BUMP ao alterar a DDL do initDb → as migrações rodam uma vez no
+// próximo cold start; cold starts seguintes pulam toda a DDL (1 query só, não ~40).
+const SCHEMA_VERSION = 1;
 export async function initDb(): Promise<void> {
   if (!sql) return;
   if (initPromise) return initPromise;
   initPromise = (async () => {
+    // Fast-path: se o schema já está na versão atual, pula toda a DDL (perf de cold start).
+    try {
+      const v = await sql`SELECT 1 FROM schema_meta WHERE version >= ${SCHEMA_VERSION} LIMIT 1`;
+      if (v.length > 0) return;
+    } catch {
+      // schema_meta ainda não existe → roda o setup completo abaixo
+    }
     // pg_trgm para fuzzy matching de nomes de empresa
     try {
       await sql`CREATE EXTENSION IF NOT EXISTS pg_trgm`;
@@ -600,6 +610,10 @@ export async function initDb(): Promise<void> {
       )
     `;
     await sql`CREATE INDEX IF NOT EXISTS idx_audit_created_at ON audit_log(created_at DESC)`;
+
+    // Marca a versão aplicada — cold starts futuros pulam toda a DDL acima (1 query só).
+    await sql`CREATE TABLE IF NOT EXISTS schema_meta (version INTEGER PRIMARY KEY)`;
+    await sql`INSERT INTO schema_meta (version) VALUES (${SCHEMA_VERSION}) ON CONFLICT DO NOTHING`;
   })();
   return initPromise;
 }
@@ -733,6 +747,12 @@ export async function recordLoginFailure(
 export async function clearLoginFailures(userId: string): Promise<void> {
   if (!sql) return;
   await sql`UPDATE admin_users SET failed_attempts = 0, locked_until = NULL WHERE id = ${userId}`;
+}
+
+/** Login bem-sucedido: zera lockout + marca último acesso numa ÚNICA query (perf). */
+export async function markSuccessfulLogin(userId: string): Promise<void> {
+  if (!sql) return;
+  await sql`UPDATE admin_users SET failed_attempts = 0, locked_until = NULL, last_login = NOW() WHERE id = ${userId}`;
 }
 
 /** Ativa/desativa uma conta (kill switch — vale no próximo request via guard). */

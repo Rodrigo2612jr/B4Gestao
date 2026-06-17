@@ -96,9 +96,9 @@ function Inner({ id }: { id: string }) {
 
   if (loading) {
     return (
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div className="b4-card overflow-hidden">
         <div className="space-y-px">
-          {[0, 1, 2].map((i) => <div key={i} className="h-16 animate-pulse bg-gray-50" />)}
+          {[0, 1, 2].map((i) => <div key={i} className="h-16 animate-pulse bg-b4-surface-2" />)}
         </div>
       </div>
     );
@@ -106,7 +106,7 @@ function Inner({ id }: { id: string }) {
 
   if (!upload) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center text-sm text-gray-500 shadow-sm">
+      <div className="b4-card p-12 text-center text-sm text-b4-ink-2">
         Upload nao encontrado.
       </div>
     );
@@ -120,22 +120,22 @@ function Inner({ id }: { id: string }) {
       {/* Breadcrumb / voltar */}
       <Link
         href="/admin/esocial"
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-primary"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-b4-ink-2 transition-colors hover:text-b4-navy"
       >
         <HiOutlineArrowLeft className="text-base" /> Voltar para uploads
       </Link>
 
       {/* Card de identidade do arquivo */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="b4-card p-6">
         <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-b4-navy/10 text-b4-navy">
             <HiOutlineDocumentReport className="text-2xl" />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <h2
-                className="truncate text-xl font-bold text-secondary"
-                style={{ fontFamily: "var(--font-display), system-ui", letterSpacing: "-0.02em" }}
+                className="truncate text-xl font-bold text-b4-ink"
+                style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif", letterSpacing: "-0.02em" }}
               >
                 {upload.filename}
               </h2>
@@ -149,11 +149,11 @@ function Inner({ id }: { id: string }) {
                 {upload.status === "done" ? "Processado" : upload.status === "error" ? "Erro" : upload.status === "processing" ? "Processando" : "Pendente"}
               </span>
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-b4-ink-2">
               {(upload.sizeBytes / 1024).toFixed(1)} KB &middot; {new Date(upload.createdAt).toLocaleString("pt-BR")}
             </p>
             {upload.error && (
-              <p className="mt-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+              <p className="mt-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-600">
                 {upload.error}
               </p>
             )}
@@ -164,9 +164,9 @@ function Inner({ id }: { id: string }) {
         {upload.meta?.byType && Object.keys(upload.meta.byType).length > 0 && (
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {Object.entries(upload.meta.byType).map(([k, v]) => (
-              <div key={k} className="rounded-xl border border-gray-100 bg-gray-50 p-3 text-center">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">{k}</p>
-                <p className="mt-1 text-2xl font-bold text-secondary">{v}</p>
+              <div key={k} className="rounded-xl border border-b4-line bg-b4-surface-2 p-3 text-center">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-b4-ink-3">{k}</p>
+                <p className="mt-1 text-2xl font-bold text-b4-ink" style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif" }}>{v}</p>
               </div>
             ))}
           </div>
@@ -206,11 +206,11 @@ function Inner({ id }: { id: string }) {
       </div>
 
       {/* Lista de alertas */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-          <h3 className="text-sm font-bold text-gray-900">Alertas detectados</h3>
+      <div className="b4-card overflow-hidden">
+        <div className="flex items-center justify-between border-b border-b4-line px-5 py-4">
+          <h3 className="text-sm font-bold text-b4-ink">Alertas detectados</h3>
           {alerts.length > 0 && (
-            <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-500">
+            <span className="rounded-md bg-b4-surface-2 px-2 py-0.5 text-xs font-semibold text-b4-ink-2">
               {alerts.length}
             </span>
           )}
@@ -221,11 +221,11 @@ function Inner({ id }: { id: string }) {
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
               <HiOutlineCheckCircle className="text-2xl" />
             </div>
-            <p className="mt-4 text-sm font-semibold text-gray-800">Nenhum alerta gerado</p>
-            <p className="mt-1 text-xs text-gray-500">O processamento nao identificou irregularidades neste upload.</p>
+            <p className="mt-4 text-sm font-semibold text-b4-ink">Nenhum alerta gerado</p>
+            <p className="mt-1 text-xs text-b4-ink-2">O processamento nao identificou irregularidades neste upload.</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-b4-line">
             {alerts.map((a) => (
               <div key={a.id} className={`p-5 ${SEVERITY_STYLE[a.severity]} border-l-4 ${
                 a.severity === "critical" ? "border-l-red-500" : a.severity === "warn" ? "border-l-yellow-400" : "border-l-blue-400"
@@ -235,29 +235,29 @@ function Inner({ id }: { id: string }) {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       {a.alertCode && (
-                        <span className="rounded bg-gray-900 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase text-white">
+                        <span className="rounded bg-b4-navy px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase text-white">
                           {a.alertCode}
                         </span>
                       )}
-                      <h4 className="text-sm font-semibold text-gray-900">{a.title}</h4>
+                      <h4 className="text-sm font-semibold text-b4-ink">{a.title}</h4>
                       <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${SEVERITY_TAG[a.severity]}`}>
                         {a.severity === "critical" ? "Critico" : a.severity === "warn" ? "Atencao" : "Info"}
                       </span>
                       {a.custoFaixa && (
-                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${FAIXA_TAG[a.custoFaixa] ?? "bg-gray-100 text-gray-700"}`}>
+                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${FAIXA_TAG[a.custoFaixa] ?? "bg-b4-surface-2 text-b4-ink-2"}`}>
                           Custo {a.custoFaixa}
                         </span>
                       )}
                     </div>
-                    <p className="mt-1.5 text-sm text-gray-700">{a.description}</p>
+                    <p className="mt-1.5 text-sm text-b4-ink-2">{a.description}</p>
                     {a.recommendedAction && (
-                      <div className="mt-3 rounded-xl border border-gray-200 bg-white p-3">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">Acao recomendada</p>
-                        <p className="mt-0.5 text-sm text-gray-800">{a.recommendedAction}</p>
+                      <div className="mt-3 rounded-xl border border-b4-line bg-b4-surface p-3">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-b4-ink-3">Acao recomendada</p>
+                        <p className="mt-0.5 text-sm text-b4-ink">{a.recommendedAction}</p>
                       </div>
                     )}
                     {(a.periodStart || a.relatedEvents) && (
-                      <div className="mt-2.5 flex flex-wrap gap-2 text-[11px] text-gray-500">
+                      <div className="mt-2.5 flex flex-wrap gap-2 text-[11px] text-b4-ink-2">
                         {a.periodStart && (
                           <span className="rounded-lg bg-white/80 px-2 py-0.5 font-mono">
                             {a.periodStart}{a.periodEnd ? ` -> ${a.periodEnd}` : ""}

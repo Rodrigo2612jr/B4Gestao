@@ -82,14 +82,15 @@ function Inner() {
       {/* Header */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-secondary" style={{ fontFamily: "var(--font-display), system-ui", letterSpacing: "-0.025em" }}>
+          <span className="b4-eyebrow">Campo · NR-17</span>
+          <h2 className="mt-2 text-[26px] font-bold text-b4-ink" style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif", letterSpacing: "-0.03em" }}>
             Avaliações Ergonômicas Preliminares
           </h2>
-          <p className="mt-1 text-sm text-gray-500">FO-SST.013 · NR-17 / ABNT ISO 20646:2017</p>
+          <p className="mt-1 text-sm text-b4-ink-2">FO-SST.013 · NR-17 / ABNT ISO 20646:2017</p>
         </div>
         <button
           onClick={() => router.push("/aep/new")}
-          className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/20 transition-colors hover:bg-primary-dark"
+          className="flex h-11 items-center gap-1.5 rounded-xl bg-b4-navy px-4 text-sm font-semibold text-white shadow-[var(--b4-shadow-xs)] transition-colors hover:bg-b4-navy-deep active:scale-95"
         >
           <HiOutlinePlus className="text-base" /> Nova AEP
         </button>
@@ -104,32 +105,32 @@ function Inner() {
       </div>
 
       {/* Lista */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-          <h3 className="text-sm font-bold text-gray-900">Todas as avaliações</h3>
+      <div className="b4-card overflow-hidden">
+        <div className="flex items-center justify-between border-b border-b4-line px-5 py-4">
+          <h3 className="text-sm font-bold text-b4-ink">Todas as avaliações</h3>
           {!loading && rows.length > 0 && (
-            <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-500">{rows.length}</span>
+            <span className="rounded-md bg-b4-surface-2 px-2 py-0.5 text-xs font-semibold text-b4-ink-2">{rows.length}</span>
           )}
         </div>
 
         {loading ? (
           <div className="space-y-px">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="h-16 animate-pulse bg-gray-50" />
+              <div key={i} className="h-16 animate-pulse bg-b4-surface-2" />
             ))}
           </div>
         ) : error ? (
-          <div className="m-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>
+          <div className="m-4 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">{error}</div>
         ) : rows.length === 0 ? (
           <div className="px-6 py-16 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-b4-navy/10 text-b4-navy">
               <HiOutlineClipboardCheck className="text-2xl" />
             </div>
-            <p className="mt-4 text-sm font-semibold text-gray-800">Nenhuma avaliação ainda</p>
-            <p className="mt-1 text-xs text-gray-500">Crie a primeira AEP para uma empresa atendida.</p>
+            <p className="mt-4 text-sm font-semibold text-b4-ink">Nenhuma avaliação ainda</p>
+            <p className="mt-1 text-xs text-b4-ink-2">Crie a primeira AEP para uma empresa atendida.</p>
             <button
               onClick={() => router.push("/aep/new")}
-              className="mt-5 inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
+              className="mt-5 inline-flex h-11 items-center gap-1.5 rounded-xl bg-b4-navy px-4 text-sm font-semibold text-white transition-colors hover:bg-b4-navy-deep active:scale-95"
             >
               <HiOutlinePlus /> Nova AEP
             </button>
@@ -137,7 +138,7 @@ function Inner() {
         ) : (
           <><table className="hidden w-full text-sm md:table">
             <thead>
-              <tr className="border-b border-gray-100 text-left text-[11px] uppercase tracking-wider text-gray-400">
+              <tr className="border-b border-b4-line text-left text-[11px] uppercase tracking-wider text-b4-ink-3">
                 <th className="px-5 py-3 font-semibold">Empresa</th>
                 <th className="px-5 py-3 font-semibold">Avaliação</th>
                 <th className="hidden px-5 py-3 font-semibold md:table-cell">Técnico</th>
@@ -152,10 +153,10 @@ function Inner() {
                 <tr
                   key={r.id}
                   onClick={() => router.push(`/aep/${r.id}`)}
-                  className="group cursor-pointer border-b border-gray-50 transition-colors last:border-0 hover:bg-primary/[0.03]"
+                  className="group cursor-pointer border-b border-b4-line transition-colors last:border-0 hover:bg-b4-surface-2"
                 >
-                  <td className="px-5 py-3.5 font-semibold text-gray-900">{r.company_name ?? "-"}</td>
-                  <td className="px-5 py-3.5 text-gray-600">{r.title}</td>
+                  <td className="px-5 py-3.5 font-semibold text-b4-ink transition-colors group-hover:text-b4-navy">{r.company_name ?? "-"}</td>
+                  <td className="px-5 py-3.5 text-b4-ink-2">{r.title}</td>
                   <td className="hidden px-5 py-3.5 md:table-cell">
                     <Person name={r.avaliador_name} />
                   </td>
@@ -163,9 +164,9 @@ function Inner() {
                     <Person name={r.supervisor_name} />
                   </td>
                   <td className="px-5 py-3.5"><StatusBadge status={r.status} /></td>
-                  <td className="hidden px-5 py-3.5 text-xs text-gray-500 lg:table-cell">{fmtDate(r.updated_at)}</td>
+                  <td className="hidden px-5 py-3.5 text-xs text-b4-ink-2 lg:table-cell">{fmtDate(r.updated_at)}</td>
                   <td className="px-5 py-3.5 text-right">
-                    <HiOutlineChevronRight className="text-gray-300 transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
+                    <HiOutlineChevronRight className="text-b4-ink-3 transition-all group-hover:translate-x-0.5 group-hover:text-b4-navy" />
                   </td>
                 </tr>
               ))}
@@ -173,26 +174,26 @@ function Inner() {
           </table>
 
           {/* Mobile: cards (sem rolagem lateral, status inteiro visível) */}
-          <div className="divide-y divide-gray-100 md:hidden">
+          <div className="divide-y divide-b4-line md:hidden">
             {rows.map((r) => (
               <button
                 key={r.id}
                 onClick={() => router.push(`/aep/${r.id}`)}
-                className="flex w-full items-start gap-3 px-4 py-4 text-left transition-colors active:bg-primary/[0.05]"
+                className="flex w-full items-start gap-3 px-4 py-4 text-left transition-colors active:bg-b4-surface-2"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-gray-900">{r.company_name ?? "-"}</p>
-                  <p className="truncate text-xs text-gray-500">{r.title}</p>
+                  <p className="truncate font-semibold text-b4-ink">{r.company_name ?? "-"}</p>
+                  <p className="truncate text-xs text-b4-ink-2">{r.title}</p>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <StatusBadge status={r.status} />
-                    <span className="text-[11px] text-gray-400">{fmtDate(r.updated_at)}</span>
+                    <span className="text-[11px] text-b4-ink-3">{fmtDate(r.updated_at)}</span>
                   </div>
-                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-gray-500">
-                    <span><span className="font-medium text-gray-400">Téc:</span> {r.avaliador_name ?? "-"}</span>
-                    <span><span className="font-medium text-gray-400">Sup:</span> {r.supervisor_name ?? "-"}</span>
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-b4-ink-2">
+                    <span><span className="font-medium text-b4-ink-3">Téc:</span> {r.avaliador_name ?? "-"}</span>
+                    <span><span className="font-medium text-b4-ink-3">Sup:</span> {r.supervisor_name ?? "-"}</span>
                   </div>
                 </div>
-                <HiOutlineChevronRight className="mt-1 flex-shrink-0 text-gray-300" />
+                <HiOutlineChevronRight className="mt-1 flex-shrink-0 text-b4-ink-3" />
               </button>
             ))}
           </div>
@@ -204,30 +205,29 @@ function Inner() {
 }
 
 function Person({ name }: { name: string | null }) {
-  if (!name) return <span className="text-gray-400">-</span>;
+  if (!name) return <span className="text-b4-ink-3">-</span>;
   return (
     <span className="flex items-center gap-2">
-      <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
+      <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-b4-navy/10 text-[10px] font-bold text-b4-navy">
         {initials(name)}
       </span>
-      <span className="text-gray-700">{name}</span>
+      <span className="text-b4-ink-2">{name}</span>
     </span>
   );
 }
 
 function FeaturedKpi({ label, value, loading, icon }: { label: string; value: number; loading: boolean; icon: React.ReactNode }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary-dark p-5 text-white shadow-md shadow-primary/20">
-      <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-white/10 blur-2xl" />
+    <div className="b4-feature p-5">
       <div className="relative">
-        <div className="flex items-center gap-2 text-white/80">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 text-lg">{icon}</span>
+        <div className="flex items-center gap-2 text-white/85">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 text-lg ring-1 ring-white/15">{icon}</span>
           <span className="text-xs font-medium">{label}</span>
         </div>
         {loading ? (
           <div className="mt-4 h-9 w-16 animate-pulse rounded bg-white/20" />
         ) : (
-          <p className="mt-3 text-4xl font-bold tabular-nums">{value}</p>
+          <p className="mt-3 text-4xl font-bold tabular-nums" style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif" }}>{value}</p>
         )}
       </div>
     </div>
@@ -235,7 +235,7 @@ function FeaturedKpi({ label, value, loading, icon }: { label: string; value: nu
 }
 
 const TONES: Record<string, { bg: string; text: string }> = {
-  blue: { bg: "bg-blue-50", text: "text-blue-600" },
+  blue: { bg: "bg-sky-50", text: "text-sky-600" },
   amber: { bg: "bg-amber-50", text: "text-amber-600" },
   emerald: { bg: "bg-emerald-50", text: "text-emerald-600" },
 };
@@ -243,15 +243,15 @@ const TONES: Record<string, { bg: string; text: string }> = {
 function Kpi({ label, value, loading, icon, tone }: { label: string; value: number; loading: boolean; icon: React.ReactNode; tone: string }) {
   const t = TONES[tone] ?? TONES.blue;
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="b4-card p-5">
       <div className="flex items-center gap-2">
         <span className={`flex h-9 w-9 items-center justify-center rounded-xl text-lg ${t.bg} ${t.text}`}>{icon}</span>
-        <span className="text-xs font-medium text-gray-500">{label}</span>
+        <span className="text-xs font-medium text-b4-ink-2">{label}</span>
       </div>
       {loading ? (
-        <div className="mt-4 h-9 w-12 animate-pulse rounded bg-gray-100" />
+        <div className="mt-4 h-9 w-12 animate-pulse rounded bg-b4-surface-2" />
       ) : (
-        <p className="mt-3 text-4xl font-bold tabular-nums text-secondary">{value}</p>
+        <p className="mt-3 text-4xl font-bold tabular-nums text-b4-ink" style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif" }}>{value}</p>
       )}
     </div>
   );

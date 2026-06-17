@@ -14,6 +14,8 @@ import KpiTile from "../_components/KpiTile";
 import EmptyState from "../_components/EmptyState";
 import { useToast } from "../_components/ToastProvider";
 
+const DISPLAY = "var(--font-admin-display), system-ui, sans-serif";
+
 interface Company {
   id: string;
   cnpj: string;
@@ -88,13 +90,11 @@ function Inner() {
       {/* Header */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2
-            className="text-2xl font-bold text-secondary"
-            style={{ fontFamily: "var(--font-display), system-ui", letterSpacing: "-0.025em" }}
-          >
+          <span className="b4-eyebrow">CRM</span>
+          <h2 className="mt-2 text-[26px] font-bold text-b4-ink" style={{ fontFamily: DISPLAY, letterSpacing: "-0.03em" }}>
             Empresas
           </h2>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-b4-ink-2">
             Espinha dorsal do CRM · identificadas e unificadas por CNPJ.
           </p>
         </div>
@@ -103,44 +103,26 @@ function Inner() {
       {/* KPIs · somente quando dados reais existem */}
       {!loading && companies.length > 0 && (
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-          <KpiTile
-            label="Total de empresas"
-            value={kpis.total}
-            icon={<HiOutlineOfficeBuilding />}
-            featured
-            loading={loading}
-          />
-          <KpiTile
-            label="Com localidade"
-            value={kpis.comCidade}
-            icon={<HiOutlineOfficeBuilding />}
-            tone="emerald"
-            loading={loading}
-          />
-          <KpiTile
-            label="Sem localidade"
-            value={kpis.semCidade}
-            icon={<HiOutlineOfficeBuilding />}
-            tone="amber"
-            loading={loading}
-          />
+          <KpiTile label="Total de empresas" value={kpis.total} icon={<HiOutlineOfficeBuilding />} featured loading={loading} />
+          <KpiTile label="Com localidade" value={kpis.comCidade} icon={<HiOutlineOfficeBuilding />} tone="emerald" loading={loading} />
+          <KpiTile label="Sem localidade" value={kpis.semCidade} icon={<HiOutlineOfficeBuilding />} tone="amber" loading={loading} />
         </div>
       )}
 
       {/* Search */}
       <div className="relative">
-        <HiOutlineSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-xl text-gray-400" />
+        <HiOutlineSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-xl text-b4-ink-3" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar por nome (tolera typo/acento) ou parte do CNPJ..."
-          className="w-full rounded-xl border border-gray-200 bg-white py-3.5 pl-12 pr-4 text-sm shadow-sm outline-none transition-all focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+          className="w-full rounded-xl border border-b4-line bg-b4-surface py-3.5 pl-12 pr-4 text-sm text-b4-ink shadow-[var(--b4-shadow-xs)] outline-none transition-all placeholder:text-b4-ink-3 focus:border-b4-navy/40 focus:ring-4 focus:ring-b4-navy/10"
         />
         {query && (
           <button
             onClick={() => setQuery("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-xl border border-gray-200 bg-white px-2 py-0.5 text-xs font-medium text-gray-500 hover:bg-gray-50"
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-xl border border-b4-line bg-b4-surface px-2 py-0.5 text-xs font-medium text-b4-ink-2 hover:bg-b4-surface-2"
           >
             Limpar
           </button>
@@ -155,10 +137,10 @@ function Inner() {
 
       {/* Tabela / Grid */}
       {loading ? (
-        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="b4-card overflow-hidden">
           <div className="space-y-px">
             {[0, 1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-16 animate-pulse bg-gray-50" />
+              <div key={i} className="h-16 animate-pulse bg-b4-surface-2" />
             ))}
           </div>
         </div>
@@ -169,16 +151,16 @@ function Inner() {
           <EmptyState variant="no-companies" />
         )
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-            <h3 className="text-sm font-bold text-gray-900">Todas as empresas</h3>
-            <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-500">
+        <div className="b4-card overflow-hidden">
+          <div className="flex items-center justify-between border-b border-b4-line px-5 py-4">
+            <h3 className="text-sm font-bold text-b4-ink">Todas as empresas</h3>
+            <span className="rounded-md bg-b4-surface-2 px-2 py-0.5 text-xs font-semibold text-b4-ink-2">
               {companies.length}
             </span>
           </div>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-100 text-left text-[11px] uppercase tracking-wider text-gray-400">
+              <tr className="border-b border-b4-line text-left text-[11px] uppercase tracking-wider text-b4-ink-3">
                 <th className="px-5 py-3 font-semibold">Empresa</th>
                 <th className="hidden px-5 py-3 font-semibold md:table-cell">CNPJ</th>
                 <th className="hidden px-5 py-3 font-semibold lg:table-cell">Localidade</th>
@@ -190,17 +172,14 @@ function Inner() {
               {companies.map((c) => (
                 <tr
                   key={c.id}
-                  className="group border-b border-gray-50 transition-colors last:border-0 hover:bg-primary/[0.03]"
+                  className="group border-b border-b4-line last:border-0 hover:bg-b4-surface-2"
                 >
                   <td className="px-5 py-3.5">
-                    <Link
-                      href={`/admin/companies/${c.id}`}
-                      className="flex items-center gap-3"
-                    >
-                      <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-bold text-primary">
+                    <Link href={`/admin/companies/${c.id}`} className="flex items-center gap-3">
+                      <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-b4-navy/10 text-[11px] font-bold text-b4-navy">
                         {initials(c.name)}
                       </span>
-                      <span className="font-semibold text-gray-900 group-hover:text-primary transition-colors">
+                      <span className="font-semibold text-b4-ink transition-colors group-hover:text-b4-navy">
                         {c.name}
                       </span>
                       {c.score !== undefined && c.score < 1 && (
@@ -210,20 +189,20 @@ function Inner() {
                       )}
                     </Link>
                   </td>
-                  <td className="hidden px-5 py-3.5 font-mono text-xs text-gray-500 md:table-cell">
+                  <td className="hidden px-5 py-3.5 font-mono text-xs text-b4-ink-2 md:table-cell">
                     {c.cnpj_formatted}
                   </td>
-                  <td className="hidden px-5 py-3.5 text-xs text-gray-500 lg:table-cell">
+                  <td className="hidden px-5 py-3.5 text-xs text-b4-ink-2 lg:table-cell">
                     {c.city || c.state
                       ? [c.city, c.state].filter(Boolean).join(" · ")
-                      : <span className="text-gray-300">-</span>}
+                      : <span className="text-b4-ink-3">-</span>}
                   </td>
-                  <td className="hidden px-5 py-3.5 text-xs text-gray-500 lg:table-cell">
+                  <td className="hidden px-5 py-3.5 text-xs text-b4-ink-2 lg:table-cell">
                     {new Date(c.updated_at).toLocaleDateString("pt-BR")}
                   </td>
                   <td className="px-5 py-3.5 text-right">
                     <Link href={`/admin/companies/${c.id}`}>
-                      <HiOutlineChevronRight className="text-gray-300 transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
+                      <HiOutlineChevronRight className="text-b4-ink-3 transition-all group-hover:translate-x-0.5 group-hover:text-b4-navy" />
                     </Link>
                   </td>
                 </tr>
@@ -235,10 +214,10 @@ function Inner() {
 
       {/* Info card */}
       {!loading && companies.length > 0 && (
-        <div className="flex items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50/50 p-4 text-xs text-blue-900">
-          <HiOutlineInformationCircle className="mt-0.5 flex-shrink-0 text-lg" />
+        <div className="flex items-start gap-3 rounded-2xl border border-b4-navy/15 bg-b4-navy/[0.04] p-4 text-xs text-b4-ink-2">
+          <HiOutlineInformationCircle className="mt-0.5 flex-shrink-0 text-lg text-b4-navy" />
           <p>
-            <strong>Dica:</strong> a busca tolera diferenças de acento, espaço e digitação. Empresas com mesmo CNPJ
+            <strong className="text-b4-ink">Dica:</strong> a busca tolera diferenças de acento, espaço e digitação. Empresas com mesmo CNPJ
             são unificadas automaticamente. Quando dois cadastros parecerem ser a mesma empresa, você pode mesclá-los
             na tela de detalhes (com confirmação de senha).
           </p>

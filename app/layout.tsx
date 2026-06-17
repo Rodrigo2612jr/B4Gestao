@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Outfit } from "next/font/google";
+import { Plus_Jakarta_Sans, Outfit, Bricolage_Grotesque, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 
 const body = Plus_Jakarta_Sans({
@@ -10,6 +10,19 @@ const body = Plus_Jakarta_Sans({
 
 const display = Outfit({
   variable: "--font-display",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+// Tipografia exclusiva do PAINEL interno (admin/CRM) — não afeta o site institucional.
+const adminDisplay = Bricolage_Grotesque({
+  variable: "--font-admin-display",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const adminBody = Hanken_Grotesk({
+  variable: "--font-admin-body",
   subsets: ["latin"],
   display: "swap",
 });
@@ -92,7 +105,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" translate="no" className={`${body.variable} ${display.variable} h-full antialiased`}>
+    <html lang="pt-BR" translate="no" className={`${body.variable} ${display.variable} ${adminDisplay.variable} ${adminBody.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

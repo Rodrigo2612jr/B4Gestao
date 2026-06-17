@@ -25,11 +25,11 @@ export default function LeadsTable({ rows, filters, setFilters, onRowClick }: Pr
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div className="b4-card overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-100 bg-gray-50/80">
+            <tr className="border-b border-b4-line bg-b4-surface-2/80">
               {SORTABLE.map(({ key, label }) => (
                 <SortHeader
                   key={key}
@@ -40,12 +40,12 @@ export default function LeadsTable({ rows, filters, setFilters, onRowClick }: Pr
                   {label}
                 </SortHeader>
               ))}
-              <th className="px-4 py-3 text-left font-semibold text-gray-600">CNPJ</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-600">Nome</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-600">Telefone</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-600">Região</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-600">Porte</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-600">Necessidade</th>
+              <th className="px-4 py-3 text-left font-semibold text-b4-ink-2">CNPJ</th>
+              <th className="px-4 py-3 text-left font-semibold text-b4-ink-2">Nome</th>
+              <th className="px-4 py-3 text-left font-semibold text-b4-ink-2">Telefone</th>
+              <th className="px-4 py-3 text-left font-semibold text-b4-ink-2">Região</th>
+              <th className="px-4 py-3 text-left font-semibold text-b4-ink-2">Porte</th>
+              <th className="px-4 py-3 text-left font-semibold text-b4-ink-2">Necessidade</th>
               <th className="w-8" aria-hidden="true" />
             </tr>
           </thead>
@@ -54,35 +54,35 @@ export default function LeadsTable({ rows, filters, setFilters, onRowClick }: Pr
               <tr
                 key={s.id}
                 onClick={() => onRowClick(s)}
-                className={`group cursor-pointer border-b border-gray-50 transition-colors hover:bg-blue-50/40 ${
-                  i % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+                className={`group cursor-pointer border-b border-b4-line transition-colors hover:bg-b4-surface-2 ${
+                  i % 2 === 0 ? "bg-b4-surface" : "bg-b4-surface-2/40"
                 }`}
               >
-                <td className="whitespace-nowrap px-4 py-3 text-gray-500">
-                  <span className="font-medium text-gray-700">{formatDate(s.criadoEm)}</span>
-                  <span className="ml-1 text-xs text-gray-400">{formatTime(s.criadoEm)}</span>
+                <td className="whitespace-nowrap px-4 py-3 text-b4-ink-2">
+                  <span className="font-medium text-b4-ink-2">{formatDate(s.criadoEm)}</span>
+                  <span className="ml-1 text-xs text-b4-ink-3">{formatTime(s.criadoEm)}</span>
                 </td>
-                <td className="px-4 py-3 font-medium text-gray-900">{s.empresa}</td>
-                <td className="px-4 py-3 text-gray-500">{s.cnpj || "-"}</td>
-                <td className="px-4 py-3 text-gray-700">{s.nome}</td>
+                <td className="px-4 py-3 font-medium text-b4-ink">{s.empresa}</td>
+                <td className="px-4 py-3 text-b4-ink-2">{s.cnpj || "-"}</td>
+                <td className="px-4 py-3 text-b4-ink-2">{s.nome}</td>
                 <td className="px-4 py-3">
                   <a
                     href={phoneToWhatsApp(s.telefone)}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="text-blue-600 hover:underline"
+                    className="text-b4-navy hover:underline"
                   >
                     {s.telefone}
                   </a>
                 </td>
-                <td className="px-4 py-3 text-gray-500">{s.regiao}</td>
-                <td className="px-4 py-3 text-gray-500">{s.funcionarios}</td>
+                <td className="px-4 py-3 text-b4-ink-2">{s.regiao}</td>
+                <td className="px-4 py-3 text-b4-ink-2">{s.funcionarios}</td>
                 <td className="px-4 py-3">
                   <NecessidadeBadge necessidade={s.necessidade} />
                 </td>
                 <td className="px-2 py-3 text-right">
-                  <HiOutlineChevronRight className="inline text-gray-300 transition-colors group-hover:text-gray-500" />
+                  <HiOutlineChevronRight className="inline text-b4-ink-3 transition-all group-hover:translate-x-0.5 group-hover:text-b4-navy" />
                 </td>
               </tr>
             ))}
@@ -105,11 +105,11 @@ function SortHeader({
   onClick: () => void;
 }) {
   return (
-    <th className="px-4 py-3 text-left font-semibold text-gray-600">
+    <th className="px-4 py-3 text-left font-semibold text-b4-ink-2">
       <button
         onClick={onClick}
         className={`inline-flex items-center gap-1 rounded px-1 -mx-1 transition-colors ${
-          active ? "text-gray-900" : "hover:text-gray-800"
+          active ? "text-b4-ink" : "hover:text-b4-ink"
         }`}
         aria-sort={active ? (dir === "asc" ? "ascending" : "descending") : "none"}
       >

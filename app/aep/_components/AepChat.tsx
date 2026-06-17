@@ -87,38 +87,38 @@ export default function AepChat({
   };
 
   return (
-    <div className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white shadow-sm">
-      <div className="flex items-center gap-2 border-b border-gray-100 px-4 py-3">
-        <HiOutlineChatAlt2 className="text-lg text-primary" />
-        <h3 className="text-sm font-semibold text-secondary">Conversa técnico ↔ supervisor</h3>
+    <div className="b4-card flex h-full flex-col">
+      <div className="flex items-center gap-2 border-b border-b4-line px-4 py-3">
+        <HiOutlineChatAlt2 className="text-lg text-b4-navy" />
+        <h3 className="text-sm font-semibold text-b4-ink">Conversa técnico ↔ supervisor</h3>
       </div>
 
       <div ref={scrollRef} className="flex-1 space-y-2 overflow-y-auto p-4" style={{ minHeight: 200, maxHeight: 460 }}>
         {messages.length === 0 ? (
-          <p className="py-8 text-center text-xs text-gray-400">Nenhuma mensagem ainda. Use o chat para alinhar a avaliação.</p>
+          <p className="py-8 text-center text-xs text-b4-ink-3">Nenhuma mensagem ainda. Use o chat para alinhar a avaliação.</p>
         ) : (
           messages.map((m) => {
             if (m.kind === "status" || m.kind === "rejection") {
               return (
                 <div key={m.id} className="my-2 text-center">
-                  <span className={`inline-block rounded-full px-3 py-1 text-[11px] font-medium ${m.kind === "rejection" ? "bg-red-50 text-red-700" : "bg-emerald-50 text-emerald-700"}`}>
+                  <span className={`inline-block rounded-full px-3 py-1 text-[11px] font-medium ${m.kind === "rejection" ? "bg-rose-50 text-rose-700" : "bg-emerald-50 text-emerald-700"}`}>
                     {m.body}
                   </span>
-                  <div className="mt-0.5 text-[10px] text-gray-400">{m.author_name} · {fmtTime(m.created_at)}</div>
+                  <div className="mt-0.5 text-[10px] text-b4-ink-3">{m.author_name} · {fmtTime(m.created_at)}</div>
                 </div>
               );
             }
             const mine = m.author_role === myActorRole;
             return (
               <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${mine ? "bg-primary text-white" : "bg-gray-100 text-gray-800"}`}>
+                <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${mine ? "bg-b4-navy text-white" : "bg-b4-surface-2 text-b4-ink"}`}>
                   {!mine && (
                     <div className="mb-0.5 text-[11px] font-semibold opacity-70">
                       {m.author_name} · {m.author_role === "SUPERVISOR" ? "Supervisor" : m.author_role === "TECNICO" ? "Técnico" : "Admin"}
                     </div>
                   )}
                   <p className="whitespace-pre-wrap">{m.body}</p>
-                  <div className={`mt-0.5 text-right text-[10px] ${mine ? "text-white/70" : "text-gray-400"}`}>{fmtTime(m.created_at)}</div>
+                  <div className={`mt-0.5 text-right text-[10px] ${mine ? "text-white/70" : "text-b4-ink-3"}`}>{fmtTime(m.created_at)}</div>
                 </div>
               </div>
             );
@@ -126,7 +126,7 @@ export default function AepChat({
         )}
       </div>
 
-      <div className="flex items-end gap-2 border-t border-gray-100 p-3">
+      <div className="flex items-end gap-2 border-t border-b4-line p-3">
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -138,12 +138,12 @@ export default function AepChat({
           }}
           rows={1}
           placeholder="Escreva uma mensagem…"
-          className="max-h-28 flex-1 resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+          className="max-h-28 flex-1 resize-none rounded-xl border border-b4-line-strong bg-b4-surface px-3 py-2 text-sm text-b4-ink outline-none transition-all placeholder:text-b4-ink-3 focus:border-b4-navy focus:ring-4 focus:ring-b4-navy/12"
         />
         <button
           onClick={send}
           disabled={sending || !text.trim()}
-          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark disabled:opacity-50"
+          className="rounded-xl bg-b4-navy px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-b4-navy-deep active:scale-95 disabled:opacity-50"
         >
           Enviar
         </button>

@@ -60,7 +60,7 @@ function Inner() {
         actions={
           <Link
             href="/admin/pulse/new"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/20 transition-colors hover:bg-primary-dark"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-b4-navy px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-b4-navy-deep"
           >
             <HiOutlinePlus className="text-base" /> Nova pesquisa
           </Link>
@@ -95,7 +95,7 @@ function Inner() {
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-44 animate-pulse rounded-2xl border border-gray-200 bg-white shadow-sm" />
+            <div key={i} className="b4-card h-44 animate-pulse bg-b4-surface-2" />
           ))}
         </div>
       ) : items.length === 0 ? (
@@ -106,40 +106,40 @@ function Inner() {
             <Link
               key={c.id}
               href={`/admin/pulse/${c.id}`}
-              className="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-md"
+              className="b4-card b4-card-hover group relative flex flex-col overflow-hidden p-5"
             >
               <div className="flex items-start justify-between gap-2">
-                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-b4-navy/10 text-b4-navy">
                   <HiOutlineChartBar className="text-xl" />
                 </div>
                 <span className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-0.5 text-[10px] font-semibold ${
                   c.status === "open"
                     ? "bg-emerald-50 text-emerald-700"
-                    : "bg-gray-100 text-gray-600"
+                    : "bg-b4-surface-2 text-b4-ink-2"
                 }`}>
-                  <span className={`h-1.5 w-1.5 rounded-full ${c.status === "open" ? "bg-emerald-500" : "bg-gray-400"}`} />
+                  <span className={`h-1.5 w-1.5 rounded-full ${c.status === "open" ? "bg-emerald-500" : "bg-b4-ink-3"}`} />
                   {c.status === "open" ? "Aberta" : "Encerrada"}
                 </span>
               </div>
 
-              <h3 className="mt-4 line-clamp-2 text-sm font-semibold text-gray-900 group-hover:text-primary">
+              <h3 className="mt-4 line-clamp-2 text-sm font-semibold text-b4-ink group-hover:text-b4-navy">
                 {c.title}
               </h3>
 
               <div className="mt-3 flex flex-wrap gap-1">
                 {c.areas.slice(0, 4).map((a) => (
-                  <span key={a} className="rounded-xl bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-600">
+                  <span key={a} className="rounded-xl bg-b4-surface-2 px-2 py-0.5 text-[10px] font-medium text-b4-ink-2">
                     {a}
                   </span>
                 ))}
                 {c.areas.length > 4 && (
-                  <span className="rounded-xl bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-500">
+                  <span className="rounded-xl bg-b4-surface-2 px-2 py-0.5 text-[10px] font-medium text-b4-ink-3">
                     +{c.areas.length - 4}
                   </span>
                 )}
               </div>
 
-              <div className="mt-auto flex items-center justify-between border-t border-gray-100 pt-3 text-[11px] text-gray-400">
+              <div className="mt-auto flex items-center justify-between border-t border-b4-line pt-3 text-[11px] text-b4-ink-3">
                 <span>n ≥ {c.threshold}</span>
                 <span>{timeAgo(c.createdAt)}</span>
               </div>

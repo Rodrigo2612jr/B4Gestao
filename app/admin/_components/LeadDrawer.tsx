@@ -75,7 +75,7 @@ export default function LeadDrawer({ lead, onClose, onDelete }: Props) {
       />
       {/* Drawer */}
       <aside
-        className={`fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white shadow-2xl transition-transform sm:w-[480px] ${
+        className={`fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-b4-surface shadow-2xl transition-transform sm:w-[480px] ${
           lead ? "translate-x-0" : "translate-x-full"
         }`}
         role="dialog"
@@ -85,18 +85,22 @@ export default function LeadDrawer({ lead, onClose, onDelete }: Props) {
         {lead && (
           <>
             {/* Header */}
-            <header className="sticky top-0 z-10 flex items-start justify-between border-b border-gray-100 bg-white px-6 py-5">
+            <header className="sticky top-0 z-10 flex items-start justify-between border-b border-b4-line bg-b4-surface px-6 py-5">
               <div className="min-w-0 flex-1 pr-4">
-                <p className="text-xs font-medium uppercase tracking-wider text-gray-500">
+                <p className="text-xs font-medium uppercase tracking-wider text-b4-ink-3">
                   Lead recebido {formatRelative(lead.criadoEm)}
                 </p>
-                <h2 id="drawer-title" className="mt-1 truncate text-xl font-bold text-gray-900">
+                <h2
+                  id="drawer-title"
+                  className="mt-1 truncate text-xl font-bold text-b4-ink"
+                  style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif" }}
+                >
                   {lead.empresa}
                 </h2>
               </div>
               <button
                 onClick={onClose}
-                className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+                className="rounded-lg p-2 text-b4-ink-3 hover:bg-b4-surface-2 hover:text-b4-ink-2"
                 aria-label="Fechar"
               >
                 <HiOutlineX className="text-xl" />
@@ -123,14 +127,14 @@ export default function LeadDrawer({ lead, onClose, onDelete }: Props) {
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => copy(lead.telefone, "Telefone")}
-                    className="flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                    className="flex items-center justify-center gap-2 rounded-lg border border-b4-line bg-b4-surface px-3 py-2.5 text-sm font-medium text-b4-ink-2 transition-colors hover:bg-b4-surface-2"
                   >
                     <HiOutlineClipboardCopy />
                     Telefone
                   </button>
                   <button
                     onClick={copyAll}
-                    className="flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                    className="flex items-center justify-center gap-2 rounded-lg border border-b4-line bg-b4-surface px-3 py-2.5 text-sm font-medium text-b4-ink-2 transition-colors hover:bg-b4-surface-2"
                   >
                     <HiOutlineClipboardCopy />
                     Tudo
@@ -139,7 +143,7 @@ export default function LeadDrawer({ lead, onClose, onDelete }: Props) {
               </div>
 
               {/* Fields */}
-              <dl className="space-y-3 rounded-2xl border border-gray-100 bg-gray-50/60 p-4">
+              <dl className="space-y-3 rounded-2xl border border-b4-line bg-b4-surface-2/60 p-4">
                 <Field
                   icon={<HiOutlineOfficeBuilding />}
                   label="Empresa"
@@ -195,7 +199,7 @@ export default function LeadDrawer({ lead, onClose, onDelete }: Props) {
               )}
 
               {/* ID footer */}
-              <p className="text-center text-xs text-gray-400">ID: {lead.id}</p>
+              <p className="text-center text-xs text-b4-ink-3">ID: {lead.id}</p>
             </div>
           </>
         )}
@@ -215,14 +219,14 @@ function Field({
 }) {
   return (
     <div className="flex items-start gap-3">
-      <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-white text-gray-500 shadow-sm">
+      <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-b4-surface text-b4-ink-2 shadow-sm">
         {icon}
       </div>
       <div className="min-w-0 flex-1">
-        <dt className="text-xs font-medium uppercase tracking-wider text-gray-500">
+        <dt className="text-xs font-medium uppercase tracking-wider text-b4-ink-3">
           {label}
         </dt>
-        <dd className="mt-0.5 text-sm font-medium text-gray-900 break-words">{value}</dd>
+        <dd className="mt-0.5 text-sm font-medium text-b4-ink break-words">{value}</dd>
       </div>
     </div>
   );

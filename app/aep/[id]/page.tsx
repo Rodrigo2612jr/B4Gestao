@@ -176,13 +176,13 @@ function Inner() {
   };
 
   if (loading) {
-    return <div className="h-64 animate-pulse rounded-2xl bg-gray-100" />;
+    return <div className="h-64 animate-pulse rounded-2xl bg-b4-surface-2" />;
   }
   if (error || !data) {
     return (
       <div className="space-y-4">
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error || "Não encontrado"}</div>
-        <button onClick={() => router.push("/aep")} className="text-sm text-primary hover:underline">← Voltar para a lista</button>
+        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">{error || "Não encontrado"}</div>
+        <button onClick={() => router.push("/aep")} className="text-sm text-b4-navy hover:underline">← Voltar para a lista</button>
       </div>
     );
   }
@@ -195,19 +195,19 @@ function Inner() {
       {/* Cabeçalho */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <button onClick={() => router.push("/aep")} className="mb-1 flex items-center gap-1 text-xs text-gray-500 hover:text-primary">
+          <button onClick={() => router.push("/aep")} className="mb-1 flex items-center gap-1 text-xs text-b4-ink-2 hover:text-b4-navy">
             <HiOutlineArrowLeft /> AEP
           </button>
-          <h2 className="text-xl font-bold text-secondary">{data.title}</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-xl font-bold text-b4-ink" style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif", letterSpacing: "-0.02em" }}>{data.title}</h2>
+          <p className="text-sm text-b4-ink-2">
             {data.company_name} · {data.company_cnpj} {data.unidade ? `· ${data.unidade}` : ""}
           </p>
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-500">
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-b4-ink-2">
             <StatusBadge status={status} />
-            <span>Técnico: <b className="text-gray-700">{data.avaliador_name ?? "-"}</b></span>
+            <span>Técnico: <b className="text-b4-ink">{data.avaliador_name ?? "-"}</b></span>
             {presence.tecnico && <span className="inline-flex items-center gap-1 text-emerald-600"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />preenchendo</span>}
-            <span className="text-gray-300">·</span>
-            <span>Supervisor: <b className="text-gray-700">{data.supervisor_name ?? "-"}</b></span>
+            <span className="text-b4-ink-3">·</span>
+            <span>Supervisor: <b className="text-b4-ink">{data.supervisor_name ?? "-"}</b></span>
             {presence.supervisor && <span className="inline-flex items-center gap-1 text-emerald-600"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />online</span>}
           </div>
         </div>
@@ -218,17 +218,17 @@ function Inner() {
             <button
               onClick={submit}
               disabled={busy}
-              className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 disabled:opacity-60"
+              className="flex h-11 items-center gap-1.5 rounded-xl bg-emerald-600 px-4 text-sm font-semibold text-white shadow-[var(--b4-shadow-xs)] transition-colors hover:bg-emerald-700 active:scale-95 disabled:opacity-60"
             >
               <HiOutlineCheck /> Concluir e enviar p/ aprovação
             </button>
           )}
           {data.viewer.canDecide && (
             <div className="flex gap-2">
-              <button onClick={approve} disabled={busy} className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60">
+              <button onClick={approve} disabled={busy} className="flex h-11 items-center gap-1.5 rounded-xl bg-emerald-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 active:scale-95 disabled:opacity-60">
                 <HiOutlineCheckCircle /> Aprovar
               </button>
-              <button onClick={() => setShowReject(true)} disabled={busy} className="flex items-center gap-1.5 rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-60">
+              <button onClick={() => setShowReject(true)} disabled={busy} className="flex h-11 items-center gap-1.5 rounded-xl border border-rose-300 bg-b4-surface px-4 text-sm font-semibold text-rose-600 transition-colors hover:bg-rose-50 active:scale-95 disabled:opacity-60">
                 <HiOutlineXCircle /> Reprovar
               </button>
             </div>
@@ -243,7 +243,7 @@ function Inner() {
         </div>
       )}
       {status === "reprovado" && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
           <b>Reprovado pelo supervisor.</b> {data.rejection_reason ? `Motivo: ${data.rejection_reason}` : "Veja o chat para os ajustes."}{" "}
           {canEdit && "Ajuste os pontos e conclua novamente."}
         </div>
@@ -258,13 +258,13 @@ function Inner() {
         {/* Coluna principal */}
         <div className="space-y-5">
           {/* Tabs de passo */}
-          <div className="flex flex-wrap gap-1 rounded-xl border border-gray-200 bg-white p-1">
+          <div className="flex flex-wrap gap-1 rounded-xl border border-b4-line bg-b4-surface p-1">
             {STEPS.map((s) => (
               <button
                 key={s.id}
                 onClick={() => setStep(s.id)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                  step === s.id ? "bg-primary text-white shadow-sm" : "text-gray-600 hover:bg-gray-100"
+                className={`rounded-lg px-3 py-2 text-xs font-semibold transition-colors active:scale-95 ${
+                  step === s.id ? "bg-b4-navy text-white shadow-[var(--b4-shadow-xs)]" : "text-b4-ink-2 hover:bg-b4-surface-2"
                 }`}
               >
                 {s.label}
@@ -293,12 +293,12 @@ function Inner() {
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
               <HiOutlineClock className="text-2xl text-amber-600" />
             </div>
-            <h3 className="mt-4 text-lg font-bold text-secondary">Aguardando aprovação do supervisor</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <h3 className="mt-4 text-lg font-bold text-b4-ink" style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif" }}>Aguardando aprovação do supervisor</h3>
+            <p className="mt-1 text-sm text-b4-ink-2">
               O supervisor {data.supervisor_name ?? ""} foi notificado e vai revisar a avaliação. Você pode acompanhar pelo chat.
               Se houver ajustes, eles aparecerão aqui e a edição será reaberta.
             </p>
-            <button onClick={() => setShowWaiting(false)} className="mt-5 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white hover:bg-primary-dark">
+            <button onClick={() => setShowWaiting(false)} className="mt-5 h-11 rounded-xl bg-b4-navy px-5 text-sm font-semibold text-white transition-colors hover:bg-b4-navy-deep active:scale-95">
               Ver conversa
             </button>
           </div>
@@ -340,8 +340,8 @@ function Inner() {
 // ============================================================
 function GeralStep({ data, readOnly, onPatch }: { data: FullData; readOnly: boolean; onPatch: (b: Record<string, unknown>) => void }) {
   return (
-    <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <h3 className="text-lg font-semibold text-secondary">Dados gerais</h3>
+    <div className="b4-card space-y-4 p-6">
+      <h3 className="text-lg font-semibold text-b4-ink" style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif" }}>Dados gerais</h3>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <ReadField label="Empresa" value={data.company_name} />
         <ReadField label="CNPJ" value={data.company_cnpj} />
@@ -436,50 +436,52 @@ function ChecklistStep({ data, readOnly, onPatch }: { data: FullData; readOnly: 
   return (
     <div className="space-y-5">
       {/* Progresso geral */}
-      <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-secondary to-primary p-4 text-white shadow-sm">
-        <div className="flex items-center justify-between text-sm">
-          <span className="font-semibold">Checklist FO-SST.013</span>
-          <span className="tabular-nums text-white/90">{answered}/{total} · {pct}%</span>
+      <div className="b4-feature p-4">
+        <div className="relative">
+          <div className="flex items-center justify-between text-sm">
+            <span className="font-semibold">Checklist FO-SST.013</span>
+            <span className="tabular-nums text-white/90">{answered}/{total} · {pct}%</span>
+          </div>
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/20">
+            <div className="h-full rounded-full bg-emerald-400 transition-all duration-500" style={{ width: `${pct}%` }} />
+          </div>
+          <p className="mt-2 text-xs text-white/70">Marque SIM, NÃO ou N/A em cada item. Toque em “observação” para detalhar quando precisar.</p>
         </div>
-        <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/20">
-          <div className="h-full rounded-full bg-accent transition-all duration-500" style={{ width: `${pct}%` }} />
-        </div>
-        <p className="mt-2 text-xs text-white/70">Marque SIM, NÃO ou N/A em cada item. Toque em “observação” para detalhar quando precisar.</p>
       </div>
 
       {AEP_CHECKLIST.map((cat) => {
         const c = CAT_COLORS[cat.id] ?? CAT_COLORS.mobiliarios;
         const catAns = cat.questions.filter((q) => answers[q.id]?.resp).length;
         return (
-          <div key={cat.id} className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <div key={cat.id} className="b4-card overflow-hidden">
             <div className={`flex items-center justify-between gap-2 ${c.band} px-5 py-3`}>
               <h4 className={`text-sm font-bold uppercase tracking-wide ${c.text}`}>{cat.label}</h4>
               <span className={`rounded-full bg-white/70 px-2 py-0.5 text-[11px] font-semibold tabular-nums ${c.text}`}>{catAns}/{cat.questions.length}</span>
             </div>
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-b4-line">
               {cat.questions.map((q) => {
                 const a = answers[q.id] || {};
                 const accent =
-                  a.resp === "SIM" ? "border-l-red-400 bg-red-50/40"
+                  a.resp === "SIM" ? "border-l-rose-400 bg-rose-50/40"
                   : a.resp === "NAO" ? "border-l-emerald-400 bg-emerald-50/40"
-                  : a.resp === "NA" ? "border-l-gray-300 bg-gray-50/50"
+                  : a.resp === "NA" ? "border-l-b4-line-strong bg-b4-surface-2"
                   : "border-l-transparent";
                 const noteOpen = notesOpen.has(q.id);
                 return (
                   <div key={q.id} className={`border-l-[3px] px-4 py-3.5 transition-colors ${accent}`}>
                     <div className="flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                      <p className="text-sm leading-snug text-gray-800 sm:flex-1">{q.label}</p>
-                      <div className="inline-flex flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                      <p className="text-sm leading-snug text-b4-ink sm:flex-1">{q.label}</p>
+                      <div className="inline-flex flex-shrink-0 overflow-hidden rounded-lg border border-b4-line bg-b4-surface-2">
                         {(["SIM", "NAO", "NA"] as ChecklistResposta[]).map((r) => {
                           const sel = a.resp === r;
-                          const on = r === "SIM" ? "bg-red-500 text-white" : r === "NAO" ? "bg-emerald-600 text-white" : "bg-gray-500 text-white";
+                          const on = r === "SIM" ? "bg-rose-500 text-white" : r === "NAO" ? "bg-emerald-600 text-white" : "bg-b4-ink-2 text-white";
                           return (
                             <button
                               key={r}
                               type="button"
                               disabled={readOnly}
                               onClick={() => setResp(q.id, r)}
-                              className={`min-w-[44px] px-3 py-1.5 text-xs font-bold transition-colors ${sel ? on : "text-gray-500 hover:bg-gray-100"} ${readOnly ? "cursor-default" : ""}`}
+                              className={`min-w-[44px] px-3 py-2 text-xs font-bold transition-colors ${sel ? on : "text-b4-ink-2 hover:bg-b4-surface"} ${readOnly ? "cursor-default" : ""}`}
                             >
                               {r === "NAO" ? "NÃO" : r === "NA" ? "N/A" : "SIM"}
                             </button>
@@ -498,7 +500,7 @@ function ChecklistStep({ data, readOnly, onPatch }: { data: FullData; readOnly: 
                               type="button"
                               disabled={readOnly}
                               onClick={() => setOpt(q.id, o.id, !!q.multi)}
-                              className={`rounded-full border px-3 py-1 text-[11px] transition-colors ${sel ? "border-primary bg-primary/10 font-medium text-primary" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+                              className={`rounded-full border px-3 py-1.5 text-[11px] transition-colors ${sel ? "border-b4-navy bg-b4-navy/10 font-medium text-b4-navy" : "border-b4-line text-b4-ink-2 hover:bg-b4-surface-2"}`}
                             >
                               {o.label}
                             </button>
@@ -515,7 +517,7 @@ function ChecklistStep({ data, readOnly, onPatch }: { data: FullData; readOnly: 
                             defaultValue={a.fields?.[f.id] ?? ""}
                             onBlur={(e) => setFieldVal(q.id, f.id, e.target.value)}
                             placeholder={f.label}
-                            className="w-36 rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+                            className="w-36 rounded-lg border border-b4-line bg-b4-surface px-2.5 py-2 text-xs text-b4-ink outline-none transition-all placeholder:text-b4-ink-3 focus:border-b4-navy focus:ring-4 focus:ring-b4-navy/10"
                           />
                         ))}
                       </div>
@@ -526,7 +528,7 @@ function ChecklistStep({ data, readOnly, onPatch }: { data: FullData; readOnly: 
                       <button
                         type="button"
                         onClick={() => toggleNote(q.id)}
-                        className={`mt-2 inline-flex items-center gap-1 text-[11px] font-medium transition-colors ${a.nota || noteOpen ? "text-primary" : "text-gray-400 hover:text-primary"}`}
+                        className={`mt-2 inline-flex items-center gap-1 text-[11px] font-medium transition-colors ${a.nota || noteOpen ? "text-b4-navy" : "text-b4-ink-3 hover:text-b4-navy"}`}
                       >
                         <HiOutlineAnnotation className="text-sm" />
                         {a.nota ? "Editar observação" : noteOpen ? "Fechar observação" : "Adicionar observação"}
@@ -534,14 +536,14 @@ function ChecklistStep({ data, readOnly, onPatch }: { data: FullData; readOnly: 
                     )}
                     {(noteOpen || a.nota) && (
                       readOnly ? (
-                        a.nota ? <p className="mt-1.5 rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-600"><span className="font-semibold text-gray-500">Obs.: </span>{a.nota}</p> : null
+                        a.nota ? <p className="mt-1.5 rounded-lg bg-b4-surface-2 px-3 py-2 text-xs text-b4-ink-2"><span className="font-semibold text-b4-ink-3">Obs.: </span>{a.nota}</p> : null
                       ) : (
                         <textarea
                           defaultValue={a.nota ?? ""}
                           onBlur={(e) => setNota(q.id, e.target.value)}
                           rows={2}
                           placeholder="Observação do avaliador para este item…"
-                          className="mt-1.5 w-full rounded-lg border border-gray-200 px-3 py-2 text-xs outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+                          className="mt-1.5 w-full rounded-lg border border-b4-line bg-b4-surface px-3 py-2 text-xs text-b4-ink outline-none transition-all placeholder:text-b4-ink-3 focus:border-b4-navy focus:ring-4 focus:ring-b4-navy/10"
                         />
                       )
                     )}
@@ -588,22 +590,22 @@ function EstruturaStep({
   return (
     <div className="space-y-4">
       {!readOnly && (
-        <div className="flex gap-2 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="b4-card flex gap-2 p-4">
           <input
             value={newSector}
             onChange={(e) => setNewSector(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && addSector()}
             placeholder="Nome do setor (ex: Administrativo, Produção, Almoxarifado)"
-            className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="flex-1 rounded-xl border border-b4-line-strong bg-b4-surface px-3 py-3 text-sm text-b4-ink outline-none transition-all placeholder:text-b4-ink-3 focus:border-b4-navy focus:ring-4 focus:ring-b4-navy/12"
           />
-          <button onClick={addSector} className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark">
+          <button onClick={addSector} className="flex h-11 flex-shrink-0 items-center gap-1.5 rounded-xl bg-b4-navy px-4 text-sm font-semibold text-white transition-colors hover:bg-b4-navy-deep active:scale-95">
             <HiOutlinePlus /> Add setor
           </button>
         </div>
       )}
 
       {data.sectors.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">
+        <div className="rounded-2xl border border-dashed border-b4-line-strong bg-b4-surface p-10 text-center text-sm text-b4-ink-2">
           Nenhum setor ainda. {!readOnly && "Adicione o primeiro setor acima."}
         </div>
       ) : (
@@ -644,15 +646,15 @@ function SectorBlock({
   };
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-      <div className="flex items-center justify-between border-b border-gray-100 px-5 py-3">
+    <div className="b4-card">
+      <div className="flex items-center justify-between border-b border-b4-line px-5 py-3">
         <div className="flex items-center gap-2">
-          <span className="rounded-md bg-secondary/10 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-secondary">Setor</span>
-          <h4 className="text-sm font-bold text-gray-900">{sector.nome}</h4>
-          <span className="text-xs text-gray-400">({sector.functions.length} função{sector.functions.length === 1 ? "" : "ões"})</span>
+          <span className="rounded-md bg-b4-navy/10 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-b4-navy">Setor</span>
+          <h4 className="text-sm font-bold text-b4-ink">{sector.nome}</h4>
+          <span className="text-xs text-b4-ink-3">({sector.functions.length} função{sector.functions.length === 1 ? "" : "ões"})</span>
         </div>
         {!readOnly && (
-          <button onClick={removeSector} className="text-gray-300 hover:text-red-500" title="Remover setor">
+          <button onClick={removeSector} className="text-b4-ink-3 transition-colors hover:text-rose-500" title="Remover setor">
             <HiOutlineTrash />
           </button>
         )}
@@ -663,7 +665,7 @@ function SectorBlock({
           <FunctionCard key={fn.id} fn={fn} assessmentId={assessmentId} readOnly={readOnly} reload={reload} push={push} />
         ))}
         {!readOnly && (
-          <button onClick={addFunction} className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-gray-300 py-2.5 text-sm font-medium text-gray-500 hover:border-primary hover:text-primary">
+          <button onClick={addFunction} className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-b4-line-strong py-3 text-sm font-medium text-b4-ink-2 transition-colors hover:border-b4-navy hover:text-b4-navy active:scale-[0.99]">
             <HiOutlinePlus /> Add função neste setor
           </button>
         )}
@@ -700,14 +702,14 @@ function FunctionCard({
   };
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-gray-50/50 p-4">
+    <div className="rounded-xl border border-b4-line bg-b4-surface-2 p-4">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
           <Field label="Função (paradigma)" defaultValue={fn.funcao_paradigma} readOnly={readOnly} onSave={(v) => save({ funcaoParadigma: v })} />
           <Field label="GHE (Grupo Homogêneo)" defaultValue={fn.ghe} readOnly={readOnly} onSave={(v) => save({ ghe: v })} />
         </div>
         {!readOnly && (
-          <button onClick={removeFn} className="mt-6 text-gray-300 hover:text-red-500" title="Remover função">
+          <button onClick={removeFn} className="mt-6 text-b4-ink-3 transition-colors hover:text-rose-500" title="Remover função">
             <HiOutlineTrash />
           </button>
         )}
@@ -767,10 +769,10 @@ function PhotoUploader({
 
   return (
     <div>
-      <label className="text-xs font-medium text-gray-600">Fotos do posto de trabalho (até 4)</label>
+      <label className="text-xs font-medium text-b4-ink-2">Fotos do posto de trabalho (até 4)</label>
       <div className="mt-1 flex flex-wrap gap-2">
         {fn.photos.map((p) => (
-          <div key={p.id} className="group relative h-20 w-20 overflow-hidden rounded-lg border border-gray-200">
+          <div key={p.id} className="group relative h-20 w-20 overflow-hidden rounded-lg border border-b4-line">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={p.url} alt={p.caption ?? "foto"} className="h-full w-full object-cover" />
             {!readOnly && (
@@ -785,7 +787,7 @@ function PhotoUploader({
           </div>
         ))}
         {!readOnly && fn.photos.length < 4 && (
-          <label className={`flex h-20 w-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-gray-300 text-gray-400 hover:border-primary hover:text-primary ${uploading ? "opacity-50" : ""}`}>
+          <label className={`flex h-20 w-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-b4-line-strong text-b4-ink-3 transition-colors hover:border-b4-navy hover:text-b4-navy ${uploading ? "opacity-50" : ""}`}>
             <HiOutlinePhotograph className="text-xl" />
             <span className="text-[10px]">{uploading ? "Enviando…" : "Add foto"}</span>
             <input
@@ -801,7 +803,7 @@ function PhotoUploader({
             />
           </label>
         )}
-        {readOnly && fn.photos.length === 0 && <span className="text-xs text-gray-400">Sem fotos.</span>}
+        {readOnly && fn.photos.length === 0 && <span className="text-xs text-b4-ink-3">Sem fotos.</span>}
       </div>
     </div>
   );
@@ -839,26 +841,26 @@ function RiscosStep({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-gray-200 bg-white p-4 text-xs text-gray-500 shadow-sm">
-        Inventário de perigos e riscos por GHE/função. <b>P</b> = probabilidade, <b>S</b> = severidade (1-5), <b>N</b> = nível (calculado).
+      <div className="b4-card p-4 text-xs text-b4-ink-2">
+        Inventário de perigos e riscos por GHE/função. <b className="text-b4-ink">P</b> = probabilidade, <b className="text-b4-ink">S</b> = severidade (1-5), <b className="text-b4-ink">N</b> = nível (calculado).
       </div>
 
       {!readOnly && (
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-          <select value={fnForNew} onChange={(e) => setFnForNew(e.target.value)} className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary">
+        <div className="b4-card flex flex-wrap items-center gap-2 p-4">
+          <select value={fnForNew} onChange={(e) => setFnForNew(e.target.value)} className="rounded-xl border border-b4-line-strong bg-b4-surface px-3 py-3 text-sm text-b4-ink outline-none transition-all focus:border-b4-navy focus:ring-4 focus:ring-b4-navy/12">
             <option value="">Geral (sem função)</option>
             {functions.map((f) => (
               <option key={f.id} value={f.id}>{f.sectorName} · {f.funcao_paradigma}</option>
             ))}
           </select>
-          <button onClick={addRisk} className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark">
+          <button onClick={addRisk} className="flex h-11 items-center gap-1.5 rounded-xl bg-b4-navy px-4 text-sm font-semibold text-white transition-colors hover:bg-b4-navy-deep active:scale-95">
             <HiOutlinePlus /> Add linha de risco
           </button>
         </div>
       )}
 
       {allRisks.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">
+        <div className="rounded-2xl border border-dashed border-b4-line-strong bg-b4-surface p-10 text-center text-sm text-b4-ink-2">
           Nenhum risco lançado ainda.
         </div>
       ) : (
@@ -901,16 +903,16 @@ function RiskRow({
     if (res.ok) await reload();
   };
 
-  const nColor = n == null ? "bg-gray-100 text-gray-500" : n >= 5 ? "bg-red-100 text-red-700" : n === 4 ? "bg-orange-100 text-orange-700" : n === 3 ? "bg-amber-100 text-amber-800" : n === 2 ? "bg-lime-100 text-lime-700" : "bg-emerald-100 text-emerald-700";
+  const nColor = n == null ? "bg-b4-surface-2 text-b4-ink-2" : n >= 5 ? "bg-rose-100 text-rose-700" : n === 4 ? "bg-orange-100 text-orange-700" : n === 3 ? "bg-amber-100 text-amber-800" : n === 2 ? "bg-lime-100 text-lime-700" : "bg-emerald-100 text-emerald-700";
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+    <div className="b4-card p-4">
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-b4-ink-3">
           {risk.sectorName ? `${risk.sectorName} · ${risk.fnName}` : "Geral"}
         </span>
         {!readOnly && (
-          <button onClick={remove} className="text-gray-300 hover:text-red-500"><HiOutlineTrash /></button>
+          <button onClick={remove} className="text-b4-ink-3 transition-colors hover:text-rose-500"><HiOutlineTrash /></button>
         )}
       </div>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -923,7 +925,7 @@ function RiskRow({
         <ScoreSelect label="P" value={p} readOnly={readOnly} onChange={(v) => { setP(v); save({ p: v, s }); }} />
         <ScoreSelect label="S" value={s} readOnly={readOnly} onChange={(v) => { setS(v); save({ p, s: v }); }} />
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-gray-500">Nível</span>
+          <span className="text-xs font-medium text-b4-ink-2">Nível</span>
           <span className={`rounded-lg px-2.5 py-1 text-xs font-bold ${nColor}`}>{n ?? "-"} {n ? `· ${riskLabel(n)}` : ""}</span>
         </div>
       </div>
@@ -934,12 +936,12 @@ function RiskRow({
 function ScoreSelect({ label, value, readOnly, onChange }: { label: string; value: number | null; readOnly: boolean; onChange: (v: number | null) => void }) {
   return (
     <div className="flex items-center gap-1.5">
-      <span className="text-xs font-medium text-gray-500">{label}</span>
+      <span className="text-xs font-medium text-b4-ink-2">{label}</span>
       <select
         value={value ?? ""}
         disabled={readOnly}
         onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)}
-        className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-xs outline-none focus:border-primary disabled:bg-gray-50"
+        className="rounded-lg border border-b4-line-strong bg-b4-surface px-2 py-1.5 text-xs text-b4-ink outline-none transition-all focus:border-b4-navy focus:ring-4 focus:ring-b4-navy/10 disabled:bg-b4-surface-2"
       >
         <option value="">-</option>
         {[1, 2, 3, 4, 5].map((v) => <option key={v} value={v}>{v}</option>)}
@@ -954,8 +956,8 @@ function ScoreSelect({ label, value, readOnly, onChange }: { label: string; valu
 function ReadField({ label, value }: { label: string; value: string | null }) {
   return (
     <div>
-      <label className="text-xs font-medium text-gray-500">{label}</label>
-      <p className="mt-1 text-sm font-medium text-gray-900">{value || "-"}</p>
+      <label className="text-xs font-medium text-b4-ink-2">{label}</label>
+      <p className="mt-1 text-sm font-medium text-b4-ink">{value || "-"}</p>
     </div>
   );
 }
@@ -987,13 +989,13 @@ function Field({
   const listId = list ? `dl-${label.replace(/\s+/g, "")}` : undefined;
   return (
     <div>
-      <label className="text-xs font-medium text-gray-600">{label}</label>
+      <label className="text-xs font-medium text-b4-ink-2">{label}</label>
       {textarea ? (
         <textarea
           defaultValue={defaultValue ?? ""}
           rows={rows}
           onBlur={(e) => onSave(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+          className="mt-1 w-full rounded-xl border border-b4-line-strong bg-b4-surface px-3 py-2.5 text-sm text-b4-ink outline-none transition-all placeholder:text-b4-ink-3 focus:border-b4-navy focus:ring-4 focus:ring-b4-navy/12"
         />
       ) : (
         <>
@@ -1002,7 +1004,7 @@ function Field({
             list={listId}
             defaultValue={defaultValue ?? ""}
             onBlur={(e) => onSave(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="mt-1 w-full rounded-xl border border-b4-line-strong bg-b4-surface px-3 py-2.5 text-sm text-b4-ink outline-none transition-all placeholder:text-b4-ink-3 focus:border-b4-navy focus:ring-4 focus:ring-b4-navy/12"
           />
           {list && (
             <datalist id={listId}>
@@ -1018,8 +1020,8 @@ function Field({
 function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">{children}</div>
+      <div className="absolute inset-0 bg-b4-navy-deep/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative z-10 w-full max-w-md rounded-2xl bg-b4-surface p-6 shadow-[var(--b4-shadow-lg)]">{children}</div>
     </div>
   );
 }
@@ -1028,22 +1030,22 @@ function RejectModal({ onClose, onConfirm }: { onClose: () => void; onConfirm: (
   const [reason, setReason] = useState("");
   return (
     <Modal onClose={onClose}>
-      <h3 className="text-lg font-bold text-secondary">Reprovar avaliação</h3>
-      <p className="mt-1 text-sm text-gray-500">Descreva o que precisa ser ajustado. O técnico verá no chat e a edição será reaberta.</p>
+      <h3 className="text-lg font-bold text-b4-ink" style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif" }}>Reprovar avaliação</h3>
+      <p className="mt-1 text-sm text-b4-ink-2">Descreva o que precisa ser ajustado. O técnico verá no chat e a edição será reaberta.</p>
       <textarea
         value={reason}
         onChange={(e) => setReason(e.target.value)}
         rows={4}
         autoFocus
         placeholder="Ex: Faltou descrever o modo operatório do setor Produção; revisar P/S do risco de postura…"
-        className="mt-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+        className="mt-3 w-full rounded-xl border border-b4-line-strong bg-b4-surface px-3 py-2.5 text-sm text-b4-ink outline-none transition-all placeholder:text-b4-ink-3 focus:border-b4-navy focus:ring-4 focus:ring-b4-navy/12"
       />
       <div className="mt-4 flex justify-end gap-2">
-        <button onClick={onClose} className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancelar</button>
+        <button onClick={onClose} className="h-11 rounded-xl border border-b4-line bg-b4-surface px-4 text-sm font-medium text-b4-ink-2 transition-colors hover:bg-b4-surface-2 active:scale-95">Cancelar</button>
         <button
           onClick={() => reason.trim().length >= 3 && onConfirm(reason.trim())}
           disabled={reason.trim().length < 3}
-          className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+          className="h-11 rounded-xl bg-rose-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-rose-700 active:scale-95 disabled:opacity-50"
         >
           Reprovar e notificar
         </button>

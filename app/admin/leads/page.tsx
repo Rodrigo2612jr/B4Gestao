@@ -100,7 +100,7 @@ function LeadsInner() {
         breadcrumbs={[{ label: "Painel B4", href: "/admin" }, { label: "Leads do site" }]}
         meta={
           !loading && submissions.length > 0 ? (
-            <span className="rounded-md bg-primary/10 px-2 py-0.5 font-mono text-xs font-bold text-primary">
+            <span className="rounded-md bg-b4-navy/10 px-2 py-0.5 font-mono text-xs font-bold text-b4-navy">
               {submissions.length}
             </span>
           ) : undefined
@@ -110,7 +110,7 @@ function LeadsInner() {
             <button
               onClick={handleRefresh}
               disabled={loading}
-              className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-xl border border-b4-line bg-b4-surface px-4 py-2 text-sm font-medium text-b4-ink-2 transition-colors hover:bg-b4-surface-2 disabled:opacity-50"
             >
               <HiOutlineRefresh className={loading ? "animate-spin" : ""} />
               <span className="hidden sm:inline">Atualizar</span>
@@ -118,7 +118,7 @@ function LeadsInner() {
             <button
               onClick={handleExport}
               disabled={filtered.length === 0}
-              className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/20 transition-colors hover:bg-primary-dark disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-xl bg-b4-navy px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-b4-navy/20 transition-colors hover:bg-b4-navy-deep disabled:opacity-50"
             >
               <HiOutlineDownload />
               <span className="hidden sm:inline">Exportar CSV</span>
@@ -190,11 +190,11 @@ function LeadsInner() {
         </>
       )}
 
-      <p className="pt-4 text-center text-xs text-gray-400">
+      <p className="pt-4 text-center text-xs text-b4-ink-3">
         Atalho: pressione{" "}
-        <kbd className="rounded border border-gray-300 bg-white px-1.5 py-0.5 font-mono text-xs">/</kbd>{" "}
+        <kbd className="rounded border border-b4-line-strong bg-b4-surface px-1.5 py-0.5 font-mono text-xs">/</kbd>{" "}
         para buscar,{" "}
-        <kbd className="rounded border border-gray-300 bg-white px-1.5 py-0.5 font-mono text-xs">Esc</kbd>{" "}
+        <kbd className="rounded border border-b4-line-strong bg-b4-surface px-1.5 py-0.5 font-mono text-xs">Esc</kbd>{" "}
         para fechar
       </p>
 

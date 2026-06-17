@@ -99,29 +99,30 @@ function Inner() {
     <div className="mx-auto max-w-3xl space-y-6">
       {/* Wizard header */}
       <div>
+        <span className="b4-eyebrow">Conformidade NR-1</span>
         <h2
-          className="text-2xl font-bold text-secondary"
-          style={{ fontFamily: "var(--font-display), system-ui", letterSpacing: "-0.025em" }}
+          className="mt-2 text-[26px] font-bold text-b4-ink"
+          style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif", letterSpacing: "-0.03em" }}
         >
           Nova auditoria · Stress Test NR-1
         </h2>
-        <p className="mt-1 text-sm text-gray-500">Etapa atual: {stepLabel}</p>
+        <p className="mt-1 text-sm text-b4-ink-2">Etapa atual: {stepLabel}</p>
       </div>
 
       {/* Progress bar (somente na fase de perguntas) */}
       {typeof step === "number" && (
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between text-xs text-gray-500">
-            <span className="font-medium text-gray-700">
+        <div className="b4-card p-4">
+          <div className="flex items-center justify-between text-xs text-b4-ink-2">
+            <span className="font-medium text-b4-ink-2">
               Página {step + 1} de {TOTAL_PAGES}
             </span>
             <span className={answered === QUESTIONS.length ? "font-semibold text-emerald-600" : ""}>
               {answered}/{QUESTIONS.length} respondidas ({progress}%)
             </span>
           </div>
-          <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-gray-100">
+          <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-b4-surface-2">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-primary to-primary-dark transition-all"
+              className="h-full rounded-full bg-gradient-to-r from-b4-navy to-b4-navy-deep transition-all"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -135,25 +136,25 @@ function Inner() {
 
       {/* Step: respondente */}
       {step === "respondent" && (
-        <div className="space-y-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h3 className="text-base font-bold text-secondary">Identificação do respondente</h3>
+        <div className="b4-card space-y-5 p-6">
+          <h3 className="text-base font-bold text-b4-ink">Identificação do respondente</h3>
           <div>
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-b4-ink-2">
               Nome completo <span className="text-red-500">*</span>
             </label>
             <input
               value={respondentName}
               onChange={(e) => setRespondentName(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition-all placeholder:text-gray-400 focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+              className="mt-1.5 w-full rounded-xl border border-b4-line bg-b4-surface px-3 py-2.5 text-sm text-b4-ink outline-none transition-all placeholder:text-b4-ink-3 focus:border-b4-navy/40 focus:ring-4 focus:ring-b4-navy/10"
               placeholder="Ex: Maria Silva"
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-700">Cargo / função</label>
+            <label className="text-sm font-medium text-b4-ink-2">Cargo / função</label>
             <input
               value={respondentRole}
               onChange={(e) => setRespondentRole(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition-all placeholder:text-gray-400 focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+              className="mt-1.5 w-full rounded-xl border border-b4-line bg-b4-surface px-3 py-2.5 text-sm text-b4-ink outline-none transition-all placeholder:text-b4-ink-3 focus:border-b4-navy/40 focus:ring-4 focus:ring-b4-navy/10"
               placeholder="Ex: Gerente de RH"
             />
           </div>
@@ -167,25 +168,25 @@ function Inner() {
 
       {/* Notas no último passo */}
       {typeof step === "number" && step === TOTAL_PAGES - 1 && (
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <label className="text-sm font-medium text-gray-700">Notas adicionais (opcional)</label>
+        <div className="b4-card p-6">
+          <label className="text-sm font-medium text-b4-ink-2">Notas adicionais (opcional)</label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
-            className="mt-1.5 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition-all placeholder:text-gray-400 focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+            className="mt-1.5 w-full rounded-xl border border-b4-line bg-b4-surface px-3 py-2.5 text-sm text-b4-ink outline-none transition-all placeholder:text-b4-ink-3 focus:border-b4-navy/40 focus:ring-4 focus:ring-b4-navy/10"
             placeholder="Contexto, observações, próximos passos..."
           />
         </div>
       )}
 
       {/* Nav sticky */}
-      <div className="sticky bottom-0 -mx-4 flex items-center justify-between gap-3 border-t border-gray-200 bg-white/95 px-4 py-3 backdrop-blur lg:-mx-8 lg:px-8">
+      <div className="sticky bottom-0 -mx-4 flex items-center justify-between gap-3 border-t border-b4-line bg-b4-surface/95 px-4 py-3 backdrop-blur lg:-mx-8 lg:px-8">
         {step !== "company" ? (
           <button
             onClick={prev}
             disabled={submitting}
-            className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+            className="flex items-center gap-1.5 rounded-xl border border-b4-line bg-b4-surface px-4 py-2 text-sm font-medium text-b4-ink-2 hover:bg-b4-surface-2 disabled:opacity-60"
           >
             <HiOutlineArrowLeft /> Voltar
           </button>
@@ -195,7 +196,7 @@ function Inner() {
         <button
           onClick={next}
           disabled={submitting}
-          className="flex items-center gap-1.5 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/20 hover:bg-primary-dark disabled:opacity-60"
+          className="flex items-center gap-1.5 rounded-xl bg-b4-navy px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-b4-navy/20 hover:bg-b4-navy-deep disabled:opacity-60"
         >
           {typeof step === "number" && step === TOTAL_PAGES - 1 ? (
             <>{submitting ? "Calculando..." : "Finalizar e calcular"} <HiOutlineCheck /></>
@@ -227,20 +228,20 @@ function QuestionPage({
         return (
           <div
             key={q.id}
-            className={`rounded-2xl border bg-white p-5 shadow-sm transition-colors ${
-              isAnswered ? "border-primary/30" : "border-gray-200"
+            className={`b4-card p-5 transition-colors ${
+              isAnswered ? "border-b4-navy/30" : ""
             }`}
           >
             <div className="flex items-start gap-3">
               <span
                 className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                  isAnswered ? "bg-primary text-white" : "bg-primary/10 text-primary"
+                  isAnswered ? "bg-b4-navy text-white" : "bg-b4-navy/10 text-b4-navy"
                 }`}
               >
                 {q.id.replace("Q", "")}
               </span>
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">{q.text}</p>
+                <p className="text-sm font-medium text-b4-ink">{q.text}</p>
                 <div className="mt-3 space-y-2">
                   {(["A", "B", "C", "D", "E"] as const).map((alt) => {
                     const selected = answers[q.id] === alt;
@@ -251,18 +252,18 @@ function QuestionPage({
                         onClick={() => setAnswers((prev) => ({ ...prev, [q.id]: alt }))}
                         className={`flex w-full items-start gap-3 rounded-xl border p-3 text-left text-sm transition-colors ${
                           selected
-                            ? "border-primary bg-primary/5 ring-1 ring-primary/30"
-                            : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                            ? "border-b4-navy bg-b4-navy/5 ring-1 ring-b4-navy/30"
+                            : "border-b4-line hover:border-b4-line-strong hover:bg-b4-surface-2"
                         }`}
                       >
                         <span
                           className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                            selected ? "bg-primary text-white" : "bg-gray-100 text-gray-500"
+                            selected ? "bg-b4-navy text-white" : "bg-b4-surface-2 text-b4-ink-2"
                           }`}
                         >
                           {alt}
                         </span>
-                        <span className={selected ? "text-gray-900" : "text-gray-700"}>
+                        <span className={selected ? "text-b4-ink" : "text-b4-ink-2"}>
                           {q.alternatives[alt]}
                         </span>
                       </button>

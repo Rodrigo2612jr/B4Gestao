@@ -87,12 +87,12 @@ function Inner({ id }: { id: string }) {
   if (loading) return (
     <div className="space-y-4">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="h-28 animate-pulse rounded-2xl border border-gray-200 bg-white shadow-sm" />
+        <div key={i} className="b4-card h-28 animate-pulse bg-b4-surface-2" />
       ))}
     </div>
   );
   if (!data) return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center text-sm text-gray-500 shadow-sm">
+    <div className="b4-card p-12 text-center text-sm text-b4-ink-2">
       Pesquisa não encontrada.
     </div>
   );
@@ -103,25 +103,25 @@ function Inner({ id }: { id: string }) {
     <div className="space-y-6">
       {/* Navegacao e acoes */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link href="/admin/pulse" className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-primary">
+        <Link href="/admin/pulse" className="inline-flex items-center gap-1.5 text-sm font-medium text-b4-ink-2 hover:text-b4-navy">
           <HiOutlineArrowLeft /> Voltar para Pulse
         </Link>
         <div className="flex flex-wrap gap-2">
           <a
             href={`/api/pulse/${id}/report`}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/20 hover:bg-primary-dark"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-b4-navy px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-b4-navy-deep"
           >
             <HiOutlineDownload /> PPTX Executivo
           </a>
           <a
             href={`/api/pulse/${id}/report?variant=dashboard`}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-b4-line bg-b4-surface px-4 py-2 text-sm font-medium text-b4-ink-2 hover:bg-b4-surface-2"
           >
             <HiOutlineDownload /> PPTX Dashboard
           </a>
           <button
             onClick={load}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-b4-line bg-b4-surface px-4 py-2 text-sm font-medium text-b4-ink-2 hover:bg-b4-surface-2"
           >
             <HiOutlineRefresh /> Atualizar
           </button>
@@ -139,41 +139,41 @@ function Inner({ id }: { id: string }) {
       </div>
 
       {/* Header da campanha */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="b4-card p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2
-              className="text-2xl font-bold text-secondary"
-              style={{ fontFamily: "var(--font-display), system-ui", letterSpacing: "-0.025em" }}
+              className="text-2xl font-bold text-b4-ink"
+              style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif", letterSpacing: "-0.025em" }}
             >
               {data.campaign.title}
             </h2>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-b4-ink-2">
               {data.campaign.areas.length} áreas · threshold {data.campaign.threshold}
             </p>
           </div>
           <span className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1 text-xs font-semibold ${
             data.campaign.status === "open"
               ? "bg-emerald-50 text-emerald-700"
-              : "bg-gray-100 text-gray-600"
+              : "bg-b4-surface-2 text-b4-ink-2"
           }`}>
-            <span className={`h-1.5 w-1.5 rounded-full ${data.campaign.status === "open" ? "bg-emerald-500" : "bg-gray-400"}`} />
+            <span className={`h-1.5 w-1.5 rounded-full ${data.campaign.status === "open" ? "bg-emerald-500" : "bg-b4-ink-3"}`} />
             {data.campaign.status === "open" ? "Aberta" : "Encerrada"}
           </span>
         </div>
 
         {/* Link publico */}
-        <div className="mt-5 rounded-xl border border-gray-200 bg-gray-50 p-3.5">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Link público para respondentes</p>
+        <div className="mt-5 rounded-xl border border-b4-line bg-b4-surface-2 p-3.5">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-b4-ink-3">Link público para respondentes</p>
           <div className="mt-1.5 flex items-center gap-2">
             <input
               readOnly
               value={publicUrl}
-              className="flex-1 rounded-xl border border-gray-200 bg-white px-3 py-1.5 font-mono text-xs outline-none"
+              className="flex-1 rounded-xl border border-b4-line bg-b4-surface px-3 py-1.5 font-mono text-xs text-b4-ink outline-none"
             />
             <button
               onClick={() => { navigator.clipboard.writeText(publicUrl); push("Link copiado"); }}
-              className="rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium hover:bg-gray-100"
+              className="rounded-xl border border-b4-line bg-b4-surface px-3 py-1.5 text-xs font-medium text-b4-ink-2 hover:bg-b4-surface-2"
               title="Copiar link"
               aria-label="Copiar link público"
             >
@@ -215,10 +215,10 @@ function Inner({ id }: { id: string }) {
           </div>
           <ul className="divide-y divide-amber-100/60 p-2">
             {data.aggregate.quickWins.map((w) => (
-              <li key={w.dimension} className="flex items-center justify-between gap-3 rounded-xl bg-white p-3.5 my-1 mx-0">
+              <li key={w.dimension} className="flex items-center justify-between gap-3 rounded-xl bg-b4-surface p-3.5 my-1 mx-0">
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-gray-900">{w.label}</p>
-                  <p className="text-xs text-gray-500">{w.reason}</p>
+                  <p className="text-sm font-semibold text-b4-ink">{w.label}</p>
+                  <p className="text-xs text-b4-ink-2">{w.reason}</p>
                 </div>
                 <span className={`flex-shrink-0 rounded-xl px-2.5 py-0.5 text-xs font-mono font-bold ${
                   w.pct < 40 ? "bg-red-50 text-red-700" : "bg-amber-50 text-amber-800"
@@ -233,14 +233,14 @@ function Inner({ id }: { id: string }) {
 
       {/* Drivers */}
       {data.aggregate.drivers && data.aggregate.drivers.length > 0 && (
-        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <div className="border-b border-gray-100 px-5 py-4">
-            <h3 className="text-sm font-bold text-gray-900">Drivers · perguntas que mais puxam o score pra baixo</h3>
-            <p className="mt-0.5 text-xs text-gray-500">Top 5 com menor média de concordância (1-5).</p>
+        <div className="b4-card overflow-hidden">
+          <div className="border-b border-b4-line px-5 py-4">
+            <h3 className="text-sm font-bold text-b4-ink">Drivers · perguntas que mais puxam o score pra baixo</h3>
+            <p className="mt-0.5 text-xs text-b4-ink-2">Top 5 com menor média de concordância (1-5).</p>
           </div>
-          <ul className="divide-y divide-gray-50 p-4 space-y-2">
+          <ul className="divide-y divide-b4-line p-4 space-y-2">
             {data.aggregate.drivers.map((d) => (
-              <li key={d.questionId} className="flex items-center gap-3 rounded-xl bg-gray-50 p-3.5">
+              <li key={d.questionId} className="flex items-center gap-3 rounded-xl bg-b4-surface-2 p-3.5">
                 <span className={`flex h-10 w-14 flex-shrink-0 items-center justify-center rounded-xl text-sm font-bold ${
                   d.avgScore < 2.5 ? "bg-red-500 text-white" :
                   d.avgScore < 3.5 ? "bg-amber-400 text-white" :
@@ -249,8 +249,8 @@ function Inner({ id }: { id: string }) {
                   {d.avgScore.toFixed(1)}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-gray-900">{d.text}</p>
-                  <p className="text-xs text-gray-400">Dimensão: {d.dimension}</p>
+                  <p className="text-sm font-medium text-b4-ink">{d.text}</p>
+                  <p className="text-xs text-b4-ink-3">Dimensão: {d.dimension}</p>
                 </div>
               </li>
             ))}
@@ -259,18 +259,18 @@ function Inner({ id }: { id: string }) {
       )}
 
       {/* Score por dimensao */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="border-b border-gray-100 px-5 py-4">
-          <h3 className="text-sm font-bold text-gray-900">Score por dimensão (global)</h3>
+      <div className="b4-card overflow-hidden">
+        <div className="border-b border-b4-line px-5 py-4">
+          <h3 className="text-sm font-bold text-b4-ink">Score por dimensão (global)</h3>
         </div>
         <div className="space-y-4 p-5">
           {Object.entries(data.aggregate.byDimension).map(([k, v]) => (
             <div key={k}>
               <div className="flex items-center justify-between text-sm">
-                <span className="font-medium text-gray-700">{v.label}</span>
-                <span className="font-mono text-xs text-gray-400">{v.score.toFixed(1)} · {v.pct}%</span>
+                <span className="font-medium text-b4-ink-2">{v.label}</span>
+                <span className="font-mono text-xs text-b4-ink-3">{v.score.toFixed(1)} · {v.pct}%</span>
               </div>
-              <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-gray-100">
+              <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-b4-surface-2">
                 <div
                   className={`h-full rounded-full transition-all ${
                     v.pct >= 75 ? "bg-emerald-500" : v.pct >= 50 ? "bg-amber-400" : "bg-red-500"
@@ -284,17 +284,17 @@ function Inner({ id }: { id: string }) {
       </div>
 
       {/* Heatmap */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="border-b border-gray-100 px-5 py-4">
-          <h3 className="text-sm font-bold text-gray-900">Heatmap por área x dimensão</h3>
-          <p className="mt-0.5 text-xs text-gray-500">
+      <div className="b4-card overflow-hidden">
+        <div className="border-b border-b4-line px-5 py-4">
+          <h3 className="text-sm font-bold text-b4-ink">Heatmap por área x dimensão</h3>
+          <p className="mt-0.5 text-xs text-b4-ink-2">
             Áreas com menos de {data.aggregate.threshold} respostas ficam bloqueadas (anonimato).
           </p>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full">
             <thead>
-              <tr className="border-b border-gray-100 text-left text-[11px] uppercase tracking-wider text-gray-400">
+              <tr className="border-b border-b4-line text-left text-[11px] uppercase tracking-wider text-b4-ink-3">
                 <th className="px-5 py-3 font-semibold">Área</th>
                 <th className="px-5 py-3 font-semibold">N</th>
                 {data.aggregate.heatmap[0]?.cells.map((c) => (
@@ -306,14 +306,14 @@ function Inner({ id }: { id: string }) {
             </thead>
             <tbody>
               {data.aggregate.heatmap.map((row) => (
-                <tr key={row.area} className="border-b border-gray-50 last:border-0 hover:bg-primary/[0.03]">
-                  <td className="px-5 py-3 text-sm font-semibold text-gray-900">{row.area}</td>
-                  <td className="px-5 py-3 text-xs text-gray-400">{row.count}</td>
+                <tr key={row.area} className="border-b border-b4-line last:border-0 hover:bg-b4-surface-2">
+                  <td className="px-5 py-3 text-sm font-semibold text-b4-ink">{row.area}</td>
+                  <td className="px-5 py-3 text-xs text-b4-ink-3">{row.count}</td>
                   {row.cells.map((c) => (
                     <td key={c.dimension} className="px-2 py-2 text-center">
                       {c.pct === null ? (
                         <span
-                          className="inline-flex h-8 w-12 items-center justify-center rounded-xl text-gray-300"
+                          className="inline-flex h-8 w-12 items-center justify-center rounded-xl text-b4-ink-3"
                           title="Anonimato"
                         >
                           <HiOutlineLockClosed />

@@ -99,16 +99,16 @@ function Inner({ id }: { id: string }) {
 
   if (loading)
     return (
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-sm">
-        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
-        <p className="mt-4 text-sm text-gray-500">Carregando auditoria...</p>
+      <div className="b4-card overflow-hidden p-12 text-center">
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-b4-navy/20 border-t-b4-navy" />
+        <p className="mt-4 text-sm text-b4-ink-2">Carregando auditoria...</p>
       </div>
     );
 
   if (!data)
     return (
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-sm">
-        <p className="text-sm text-gray-500">Auditoria não encontrada.</p>
+      <div className="b4-card overflow-hidden p-12 text-center">
+        <p className="text-sm text-b4-ink-2">Auditoria não encontrada.</p>
       </div>
     );
 
@@ -120,20 +120,20 @@ function Inner({ id }: { id: string }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link
           href="/admin/stress-test"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-primary"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-b4-ink-2 transition-colors hover:text-b4-navy"
         >
           <HiOutlineArrowLeft /> Stress Test NR-1
         </Link>
         <div className="flex flex-wrap gap-2">
           <a
             href={`/api/stress-test/${id}/report`}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs font-semibold text-white shadow-sm shadow-primary/20 hover:bg-primary-dark"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-b4-navy px-3.5 py-2 text-xs font-semibold text-white shadow-sm shadow-b4-navy/20 hover:bg-b4-navy-deep"
           >
             <HiOutlineDownload /> PPTX Executivo
           </a>
           <a
             href={`/api/stress-test/${id}/report?variant=dashboard`}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-b4-line bg-b4-surface px-3.5 py-2 text-xs font-medium text-b4-ink-2 hover:bg-b4-surface-2"
           >
             <HiOutlineDownload /> PPTX Dashboard
           </a>
@@ -147,17 +147,17 @@ function Inner({ id }: { id: string }) {
       </div>
 
       {/* Card principal: Score + Semáforo */}
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div className="b4-card overflow-hidden">
         <div className={`bg-gradient-to-r ${SEMAFORO_GRADIENT[r.semaforo]} p-6`}>
           <div className="flex items-center gap-5">
-            <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-2xl bg-white/20 text-3xl font-bold text-white shadow-inner">
+            <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-2xl bg-white/20 text-3xl font-bold text-white shadow-inner" style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif" }}>
               {r.total}
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-white/70">Semáforo NR-1</p>
               <h2
                 className="text-2xl font-bold text-white"
-                style={{ fontFamily: "var(--font-display), system-ui", letterSpacing: "-0.02em" }}
+                style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif", letterSpacing: "-0.02em" }}
               >
                 {r.semaforoLabel}
               </h2>
@@ -169,19 +169,19 @@ function Inner({ id }: { id: string }) {
           </div>
         </div>
         {/* Metadados do respondente dentro do card principal */}
-        <div className="flex flex-wrap items-center gap-4 border-t border-gray-100 px-6 py-4">
+        <div className="flex flex-wrap items-center gap-4 border-t border-b4-line px-6 py-4">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-b4-navy/10 text-b4-navy">
               <HiOutlineUser className="text-base" />
             </span>
             <div>
-              <p className="text-sm font-semibold text-gray-900">{data.respondentName}</p>
+              <p className="text-sm font-semibold text-b4-ink">{data.respondentName}</p>
               {data.respondentRole && (
-                <p className="text-xs text-gray-500">{data.respondentRole}</p>
+                <p className="text-xs text-b4-ink-2">{data.respondentRole}</p>
               )}
             </div>
           </div>
-          <div className="ml-auto text-right text-xs text-gray-500">
+          <div className="ml-auto text-right text-xs text-b4-ink-2">
             <p>Realizado em {new Date(data.createdAt).toLocaleString("pt-BR")}</p>
             {data.createdBy && <p className="mt-0.5">por {data.createdBy}</p>}
           </div>
@@ -191,46 +191,46 @@ function Inner({ id }: { id: string }) {
       {/* Sub-scores grid */}
       <div className="grid gap-4 md:grid-cols-2">
         {/* Engavetamento */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+        <div className="b4-card p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-b4-ink-3">
             Risco de Engavetamento
           </p>
           <div className="mt-3 flex items-end gap-2">
-            <span className="text-4xl font-bold tabular-nums text-secondary">{r.engavetamento.score}</span>
-            <span className="pb-1 text-sm text-gray-400">/ {r.engavetamento.max}</span>
+            <span className="text-4xl font-bold tabular-nums text-b4-ink" style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif" }}>{r.engavetamento.score}</span>
+            <span className="pb-1 text-sm text-b4-ink-3">/ {r.engavetamento.max}</span>
           </div>
-          <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-100">
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-b4-surface-2">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-primary to-primary-dark"
+              className="h-full rounded-full bg-gradient-to-r from-b4-navy to-b4-navy-deep"
               style={{ width: `${(r.engavetamento.score / r.engavetamento.max) * 100}%` }}
             />
           </div>
-          <p className="mt-3 text-sm font-semibold text-gray-900">
+          <p className="mt-3 text-sm font-semibold text-b4-ink">
             Classificação:{" "}
-            <span className="font-normal text-gray-700">{r.engavetamento.classification}</span>
+            <span className="font-normal text-b4-ink-2">{r.engavetamento.classification}</span>
           </p>
-          <p className="mt-1 text-sm text-gray-600">{r.engavetamento.label}</p>
-          <p className="mt-2 text-xs text-gray-400">
+          <p className="mt-1 text-sm text-b4-ink-2">{r.engavetamento.label}</p>
+          <p className="mt-2 text-xs text-b4-ink-3">
             Perguntas núcleo: Q01, Q12-Q16, Q21, Q25. Faixas: Baixo 24-32 / Médio 14-23 / Alto 0-13.
           </p>
         </div>
 
         {/* Coerência psicossocial */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+        <div className="b4-card p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-b4-ink-3">
             Coerência psicossocial
           </p>
-          <p className="mt-3 text-2xl font-bold text-secondary">{r.coerencia.label}</p>
-          <p className="mt-2 text-sm text-gray-600">{r.coerencia.description}</p>
-          <p className="mt-3 text-xs text-gray-400">
+          <p className="mt-3 text-2xl font-bold text-b4-ink" style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif" }}>{r.coerencia.label}</p>
+          <p className="mt-2 text-sm text-b4-ink-2">{r.coerencia.description}</p>
+          <p className="mt-3 text-xs text-b4-ink-3">
             Cruzamento Q18A (afirmação) × Q18B (evidência).
           </p>
         </div>
       </div>
 
       {/* Por categoria */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Por categoria</p>
+      <div className="b4-card p-5">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-b4-ink-3">Por categoria</p>
         <div className="mt-4 space-y-4">
           {Object.entries(r.byCategory).map(([cat, b]) => {
             const barColor =
@@ -240,12 +240,12 @@ function Inner({ id }: { id: string }) {
             return (
               <div key={cat}>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-gray-700">{categoryLabel(cat)}</span>
-                  <span className="font-mono text-xs text-gray-500">
+                  <span className="font-medium text-b4-ink-2">{categoryLabel(cat)}</span>
+                  <span className="font-mono text-xs text-b4-ink-2">
                     {b.score}/{b.max} · {b.pct}%
                   </span>
                 </div>
-                <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-gray-100">
+                <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-b4-surface-2">
                   <div
                     className={`h-full rounded-full bg-gradient-to-r ${barColor}`}
                     style={{ width: `${b.pct}%` }}
@@ -273,10 +273,10 @@ function Inner({ id }: { id: string }) {
                   {w.chosen}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-medium text-b4-ink">
                     {w.id} · {w.text}
                   </p>
-                  <p className="mt-0.5 text-xs text-gray-500">Peso: {w.weight}/4</p>
+                  <p className="mt-0.5 text-xs text-b4-ink-2">Peso: {w.weight}/4</p>
                 </div>
               </li>
             ))}
@@ -285,23 +285,23 @@ function Inner({ id }: { id: string }) {
       )}
 
       {/* Respostas completas · collapsible */}
-      <details className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-gray-700 hover:bg-gray-50/60">
+      <details className="b4-card group overflow-hidden">
+        <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-b4-ink-2 hover:bg-b4-surface-2">
           <span>Ver todas as 25 respostas</span>
-          <HiOutlineChevronDown className="text-gray-400 transition-transform group-open:rotate-180" />
+          <HiOutlineChevronDown className="text-b4-ink-3 transition-transform group-open:rotate-180" />
         </summary>
-        <div className="border-t border-gray-100 px-5 pb-5 pt-4">
+        <div className="border-t border-b4-line px-5 pb-5 pt-4">
           <div className="grid gap-2 sm:grid-cols-2">
             {QUESTIONS.map((q) => {
               const a = data.answers[q.id];
               return (
-                <div key={q.id} className="flex items-start gap-2.5 rounded-xl bg-gray-50 p-3">
-                  <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-700">
+                <div key={q.id} className="flex items-start gap-2.5 rounded-xl bg-b4-surface-2 p-3">
+                  <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-b4-line-strong text-xs font-bold text-b4-ink-2">
                     {q.id.replace("Q", "")}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="line-clamp-2 text-xs text-gray-600">{q.text}</p>
-                    <p className="mt-1 font-mono text-xs font-bold text-primary">{a}</p>
+                    <p className="line-clamp-2 text-xs text-b4-ink-2">{q.text}</p>
+                    <p className="mt-1 font-mono text-xs font-bold text-b4-navy">{a}</p>
                   </div>
                 </div>
               );
@@ -320,37 +320,37 @@ function Inner({ id }: { id: string }) {
 
       {/* Notas */}
       {data.notes && (
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Notas</p>
-          <p className="mt-2 text-sm text-gray-700">{data.notes}</p>
+        <div className="b4-card p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-b4-ink-3">Notas</p>
+          <p className="mt-2 text-sm text-b4-ink-2">{data.notes}</p>
         </div>
       )}
 
       {/* Modal exclusão */}
       {deleteOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-md rounded-2xl bg-b4-surface p-6 shadow-xl">
             <h3
-              className="text-lg font-bold text-secondary"
-              style={{ fontFamily: "var(--font-display), system-ui" }}
+              className="text-lg font-bold text-b4-ink"
+              style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif" }}
             >
               Excluir auditoria
             </h3>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-b4-ink-2">
               Esta ação remove a auditoria permanentemente. Confirme sua senha para continuar:
             </p>
             <input
               type="password"
               value={pwd}
               onChange={(e) => setPwd(e.target.value)}
-              className="mt-3 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition-all focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+              className="mt-3 w-full rounded-xl border border-b4-line bg-b4-surface px-3 py-2.5 text-sm text-b4-ink outline-none transition-all focus:border-b4-navy/40 focus:ring-4 focus:ring-b4-navy/10"
               autoFocus
             />
             {err && <p className="mt-2 text-xs text-red-600">{err}</p>}
             <div className="mt-5 flex justify-end gap-2">
               <button
                 onClick={() => { setDeleteOpen(false); setPwd(""); setErr(""); }}
-                className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="rounded-xl border border-b4-line px-4 py-2 text-sm font-medium text-b4-ink-2 hover:bg-b4-surface-2"
               >
                 Cancelar
               </button>

@@ -148,7 +148,7 @@ function Inner() {
         actions={
           <button
             onClick={() => { setShowForm((v) => !v); setInviteLink(null); }}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/20 transition-colors hover:bg-primary-dark"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-b4-navy px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-b4-navy/20 transition-colors hover:bg-b4-navy-deep"
           >
             <HiOutlineUserAdd className="text-base" /> Novo acesso
           </button>
@@ -158,61 +158,61 @@ function Inner() {
       {inviteLink && <InviteBox url={inviteLink} onClose={() => setInviteLink(null)} />}
 
       {showForm && (
-        <form onSubmit={createUser} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h3 className="text-sm font-semibold text-gray-900">Criar acesso</h3>
-          <p className="mt-0.5 text-xs text-gray-500">
+        <form onSubmit={createUser} className="b4-card p-5">
+          <h3 className="text-sm font-semibold text-b4-ink">Criar acesso</h3>
+          <p className="mt-0.5 text-xs text-b4-ink-2">
             O sistema gera um <strong>link de ativação de uso único</strong> — o colaborador define a própria senha. Você nunca digita nem vê a senha dele.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-700">Nome</label>
+              <label className="mb-1 block text-xs font-medium text-b4-ink-2">Nome</label>
               <input value={name} onChange={(e) => setName(e.target.value)} required minLength={2}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+                className="w-full rounded-lg border border-b4-line bg-b4-surface px-3 py-2 text-sm text-b4-ink outline-none placeholder:text-b4-ink-3 focus:border-b4-navy focus:ring-2 focus:ring-b4-navy/20" />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-700">E-mail</label>
+              <label className="mb-1 block text-xs font-medium text-b4-ink-2">E-mail</label>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+                className="w-full rounded-lg border border-b4-line bg-b4-surface px-3 py-2 text-sm text-b4-ink outline-none placeholder:text-b4-ink-3 focus:border-b4-navy focus:ring-2 focus:ring-b4-navy/20" />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-700">Papel</label>
+              <label className="mb-1 block text-xs font-medium text-b4-ink-2">Papel</label>
               <select value={role} onChange={(e) => setRole(e.target.value as Role)}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
+                className="w-full rounded-lg border border-b4-line bg-b4-surface px-3 py-2 text-sm text-b4-ink outline-none focus:border-b4-navy focus:ring-2 focus:ring-b4-navy/20">
                 {ROLES.map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-700">Validade do acesso (dias)</label>
+              <label className="mb-1 block text-xs font-medium text-b4-ink-2">Validade do acesso (dias)</label>
               <input type="number" min={1} max={3650} value={validDays} onChange={(e) => setValidDays(e.target.value)}
                 placeholder="vazio = sem expiração"
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
-              <p className="mt-1 text-[11px] text-gray-400">Recomendado para técnicos de campo (ex.: 90). Deixe vazio para acesso permanente (equipe interna).</p>
+                className="w-full rounded-lg border border-b4-line bg-b4-surface px-3 py-2 text-sm text-b4-ink outline-none placeholder:text-b4-ink-3 focus:border-b4-navy focus:ring-2 focus:ring-b4-navy/20" />
+              <p className="mt-1 text-[11px] text-b4-ink-3">Recomendado para técnicos de campo (ex.: 90). Deixe vazio para acesso permanente (equipe interna).</p>
             </div>
           </div>
           <div className="mt-4 flex justify-end gap-2">
-            <button type="button" onClick={() => setShowForm(false)} className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancelar</button>
-            <button type="submit" disabled={submitting} className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark disabled:opacity-50">
+            <button type="button" onClick={() => setShowForm(false)} className="rounded-lg border border-b4-line px-4 py-2 text-sm font-medium text-b4-ink-2 hover:bg-b4-surface-2">Cancelar</button>
+            <button type="submit" disabled={submitting} className="rounded-lg bg-b4-navy px-4 py-2 text-sm font-semibold text-white hover:bg-b4-navy-deep disabled:opacity-50">
               {submitting ? "Criando…" : "Criar e gerar link"}
             </button>
           </div>
         </form>
       )}
 
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex items-center gap-2 border-b border-gray-100 px-5 py-3 text-sm font-semibold text-gray-700">
-          <HiOutlineUsers className="text-gray-400" /> Usuários ({users.length})
+      <div className="b4-card overflow-hidden">
+        <div className="flex items-center gap-2 border-b border-b4-line px-5 py-3 text-sm font-semibold text-b4-ink-2">
+          <HiOutlineUsers className="text-b4-ink-3" /> Usuários ({users.length})
         </div>
         {loading ? (
           <div className="space-y-2 p-5">
-            {[1, 2, 3].map((i) => <div key={i} className="h-12 animate-pulse rounded-lg bg-gray-100" />)}
+            {[1, 2, 3].map((i) => <div key={i} className="h-12 animate-pulse rounded-lg bg-b4-surface-2" />)}
           </div>
         ) : users.length === 0 ? (
-          <p className="p-8 text-center text-sm text-gray-500">Nenhum usuário ainda.</p>
+          <p className="p-8 text-center text-sm text-b4-ink-2">Nenhum usuário ainda.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-100 text-left text-[11px] uppercase tracking-wider text-gray-400">
+                <tr className="border-b border-b4-line text-left text-[11px] uppercase tracking-wider text-b4-ink-3">
                   <th className="px-5 py-2.5 font-semibold">Usuário</th>
                   <th className="px-3 py-2.5 font-semibold">Papel</th>
                   <th className="px-3 py-2.5 font-semibold">Status</th>
@@ -225,13 +225,13 @@ function Inner() {
                 {users.map((u) => {
                   const expired = u.access_expires_at && new Date(u.access_expires_at) < new Date();
                   return (
-                    <tr key={u.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
+                    <tr key={u.id} className="border-b border-b4-line last:border-0 hover:bg-b4-surface-2">
                       <td className="px-5 py-3">
-                        <p className="font-medium text-gray-900">{u.name}</p>
-                        <p className="text-xs text-gray-500">{u.email}</p>
+                        <p className="font-medium text-b4-ink">{u.name}</p>
+                        <p className="text-xs text-b4-ink-2">{u.email}</p>
                       </td>
                       <td className="px-3 py-3">
-                        <span className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[11px] font-semibold text-primary">{ROLE_LABEL[u.role] ?? u.role}</span>
+                        <span className="rounded-md bg-b4-navy/10 px-1.5 py-0.5 text-[11px] font-semibold text-b4-navy">{ROLE_LABEL[u.role] ?? u.role}</span>
                       </td>
                       <td className="px-3 py-3">
                         {!u.is_active ? (
@@ -244,8 +244,8 @@ function Inner() {
                           <Badge tone="emerald">Ativo</Badge>
                         )}
                       </td>
-                      <td className="px-3 py-3 text-gray-600">{fmtDate(u.access_expires_at)}</td>
-                      <td className="px-3 py-3 text-gray-600">{fmtDate(u.last_login)}</td>
+                      <td className="px-3 py-3 text-b4-ink-2">{fmtDate(u.access_expires_at)}</td>
+                      <td className="px-3 py-3 text-b4-ink-2">{fmtDate(u.last_login)}</td>
                       <td className="px-5 py-3">
                         <div className="flex flex-wrap items-center justify-end gap-1.5">
                           <RowBtn onClick={() => patch({ userId: u.id, action: "regenerate_invite" }, "Novo link de ativação gerado")}>Gerar link</RowBtn>
@@ -274,8 +274,8 @@ function Badge({ tone, children }: { tone: "emerald" | "amber" | "red" | "gray";
   const map = {
     emerald: "bg-emerald-50 text-emerald-700",
     amber: "bg-amber-50 text-amber-700",
-    red: "bg-red-50 text-red-700",
-    gray: "bg-gray-100 text-gray-600",
+    red: "bg-rose-50 text-rose-700",
+    gray: "bg-b4-surface-2 text-b4-ink-2",
   };
   return <span className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ${map[tone]}`}>{children}</span>;
 }
@@ -283,10 +283,10 @@ function Badge({ tone, children }: { tone: "emerald" | "amber" | "red" | "gray";
 function RowBtn({ children, onClick, tone }: { children: React.ReactNode; onClick: () => void; tone?: "red" | "emerald" }) {
   const cls =
     tone === "red"
-      ? "border-red-200 text-red-600 hover:bg-red-50"
+      ? "border-rose-200 text-rose-600 hover:bg-rose-50"
       : tone === "emerald"
       ? "border-emerald-200 text-emerald-700 hover:bg-emerald-50"
-      : "border-gray-200 text-gray-600 hover:bg-gray-50";
+      : "border-b4-line text-b4-ink-2 hover:bg-b4-surface-2";
   return (
     <button onClick={onClick} className={`rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors ${cls}`}>
       {children}

@@ -19,20 +19,22 @@ interface Props {
   accent?: "primary" | "amber" | "violet" | "emerald" | "rose";
 }
 
+const DISPLAY = "var(--font-admin-display), system-ui, sans-serif";
+
 export default function PageHeader({ title, subtitle, breadcrumbs, actions, meta }: Props) {
   return (
-    <div className="mb-6">
+    <div className="mb-7">
       {breadcrumbs && breadcrumbs.length > 0 && (
-        <nav className="mb-2 flex items-center gap-1 text-xs text-gray-400" aria-label="Breadcrumb">
+        <nav className="mb-2 flex items-center gap-1 text-xs text-b4-ink-3" aria-label="Breadcrumb">
           {breadcrumbs.map((b, i) => (
             <span key={i} className="flex items-center gap-1">
-              {i > 0 && <HiOutlineChevronRight className="text-gray-300" />}
+              {i > 0 && <HiOutlineChevronRight className="text-b4-ink-3/60" />}
               {b.href ? (
-                <Link href={b.href} className="transition-colors hover:text-gray-700">
+                <Link href={b.href} className="transition-colors hover:text-b4-ink">
                   {b.label}
                 </Link>
               ) : (
-                <span className="text-gray-600">{b.label}</span>
+                <span className="text-b4-ink-2">{b.label}</span>
               )}
             </span>
           ))}
@@ -43,14 +45,14 @@ export default function PageHeader({ title, subtitle, breadcrumbs, actions, meta
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-3">
             <h1
-              className="truncate text-2xl font-bold text-secondary sm:text-[26px]"
-              style={{ fontFamily: "var(--font-display), system-ui", letterSpacing: "-0.025em" }}
+              className="truncate text-2xl font-bold text-b4-ink sm:text-[26px]"
+              style={{ fontFamily: DISPLAY, letterSpacing: "-0.03em" }}
             >
               {title}
             </h1>
             {meta}
           </div>
-          {subtitle && <p className="mt-1 text-sm leading-relaxed text-gray-500">{subtitle}</p>}
+          {subtitle && <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-b4-ink-2">{subtitle}</p>}
         </div>
         {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
       </div>

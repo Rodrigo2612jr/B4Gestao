@@ -56,19 +56,19 @@ export default function DeleteDialog({ open, leadName, onClose, onConfirm }: Pro
       <form
         onSubmit={handleSubmit}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl animate-fade-in-up"
+        className="w-full max-w-md rounded-2xl border border-b4-line bg-b4-surface p-6 shadow-2xl animate-fade-in-up"
       >
         <div className="flex items-start gap-4">
           <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
             <HiOutlineExclamation className="text-2xl" />
           </div>
           <div className="flex-1">
-            <h2 id="delete-title" className="text-lg font-bold text-gray-900">
+            <h2 id="delete-title" className="text-lg font-bold text-b4-ink">
               Excluir lead?
             </h2>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-b4-ink-2">
               Você está prestes a excluir o lead de{" "}
-              <strong className="text-gray-900">{leadName}</strong>. Essa ação é
+              <strong className="text-b4-ink">{leadName}</strong>. Essa ação é
               permanente e não pode ser desfeita.
             </p>
           </div>
@@ -77,12 +77,12 @@ export default function DeleteDialog({ open, leadName, onClose, onConfirm }: Pro
         <div className="mt-5">
           <label
             htmlFor="delete-senha"
-            className="mb-1.5 block text-sm font-medium text-gray-700"
+            className="mb-1.5 block text-sm font-medium text-b4-ink-2"
           >
             Confirme com a senha de admin
           </label>
           <div className="relative">
-            <HiOutlineLockClosed className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <HiOutlineLockClosed className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-b4-ink-3" />
             <input
               id="delete-senha"
               type="password"
@@ -90,7 +90,7 @@ export default function DeleteDialog({ open, leadName, onClose, onConfirm }: Pro
               onChange={(e) => setSenha(e.target.value)}
               autoFocus
               autoComplete="current-password"
-              className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              className="w-full rounded-lg border border-b4-line bg-b4-surface py-2.5 pl-10 pr-4 text-sm text-b4-ink outline-none transition-all placeholder:text-b4-ink-3 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
               placeholder="Digite a senha"
             />
           </div>
@@ -106,7 +106,7 @@ export default function DeleteDialog({ open, leadName, onClose, onConfirm }: Pro
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="rounded-lg border border-b4-line bg-b4-surface px-4 py-2 text-sm font-medium text-b4-ink-2 hover:bg-b4-surface-2 disabled:opacity-50"
           >
             Cancelar
           </button>

@@ -14,51 +14,51 @@ const TONES: Record<Tone, { bg: string; text: string }> = {
   sky: { bg: "bg-sky-50", text: "text-sky-600" },
 };
 
+const DISPLAY = "var(--font-admin-display), system-ui, sans-serif";
+
 interface Props {
   label: string;
   value: string | number;
   icon?: ReactNode;
   hint?: string;
   loading?: boolean;
-  /** Card de destaque (gradiente azul B4, texto branco). */
+  /** Card de destaque (painel navy B4, texto branco). */
   featured?: boolean;
   tone?: Tone;
   href?: string;
 }
 
 /**
- * KPI tile padrão do painel (estilo profissional, identidade B4).
- * Use `featured` para o card de destaque (azul B4) · um por grupo.
+ * KPI tile padrão do painel (identidade B4). Use `featured` para o card navy de destaque.
  */
 export default function KpiTile({ label, value, icon, hint, loading, featured, tone = "blue", href }: Props) {
   const inner = featured ? (
-    <div className="relative h-full overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary-dark p-5 text-white shadow-md shadow-primary/20">
-      <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-white/10 blur-2xl" />
+    <div className="b4-feature h-full p-5">
       <div className="relative">
-        <div className="flex items-center gap-2 text-white/80">
-          {icon && <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 text-lg">{icon}</span>}
+        <div className="flex items-center gap-2 text-white/85">
+          {icon && <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 text-lg ring-1 ring-white/15">{icon}</span>}
           <span className="text-xs font-medium">{label}</span>
         </div>
         {loading ? (
           <div className="mt-4 h-9 w-16 animate-pulse rounded bg-white/20" />
         ) : (
-          <p className="mt-3 text-4xl font-bold tabular-nums">{value}</p>
+          <p className="mt-3 text-4xl font-bold tabular-nums" style={{ fontFamily: DISPLAY }}>{value}</p>
         )}
         {hint && !loading && <p className="mt-1 text-xs text-white/70">{hint}</p>}
       </div>
     </div>
   ) : (
-    <div className="h-full rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+    <div className="b4-card b4-card-hover h-full p-5">
       <div className="flex items-center gap-2">
         {icon && <span className={`flex h-9 w-9 items-center justify-center rounded-xl text-lg ${TONES[tone].bg} ${TONES[tone].text}`}>{icon}</span>}
-        <span className="text-xs font-medium text-gray-500">{label}</span>
+        <span className="text-xs font-medium text-b4-ink-2">{label}</span>
       </div>
       {loading ? (
-        <div className="mt-4 h-9 w-12 animate-pulse rounded bg-gray-100" />
+        <div className="mt-4 h-9 w-12 animate-pulse rounded bg-b4-surface-2" />
       ) : (
-        <p className="mt-3 text-4xl font-bold tabular-nums text-secondary">{value}</p>
+        <p className="mt-3 text-4xl font-bold tabular-nums text-b4-ink" style={{ fontFamily: DISPLAY }}>{value}</p>
       )}
-      {hint && !loading && <p className="mt-1 text-xs text-gray-400">{hint}</p>}
+      {hint && !loading && <p className="mt-1 text-xs text-b4-ink-3">{hint}</p>}
     </div>
   );
 

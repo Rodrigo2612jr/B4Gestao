@@ -13,6 +13,20 @@
   --color-white: #FFFFFF;
   --font-sans: var(--font-body);
   --font-display: var(--font-display);
+
+  /* Paleta do PAINEL (utilitários nomeados: text-b4-ink, bg-b4-surface, border-b4-line, ...) */
+  --color-b4-navy: #0e427b;
+  --color-b4-navy-deep: #0a1f3d;
+  --color-b4-ink: #0c1a2e;
+  --color-b4-ink-2: #46566f;
+  --color-b4-ink-3: #8595ad;
+  --color-b4-line: #e6ebf3;
+  --color-b4-line-strong: #d6deec;
+  --color-b4-surface: #ffffff;
+  --color-b4-surface-2: #f6f8fc;
+  --color-b4-bg: #eceff6;
+  --color-b4-accent: #16a34a;
+  --color-b4-accent-soft: #dcfce7;
 }
 
 html {
@@ -407,6 +421,102 @@ h1, h2, h3, h4 {
 
 /* Linhas de tabela e itens clicáveis: realce suave */
 .admin-root tbody tr { transition: background-color 0.15s ease; }
+
+/* ============================================================
+   B4 PAINEL — SISTEMA DE DESIGN (escopo .admin-root)
+   "Console de inteligência em SST" — premium, em camadas, com a
+   tinta navy da marca + verde de sinal. NÃO afeta o site institucional.
+   ============================================================ */
+.admin-root {
+  font-family: var(--font-admin-body), system-ui, sans-serif;
+
+  /* Paleta do painel */
+  --b4-navy: #0e427b;
+  --b4-navy-deep: #0a1f3d;
+  --b4-ink: #0c1a2e;        /* títulos / texto forte */
+  --b4-ink-2: #46566f;      /* texto secundário */
+  --b4-ink-3: #8595ad;      /* muted / placeholder */
+  --b4-line: #e6ebf3;       /* hairline */
+  --b4-line-strong: #d6deec;
+  --b4-surface: #ffffff;    /* card */
+  --b4-surface-2: #f6f8fc;  /* zebra / hover sutil */
+  --b4-bg: #eceff6;         /* fundo do app */
+  --b4-accent: #16a34a;     /* verde de sinal */
+  --b4-accent-soft: #dcfce7;
+
+  /* Sombras em camadas (profundidade, sem "flat branco") */
+  --b4-shadow-xs: 0 1px 2px rgba(12,26,46,.05);
+  --b4-shadow: 0 1px 2px rgba(12,26,46,.04), 0 6px 18px -6px rgba(12,26,46,.10);
+  --b4-shadow-lg: 0 2px 6px rgba(12,26,46,.06), 0 24px 48px -16px rgba(12,26,46,.20);
+
+  color: var(--b4-ink);
+  background-color: var(--b4-bg);
+}
+
+/* Profundidade sutil do fundo (camada decorativa fixa, separada da regra base) */
+.admin-root::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1100px 560px at 100% -8%, rgba(14, 66, 123, 0.06), transparent 60%),
+    radial-gradient(820px 460px at -8% 112%, rgba(22, 163, 74, 0.05), transparent 55%);
+}
+.admin-root > * { position: relative; z-index: 1; }
+
+.admin-root h1, .admin-root h2, .admin-root h3, .admin-root h4, .admin-root h5 {
+  font-family: var(--font-admin-display), system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  color: var(--b4-ink);
+}
+
+/* Card padrão do painel */
+.b4-card {
+  background: var(--b4-surface);
+  border: 1px solid var(--b4-line);
+  border-radius: 18px;
+  box-shadow: var(--b4-shadow);
+}
+.b4-card-hover { transition: transform .2s cubic-bezier(.22,1,.36,1), box-shadow .2s ease, border-color .2s ease; }
+.b4-card-hover:hover { transform: translateY(-2px); box-shadow: var(--b4-shadow-lg); border-color: var(--b4-line-strong); }
+
+/* Painel "feature" navy — destaques e KPIs principais */
+.b4-feature {
+  position: relative; overflow: hidden; border-radius: 18px; color: #fff;
+  background: linear-gradient(135deg, #0a1f3d 0%, #0e427b 58%, #1660a9 100%);
+  box-shadow: var(--b4-shadow-lg);
+}
+.b4-feature::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
+  background:
+    radial-gradient(420px 220px at 88% -20%, rgba(126,217,87,.20), transparent 60%),
+    radial-gradient(380px 220px at 8% 120%, rgba(59,125,216,.28), transparent 60%);
+}
+
+/* Régua/eyebrow de seção (acento da marca antes do título) */
+.b4-eyebrow {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-family: var(--font-admin-display), system-ui, sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--b4-navy);
+}
+.b4-eyebrow::before { content: ""; width: 18px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, var(--b4-navy), var(--b4-accent)); }
+
+/* Chip / badge base */
+.b4-chip {
+  display: inline-flex; align-items: center; gap: .375rem;
+  border-radius: 999px; padding: .15rem .55rem;
+  font-size: 11px; font-weight: 600; line-height: 1.45; border: 1px solid transparent;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Scrollbar do painel (mais discreta e elegante) */
+.admin-root ::-webkit-scrollbar { width: 10px; height: 10px; }
+.admin-root ::-webkit-scrollbar-track { background: transparent; }
+.admin-root ::-webkit-scrollbar-thumb { background: #cdd6e4; border-radius: 999px; border: 3px solid transparent; background-clip: content-box; }
+.admin-root ::-webkit-scrollbar-thumb:hover { background: #b4c1d6; background-clip: content-box; }
 
 @media (prefers-reduced-motion: reduce) {
   .admin-page-enter { animation: none; }

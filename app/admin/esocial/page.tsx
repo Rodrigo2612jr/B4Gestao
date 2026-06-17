@@ -75,7 +75,7 @@ function Inner() {
         actions={
           <button
             onClick={() => setShowUpload(true)}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/20 transition-colors hover:bg-primary-dark"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-b4-navy px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-b4-navy/20 transition-colors hover:bg-b4-navy-deep"
           >
             <HiOutlineUpload /> Novo upload
           </button>
@@ -118,24 +118,24 @@ function Inner() {
 
       {/* Lista de uploads */}
       {loading ? (
-        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="b4-card overflow-hidden">
           <div className="space-y-px">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="h-16 animate-pulse bg-gray-50" />
+              <div key={i} className="h-16 animate-pulse bg-b4-surface-2" />
             ))}
           </div>
         </div>
       ) : uploads.length === 0 ? (
         <EmptyState variant="no-uploads" action={{ label: "Fazer primeiro upload", onClick: () => setShowUpload(true) }} />
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-            <h3 className="text-sm font-bold text-gray-900">Uploads processados</h3>
-            <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-500">{uploads.length}</span>
+        <div className="b4-card overflow-hidden">
+          <div className="flex items-center justify-between border-b border-b4-line px-5 py-4">
+            <h3 className="text-sm font-bold text-b4-ink">Uploads processados</h3>
+            <span className="rounded-md bg-b4-surface-2 px-2 py-0.5 text-xs font-semibold text-b4-ink-2">{uploads.length}</span>
           </div>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-100 text-left text-[11px] uppercase tracking-wider text-gray-400">
+              <tr className="border-b border-b4-line text-left text-[11px] uppercase tracking-wider text-b4-ink-3">
                 <th className="px-5 py-3 font-semibold">Arquivo</th>
                 <th className="px-5 py-3 font-semibold">Status</th>
                 <th className="hidden px-5 py-3 font-semibold md:table-cell">Eventos</th>
@@ -148,17 +148,17 @@ function Inner() {
               {uploads.map((u) => (
                 <tr
                   key={u.id}
-                  className="group cursor-pointer border-b border-gray-50 transition-colors last:border-0 hover:bg-primary/[0.03]"
+                  className="group cursor-pointer border-b border-b4-line transition-colors last:border-0 hover:bg-b4-surface-2"
                   onClick={() => window.location.href = `/admin/esocial/uploads/${u.id}`}
                 >
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-2">
-                      <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                      <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-b4-navy/10 text-b4-navy">
                         <HiOutlineDocumentReport className="text-base" />
                       </span>
                       <div>
-                        <p className="font-semibold text-gray-900">{u.filename}</p>
-                        <p className="text-xs text-gray-400">{(u.sizeBytes / 1024).toFixed(1)} KB</p>
+                        <p className="font-semibold text-b4-ink">{u.filename}</p>
+                        <p className="text-xs text-b4-ink-3">{(u.sizeBytes / 1024).toFixed(1)} KB</p>
                       </div>
                     </div>
                   </td>
@@ -173,21 +173,21 @@ function Inner() {
                       {u.status === "done" ? "Processado" : u.status === "error" ? "Erro" : u.status === "processing" ? "Processando" : "Pendente"}
                     </span>
                   </td>
-                  <td className="hidden px-5 py-3.5 text-gray-600 md:table-cell">{u.eventsCount}</td>
+                  <td className="hidden px-5 py-3.5 text-b4-ink-2 md:table-cell">{u.eventsCount}</td>
                   <td className="px-5 py-3.5">
                     {u.alertsCount > 0 ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-semibold text-rose-700">
                         <HiOutlineExclamation className="text-sm" /> {u.alertsCount}
                       </span>
                     ) : (
-                      <span className="text-xs text-gray-400">-</span>
+                      <span className="text-xs text-b4-ink-3">-</span>
                     )}
                   </td>
-                  <td className="hidden px-5 py-3.5 text-xs text-gray-400 lg:table-cell">
+                  <td className="hidden px-5 py-3.5 text-xs text-b4-ink-3 lg:table-cell">
                     {new Date(u.createdAt).toLocaleString("pt-BR")}
                   </td>
                   <td className="px-5 py-3.5 text-right">
-                    <HiOutlineChevronRight className="text-gray-300 transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
+                    <HiOutlineChevronRight className="text-b4-ink-3 transition-all group-hover:translate-x-0.5 group-hover:text-b4-navy" />
                   </td>
                 </tr>
               ))}
@@ -235,34 +235,34 @@ function UploadDialog({ onClose, onDone }: { onClose: () => void; onDone: () => 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4">
-      <div className="my-8 w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
-        <h3 className="text-lg font-bold text-secondary" style={{ fontFamily: "var(--font-display), system-ui", letterSpacing: "-0.02em" }}>
+      <div className="my-8 w-full max-w-lg rounded-2xl bg-b4-surface p-6 shadow-xl">
+        <h3 className="text-lg font-bold text-b4-ink" style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif", letterSpacing: "-0.02em" }}>
           Novo upload do eSocial
         </h3>
         <div className="mt-5 space-y-4">
           <CompanyPickerOrCreate selected={company} onSelect={setCompany} title="Empresa do eSocial" />
           <div>
-            <label className="text-xs font-medium text-gray-700">Arquivo (XML/CSV/ZIP, máx 10MB)</label>
+            <label className="text-xs font-medium text-b4-ink-2">Arquivo (XML/CSV/ZIP, máx 10MB)</label>
             <input
               type="file"
               accept=".xml,.csv,.zip,.txt"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10 file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white"
+              className="mt-1 w-full rounded-xl border border-b4-line px-3 py-2 text-sm text-b4-ink outline-none focus:border-b4-navy/40 focus:ring-4 focus:ring-b4-navy/10 file:mr-3 file:rounded-lg file:border-0 file:bg-b4-navy file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white"
             />
           </div>
-          {err && <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600">{err}</p>}
+          {err && <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-600">{err}</p>}
         </div>
         <div className="mt-6 flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="rounded-xl border border-b4-line bg-b4-surface px-4 py-2 text-sm font-medium text-b4-ink-2 hover:bg-b4-surface-2"
           >
             Cancelar
           </button>
           <button
             onClick={submit}
             disabled={!company || !file || busy}
-            className="rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark disabled:opacity-50"
+            className="rounded-xl bg-b4-navy px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-b4-navy-deep disabled:opacity-50"
           >
             {busy ? "Processando..." : "Enviar e processar"}
           </button>

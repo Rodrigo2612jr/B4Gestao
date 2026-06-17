@@ -37,10 +37,10 @@ export default function EmptyState({
     (onClear ? { label: "Limpar filtros", onClick: onClear } : meta.action);
 
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-white px-6 py-16 text-center">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-b4-line-strong bg-b4-surface px-6 py-16 text-center">
       <div className="mb-6">{meta.illustration}</div>
-      <h3 className="text-base font-semibold text-secondary">{finalTitle}</h3>
-      <p className="mx-auto mt-1.5 max-w-md text-sm leading-relaxed text-gray-500">{finalDesc}</p>
+      <h3 className="text-base font-semibold text-b4-ink">{finalTitle}</h3>
+      <p className="mx-auto mt-1.5 max-w-md text-sm leading-relaxed text-b4-ink-2">{finalDesc}</p>
       {(finalAction || secondary) && (
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           {finalAction && <ActionButton {...finalAction} primary />}
@@ -53,8 +53,8 @@ export default function EmptyState({
 
 function ActionButton({ label, href, onClick, primary }: { label: string; href?: string; onClick?: () => void; primary?: boolean }) {
   const cls = primary
-    ? "inline-flex items-center gap-1.5 rounded-lg bg-secondary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-secondary/90"
-    : "inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50";
+    ? "inline-flex items-center gap-1.5 rounded-xl bg-b4-navy px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-b4-navy-deep"
+    : "inline-flex items-center gap-1.5 rounded-xl border border-b4-line bg-b4-surface px-4 py-2 text-sm font-medium text-b4-ink-2 transition-colors hover:bg-b4-surface-2";
   if (href) return <Link href={href} className={cls}>{label}</Link>;
   return <button onClick={onClick} className={cls}>{label}</button>;
 }

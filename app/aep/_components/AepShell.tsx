@@ -4,10 +4,14 @@ import { useState, useEffect, useCallback, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HiOutlineLogout, HiOutlineKey, HiOutlineChevronDown, HiOutlineLockClosed, HiOutlineMail } from "react-icons/hi";
+import { HiOutlineLogout, HiOutlineKey, HiOutlineChevronDown, HiOutlineLockClosed, HiOutlineMail, HiOutlineShieldCheck } from "react-icons/hi";
 import ToastProvider, { useToast } from "../../admin/_components/ToastProvider";
 import ChangePasswordDialog from "../../admin/_components/ChangePasswordDialog";
 import Avatar from "../../admin/_components/Avatar";
+
+const DISPLAY = "var(--font-admin-display), system-ui, sans-serif";
+const LOGIN_BG =
+  "radial-gradient(900px 500px at 85% -10%, rgba(59,125,216,0.28), transparent 55%), radial-gradient(700px 480px at 0% 110%, rgba(126,217,87,0.14), transparent 55%), linear-gradient(160deg,#0a1f3d 0%,#0b2447 55%,#0c2c57 100%)";
 
 const ALLOWED = ["TECNICO", "SUPERVISOR", "ADMIN"];
 const ROLE_LABEL: Record<string, string> = {
@@ -71,8 +75,8 @@ function Inner({ children, title }: { children: ReactNode; title?: string }) {
 
   if (state === "loading") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f6f7f9]">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-gray-200 border-t-primary" />
+      <div className="admin-root flex min-h-screen items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-b4-line-strong border-t-b4-navy" />
       </div>
     );
   }
@@ -81,61 +85,63 @@ function Inner({ children, title }: { children: ReactNode; title?: string }) {
 
   if (state === "denied") {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-[#f6f7f9] px-6 text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50 text-2xl text-red-500"><HiOutlineLockClosed /></div>
-        <h1 className="text-lg font-bold text-secondary">Acesso restrito</h1>
-        <p className="max-w-sm text-sm text-gray-500">Este portal é exclusivo para técnicos e supervisores do AEP. Seu perfil ({ROLE_LABEL[userRole] ?? (userRole || "sem perfil")}) não tem acesso.</p>
-        <button onClick={logout} className="mt-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Sair</button>
+      <div className="admin-root flex min-h-screen flex-col items-center justify-center gap-3 px-6 text-center">
+        <div className="b4-card max-w-sm p-8">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50 text-2xl text-red-500"><HiOutlineLockClosed /></div>
+          <h1 className="mt-4 text-lg font-bold text-b4-ink" style={{ fontFamily: DISPLAY }}>Acesso restrito</h1>
+          <p className="mt-2 text-sm text-b4-ink-2">Este portal é exclusivo para técnicos e supervisores do AEP. Seu perfil ({ROLE_LABEL[userRole] ?? (userRole || "sem perfil")}) não tem acesso.</p>
+          <button onClick={logout} className="mt-5 rounded-xl border border-b4-line bg-b4-surface px-4 py-2 text-sm font-medium text-b4-ink-2 hover:bg-b4-surface-2">Sair</button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="admin-root flex min-h-screen flex-col bg-[#f6f7f9]">
-      <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/95 backdrop-blur">
+    <div className="admin-root flex min-h-screen flex-col">
+      <header className="sticky top-0 z-30 border-b border-b4-line bg-white/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[1200px] items-center gap-3 px-4 lg:px-8">
           <Link href="/aep" className="flex items-center gap-3">
-            <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-primary to-primary-dark shadow-md shadow-primary/20">
+            <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-900/30 ring-1 ring-white/20">
               <Image src="/images/logo-white-v3.png" alt="B4" width={32} height={32} className="h-6 w-6 object-contain" priority />
             </div>
             <div className="leading-tight">
-              <div className="text-[15px] font-bold text-secondary" style={{ fontFamily: "var(--font-display), system-ui" }}>B4 · AEP</div>
-              <div className="hidden text-[10px] uppercase tracking-[0.15em] text-gray-400 sm:block">Avaliação Ergonômica</div>
+              <div className="text-[15px] font-bold text-b4-ink" style={{ fontFamily: DISPLAY }}>B4 · AEP</div>
+              <div className="hidden text-[10px] uppercase tracking-[0.16em] text-b4-ink-3 sm:block">Avaliação Ergonômica</div>
             </div>
           </Link>
 
-          {title && <span className="ml-2 hidden truncate text-sm font-medium text-gray-500 lg:inline">{title}</span>}
+          {title && <span className="ml-2 hidden truncate text-sm font-medium text-b4-ink-2 lg:inline">{title}</span>}
 
           <div className="relative ml-auto">
             <button
               onClick={() => setMenuOpen((v) => !v)}
               aria-label="Conta"
               aria-expanded={menuOpen}
-              className="flex h-11 items-center gap-2 rounded-xl border border-gray-200 bg-white pl-1.5 pr-2.5 transition-colors hover:bg-gray-50 active:scale-95"
+              className="flex h-11 items-center gap-2 rounded-xl border border-b4-line bg-b4-surface pl-1.5 pr-2.5 transition-colors hover:bg-b4-surface-2 active:scale-95"
             >
               <Avatar name={userName || userEmail || "?"} size="sm" />
-              <span className="hidden text-xs font-medium text-gray-600 sm:inline">{userName}</span>
-              <span className="hidden rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary sm:inline">{ROLE_LABEL[userRole] ?? userRole}</span>
-              <HiOutlineChevronDown className="text-base text-gray-400" />
+              <span className="hidden text-xs font-medium text-b4-ink-2 sm:inline">{userName}</span>
+              <span className="hidden rounded-md bg-b4-navy/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-b4-navy sm:inline">{ROLE_LABEL[userRole] ?? userRole}</span>
+              <HiOutlineChevronDown className="text-base text-b4-ink-3" />
             </button>
             {menuOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-                <div className="absolute right-0 z-50 mt-2 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl ring-1 ring-black/5">
-                  <div className="border-b border-gray-100 p-3">
+                <div className="absolute right-0 z-50 mt-2 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-b4-line bg-white shadow-[var(--b4-shadow-lg)]">
+                  <div className="border-b border-b4-line p-3">
                     <div className="flex items-center gap-2.5">
                       <Avatar name={userName || userEmail || "?"} size="md" />
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-gray-900">{userName}</p>
-                        <p className="truncate text-xs text-gray-500">{userEmail}</p>
+                        <p className="truncate text-sm font-semibold text-b4-ink">{userName}</p>
+                        <p className="truncate text-xs text-b4-ink-3">{userEmail}</p>
                       </div>
                     </div>
-                    <span className="mt-2 inline-block rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">{ROLE_LABEL[userRole] ?? userRole}</span>
+                    <span className="mt-2 inline-block rounded-md bg-b4-navy/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-b4-navy">{ROLE_LABEL[userRole] ?? userRole}</span>
                   </div>
-                  <button onClick={() => { setMenuOpen(false); setForced(false); setShowChangePwd(true); }} className="flex w-full items-center gap-2.5 px-4 py-3.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
-                    <HiOutlineKey className="text-base text-gray-400" /> Alterar senha
+                  <button onClick={() => { setMenuOpen(false); setForced(false); setShowChangePwd(true); }} className="flex w-full items-center gap-2.5 px-4 py-3.5 text-sm text-b4-ink-2 hover:bg-b4-surface-2 active:bg-b4-surface-2">
+                    <HiOutlineKey className="text-base text-b4-ink-3" /> Alterar senha
                   </button>
-                  <button onClick={logout} className="flex w-full items-center gap-2.5 border-t border-gray-100 px-4 py-3.5 text-sm font-medium text-red-600 hover:bg-red-50 active:bg-red-100">
+                  <button onClick={logout} className="flex w-full items-center gap-2.5 border-t border-b4-line px-4 py-3.5 text-sm font-medium text-red-600 hover:bg-red-50 active:bg-red-100">
                     <HiOutlineLogout className="text-base" /> Sair / trocar de conta
                   </button>
                 </div>
@@ -187,41 +193,53 @@ function AepLogin({ onSuccess }: { onSuccess: () => void }) {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f6f7f9] px-4" style={{ background: "linear-gradient(160deg,#f6f7f9 0%,#eef2f7 100%)" }}>
-      <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-        <div className="flex flex-col items-center text-center">
-          <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary-dark shadow-md shadow-primary/20">
-            <Image src="/images/logo-white-v3.png" alt="B4" width={40} height={40} className="h-8 w-8 object-contain" priority />
+    <div className="admin-root relative flex min-h-screen items-center justify-center px-4 py-10" style={{ background: LOGIN_BG }}>
+      <div className="relative w-full max-w-[400px]">
+        <div className="mb-6 flex flex-col items-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-xl shadow-black/30 ring-1 ring-white/25">
+            <Image src="/images/logo-white-v3.png" alt="B4" width={40} height={40} className="h-9 w-9 object-contain" priority />
           </div>
-          <h1 className="mt-4 text-xl font-bold text-secondary" style={{ fontFamily: "var(--font-display), system-ui" }}>Portal AEP</h1>
-          <p className="text-sm text-gray-500">Avaliação Ergonômica Preliminar · B4 Gestão</p>
+          <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-emerald-300/80">Avaliação Ergonômica</p>
         </div>
-        <form onSubmit={submit} className="mt-6 space-y-4">
-          <div>
-            <label htmlFor="aep-email" className="text-sm font-medium text-gray-700">Email</label>
-            <div className="relative mt-1">
-              <HiOutlineMail className="absolute left-3 top-1/2 -translate-y-1/2 text-base text-gray-400" />
-              <input id="aep-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
-                placeholder="seu@email.com"
-                className="w-full rounded-xl border border-gray-200 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10" />
+
+        <form onSubmit={submit} className="relative overflow-hidden rounded-2xl border border-white/15 bg-white p-8 shadow-2xl shadow-black/40">
+          <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#0e427b] via-[#3b7dd8] to-emerald-400" />
+          <h1 className="text-center text-[22px] font-bold text-b4-ink" style={{ fontFamily: DISPLAY, letterSpacing: "-0.02em" }}>Portal AEP</h1>
+          <p className="mt-1 text-center text-sm text-b4-ink-2">Avaliação Ergonômica Preliminar · B4 Gestão</p>
+
+          <div className="mt-7 space-y-4">
+            <div>
+              <label htmlFor="aep-email" className="mb-1.5 block text-xs font-semibold text-b4-ink-2">E-mail</label>
+              <div className="relative">
+                <HiOutlineMail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-b4-ink-3" />
+                <input id="aep-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="username"
+                  placeholder="seu@email.com"
+                  className="w-full rounded-xl border border-b4-line-strong bg-b4-surface-2 py-3 pl-10 pr-4 text-sm text-b4-ink outline-none transition-all placeholder:text-b4-ink-3 focus:border-b4-navy focus:bg-white focus:ring-4 focus:ring-b4-navy/12" />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="aep-senha" className="mb-1.5 block text-xs font-semibold text-b4-ink-2">Senha</label>
+              <div className="relative">
+                <HiOutlineLockClosed className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-b4-ink-3" />
+                <input id="aep-senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} required autoComplete="current-password"
+                  placeholder="Digite a senha"
+                  className="w-full rounded-xl border border-b4-line-strong bg-b4-surface-2 py-3 pl-10 pr-4 text-sm text-b4-ink outline-none transition-all placeholder:text-b4-ink-3 focus:border-b4-navy focus:bg-white focus:ring-4 focus:ring-b4-navy/12" />
+              </div>
             </div>
           </div>
-          <div>
-            <label htmlFor="aep-senha" className="text-sm font-medium text-gray-700">Senha</label>
-            <div className="relative mt-1">
-              <HiOutlineLockClosed className="absolute left-3 top-1/2 -translate-y-1/2 text-base text-gray-400" />
-              <input id="aep-senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} required
-                placeholder="Digite a senha"
-                className="w-full rounded-xl border border-gray-200 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10" />
-            </div>
-          </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+
+          {error && <p className="mt-4 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
+
           <button type="submit" disabled={busy}
-            className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/20 transition-colors hover:bg-primary-dark disabled:opacity-60">
-            {busy ? "Entrando..." : "Entrar"}
+            className="mt-6 w-full rounded-xl bg-gradient-to-br from-[#0e427b] to-[#0a1f3d] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#0e427b]/25 transition-all hover:brightness-110 disabled:opacity-60">
+            {busy ? "Entrando…" : "Entrar"}
           </button>
+
+          <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-xs text-b4-ink-3">
+            <HiOutlineShieldCheck className="text-sm text-emerald-500" />
+            Acesso restrito · todas as ações são registradas
+          </p>
         </form>
-        <p className="mt-4 text-center text-xs text-gray-400">Acesso restrito a técnicos e supervisores. Todas as ações são registradas.</p>
       </div>
     </div>
   );

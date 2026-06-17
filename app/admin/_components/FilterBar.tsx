@@ -52,20 +52,20 @@ export default function FilterBar({
       {/* Search + date range + clear */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
-          <HiOutlineSearch className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <HiOutlineSearch className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-b4-ink-3" />
           <input
             ref={searchRef}
             type="text"
             value={filters.busca}
             onChange={(e) => setFilters({ ...filters, busca: e.target.value })}
             placeholder="Buscar por empresa, nome, telefone, região, CNPJ..."
-            className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+            className="w-full rounded-lg border border-b4-line bg-b4-surface py-2.5 pl-10 pr-4 text-sm text-b4-ink outline-none transition-all placeholder:text-b4-ink-3 focus:border-b4-navy focus:ring-2 focus:ring-b4-navy/20"
             data-search-input
           />
           {filters.busca && (
             <button
               onClick={() => setFilters({ ...filters, busca: "" })}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-b4-ink-3 hover:bg-b4-surface-2 hover:text-b4-ink-2"
               aria-label="Limpar busca"
             >
               <HiOutlineX className="text-base" />
@@ -74,15 +74,15 @@ export default function FilterBar({
         </div>
 
         {/* Date range */}
-        <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white p-1">
+        <div className="flex items-center gap-1 rounded-lg border border-b4-line bg-b4-surface p-1">
           {(["all", "today", "7d", "30d"] as const).map((r) => (
             <button
               key={r}
               onClick={() => setFilters({ ...filters, dateRange: r })}
               className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
                 filters.dateRange === r
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-600 hover:bg-gray-100"
+                  ? "bg-b4-navy text-white"
+                  : "text-b4-ink-2 hover:bg-b4-surface-2"
               }`}
             >
               {r === "all" ? "Todos" : r === "today" ? "Hoje" : r === "7d" ? "7 dias" : "30 dias"}
@@ -93,7 +93,7 @@ export default function FilterBar({
         {activeCount > 0 && (
           <button
             onClick={() => setFilters(INITIAL_FILTERS)}
-            className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700 transition-colors hover:bg-red-100"
+            className="flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700 transition-colors hover:bg-rose-100"
           >
             <HiOutlineX className="text-sm" />
             Limpar ({activeCount})
@@ -132,7 +132,7 @@ export default function FilterBar({
       )}
 
       {/* Count */}
-      <div className="flex items-center justify-between text-sm text-gray-500">
+      <div className="flex items-center justify-between text-sm text-b4-ink-2">
         <span>
           {resultCount === totalCount
             ? `${totalCount} lead${totalCount !== 1 ? "s" : ""}`
@@ -156,7 +156,7 @@ function ChipGroup({
 }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+      <span className="text-xs font-semibold uppercase tracking-wider text-b4-ink-3">
         {label}:
       </span>
       {values.map((v) => {
@@ -169,8 +169,8 @@ function ChipGroup({
             aria-checked={isActive}
             className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
               isActive
-                ? "border-blue-600 bg-blue-600 text-white"
-                : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
+                ? "border-b4-navy bg-b4-navy text-white"
+                : "border-b4-line bg-b4-surface text-b4-ink-2 hover:border-b4-line-strong hover:bg-b4-surface-2"
             }`}
           >
             {v}

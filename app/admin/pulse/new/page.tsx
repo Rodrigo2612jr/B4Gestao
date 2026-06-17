@@ -66,46 +66,47 @@ function Inner() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1 text-xs text-gray-400" aria-label="Breadcrumb">
-        <a href="/admin" className="transition-colors hover:text-gray-700">Painel B4</a>
-        <HiOutlineChevronRight className="text-gray-300" />
-        <a href="/admin/pulse" className="transition-colors hover:text-gray-700">Pulse</a>
-        <HiOutlineChevronRight className="text-gray-300" />
-        <span className="text-gray-600">Nova pesquisa</span>
+      <nav className="flex items-center gap-1 text-xs text-b4-ink-3" aria-label="Breadcrumb">
+        <a href="/admin" className="transition-colors hover:text-b4-ink">Painel B4</a>
+        <HiOutlineChevronRight className="text-b4-ink-3/60" />
+        <a href="/admin/pulse" className="transition-colors hover:text-b4-ink">Pulse</a>
+        <HiOutlineChevronRight className="text-b4-ink-3/60" />
+        <span className="text-b4-ink-2">Nova pesquisa</span>
       </nav>
 
       <div>
+        <span className="b4-eyebrow">Pulse NR-1</span>
         <h2
-          className="text-2xl font-bold text-secondary"
-          style={{ fontFamily: "var(--font-display), system-ui", letterSpacing: "-0.025em" }}
+          className="mt-2 text-2xl font-bold text-b4-ink"
+          style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif", letterSpacing: "-0.025em" }}
         >
           Nova pesquisa Pulse
         </h2>
-        <p className="mt-1 text-sm text-gray-500">Configure e lance uma nova campanha de clima psicossocial NR-1.</p>
+        <p className="mt-1 text-sm text-b4-ink-2">Configure e lance uma nova campanha de clima psicossocial NR-1.</p>
       </div>
 
       {/* Empresa */}
       <CompanyPickerOrCreate selected={company} onSelect={setCompany} />
 
       {/* Configuracoes principais */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-5">
-        <h3 className="text-sm font-bold text-gray-900 border-b border-gray-100 pb-3">Configurações da pesquisa</h3>
+      <div className="b4-card p-6 space-y-5">
+        <h3 className="text-sm font-bold text-b4-ink border-b border-b4-line pb-3">Configurações da pesquisa</h3>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Título da pesquisa</label>
+          <label className="block text-sm font-medium text-b4-ink-2">Título da pesquisa</label>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mt-1.5 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+            className="mt-1.5 w-full rounded-xl border border-b4-line px-3 py-2.5 text-sm text-b4-ink outline-none transition focus:border-b4-navy/40 focus:ring-4 focus:ring-b4-navy/10"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Áreas / departamentos</label>
-          <p className="mt-0.5 text-xs text-gray-400">Cada respondente seleciona sua área. Só aparecem agregados acima do threshold.</p>
+          <label className="block text-sm font-medium text-b4-ink-2">Áreas / departamentos</label>
+          <p className="mt-0.5 text-xs text-b4-ink-3">Cada respondente seleciona sua área. Só aparecem agregados acima do threshold.</p>
           <div className="mt-2.5 flex flex-wrap gap-2">
             {areas.map((a) => (
-              <span key={a} className="inline-flex items-center gap-1.5 rounded-xl bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              <span key={a} className="inline-flex items-center gap-1.5 rounded-xl bg-b4-navy/10 px-3 py-1 text-xs font-medium text-b4-navy">
                 {a}
                 <button onClick={() => setAreas(areas.filter((x) => x !== a))} className="hover:text-red-600" aria-label={`Remover ${a}`}>
                   <HiOutlineX />
@@ -119,11 +120,11 @@ function Inner() {
               onChange={(e) => setAreaInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addArea(); } }}
               placeholder="Ex: Produção"
-              className="flex-1 rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+              className="flex-1 rounded-xl border border-b4-line px-3 py-2.5 text-sm text-b4-ink outline-none transition placeholder:text-b4-ink-3 focus:border-b4-navy/40 focus:ring-4 focus:ring-b4-navy/10"
             />
             <button
               onClick={addArea}
-              className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="rounded-xl border border-b4-line bg-b4-surface px-3 py-2 text-sm font-medium text-b4-ink-2 hover:bg-b4-surface-2"
               aria-label="Adicionar área"
             >
               <HiOutlinePlus />
@@ -132,34 +133,34 @@ function Inner() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Threshold de anonimato</label>
-          <p className="mt-0.5 text-xs text-gray-400">Mínimo de respostas por área para liberar visualização. Recomendado: 8 (mínimo) a 15 (ideal).</p>
+          <label className="block text-sm font-medium text-b4-ink-2">Threshold de anonimato</label>
+          <p className="mt-0.5 text-xs text-b4-ink-3">Mínimo de respostas por área para liberar visualização. Recomendado: 8 (mínimo) a 15 (ideal).</p>
           <input
             type="number"
             min={3}
             max={50}
             value={threshold}
             onChange={(e) => setThreshold(parseInt(e.target.value) || 8)}
-            className="mt-1.5 w-32 rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+            className="mt-1.5 w-32 rounded-xl border border-b4-line px-3 py-2.5 text-sm text-b4-ink outline-none transition focus:border-b4-navy/40 focus:ring-4 focus:ring-b4-navy/10"
           />
         </div>
 
         <div>
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-gray-700">Questionário</label>
+            <label className="text-sm font-medium text-b4-ink-2">Questionário</label>
             <button
               onClick={() => setShowEditor(true)}
-              className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+              className="inline-flex items-center gap-1 text-xs font-medium text-b4-navy hover:underline"
             >
               <HiOutlinePencil /> Editar perguntas
             </button>
           </div>
-          <p className="mt-1 text-xs text-gray-400">
+          <p className="mt-1 text-xs text-b4-ink-3">
             {questions.length} perguntas · escala Likert 1-5 · {new Set(questions.map((q) => q.dimension)).size} dimensões
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {Array.from(new Set(questions.map((q) => q.dimension))).map((d) => (
-              <span key={d} className="rounded-xl bg-primary/10 px-2.5 py-0.5 text-[10px] font-medium text-primary">
+              <span key={d} className="rounded-xl bg-b4-navy/10 px-2.5 py-0.5 text-[10px] font-medium text-b4-navy">
                 {DIMENSION_LABELS[d as Dimension] ?? d}
               </span>
             ))}
@@ -169,7 +170,7 @@ function Inner() {
         <button
           onClick={submit}
           disabled={busy}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-white shadow-sm shadow-primary/20 transition hover:bg-primary-dark disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-b4-navy px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-b4-navy-deep disabled:opacity-60"
         >
           {busy ? "Criando..." : <><HiOutlineCheck /> Criar pesquisa</>}
         </button>
@@ -239,14 +240,14 @@ function QuestionEditor({
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4">
-      <div className="my-8 w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-xl">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-5 py-4">
-          <h3 className="text-lg font-bold text-secondary">Editor de perguntas Pulse</h3>
+      <div className="my-8 w-full max-w-3xl overflow-hidden rounded-2xl bg-b4-surface shadow-xl">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-b4-line bg-b4-surface px-5 py-4">
+          <h3 className="text-lg font-bold text-b4-ink" style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif" }}>Editor de perguntas Pulse</h3>
           <div className="flex items-center gap-3">
-            <button onClick={onResetTemplate} className="text-xs font-medium text-gray-500 hover:text-primary">
+            <button onClick={onResetTemplate} className="text-xs font-medium text-b4-ink-2 hover:text-b4-navy">
               Restaurar template padrão
             </button>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-700" aria-label="Fechar">
+            <button onClick={onClose} className="text-b4-ink-3 hover:text-b4-ink" aria-label="Fechar">
               <HiOutlineX className="text-xl" />
             </button>
           </div>
@@ -254,18 +255,18 @@ function QuestionEditor({
 
         <div className="space-y-3 p-5">
           {qs.map((q, idx) => (
-            <div key={idx} className="rounded-2xl border border-gray-200 bg-white p-4">
+            <div key={idx} className="rounded-2xl border border-b4-line bg-b4-surface p-4">
               <div className="flex items-start gap-3">
                 <div className="flex flex-col gap-1">
                   <button
                     onClick={() => move(idx, -1)}
                     disabled={idx === 0}
-                    className="rounded-xl border border-gray-200 px-1.5 py-0.5 text-xs text-gray-500 disabled:opacity-30 hover:border-primary/40 hover:text-primary"
+                    className="rounded-xl border border-b4-line px-1.5 py-0.5 text-xs text-b4-ink-2 disabled:opacity-30 hover:border-b4-navy/40 hover:text-b4-navy"
                   >↑</button>
                   <button
                     onClick={() => move(idx, 1)}
                     disabled={idx === qs.length - 1}
-                    className="rounded-xl border border-gray-200 px-1.5 py-0.5 text-xs text-gray-500 disabled:opacity-30 hover:border-primary/40 hover:text-primary"
+                    className="rounded-xl border border-b4-line px-1.5 py-0.5 text-xs text-b4-ink-2 disabled:opacity-30 hover:border-b4-navy/40 hover:text-b4-navy"
                   >↓</button>
                 </div>
                 <div className="grid flex-1 gap-2">
@@ -273,13 +274,13 @@ function QuestionEditor({
                     <input
                       value={q.id}
                       onChange={(e) => update(idx, { id: e.target.value })}
-                      className="rounded-xl border border-gray-200 px-2 py-1.5 font-mono text-xs outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+                      className="rounded-xl border border-b4-line px-2 py-1.5 font-mono text-xs text-b4-ink outline-none focus:border-b4-navy/40 focus:ring-4 focus:ring-b4-navy/10"
                       placeholder="P1"
                     />
                     <input
                       value={q.text}
                       onChange={(e) => update(idx, { text: e.target.value })}
-                      className="rounded-xl border border-gray-200 px-2 py-1.5 text-sm outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+                      className="rounded-xl border border-b4-line px-2 py-1.5 text-sm text-b4-ink outline-none focus:border-b4-navy/40 focus:ring-4 focus:ring-b4-navy/10"
                       placeholder="Texto da pergunta"
                     />
                   </div>
@@ -287,13 +288,13 @@ function QuestionEditor({
                     <select
                       value={q.dimension}
                       onChange={(e) => update(idx, { dimension: e.target.value as Dimension })}
-                      className="rounded-xl border border-gray-200 px-2 py-1.5 text-xs outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+                      className="rounded-xl border border-b4-line px-2 py-1.5 text-xs text-b4-ink outline-none focus:border-b4-navy/40 focus:ring-4 focus:ring-b4-navy/10"
                     >
                       {Object.entries(DIMENSION_LABELS).map(([k, v]) => (
                         <option key={k} value={k}>{v}</option>
                       ))}
                     </select>
-                    <label className="flex items-center gap-1.5 text-xs text-gray-700">
+                    <label className="flex items-center gap-1.5 text-xs text-b4-ink-2">
                       <input
                         type="checkbox"
                         checked={!!q.reverse}
@@ -316,20 +317,20 @@ function QuestionEditor({
           ))}
           <button
             onClick={addNew}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-gray-200 py-3 text-sm font-medium text-gray-500 transition hover:border-primary/40 hover:text-primary"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-b4-line py-3 text-sm font-medium text-b4-ink-2 transition hover:border-b4-navy/40 hover:text-b4-navy"
           >
             <HiOutlinePlus /> Adicionar pergunta
           </button>
         </div>
 
-        <div className="sticky bottom-0 flex justify-end gap-2 border-t border-gray-100 bg-white px-5 py-4">
+        <div className="sticky bottom-0 flex justify-end gap-2 border-t border-b4-line bg-b4-surface px-5 py-4">
           <button
             onClick={onClose}
-            className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="rounded-xl border border-b4-line bg-b4-surface px-4 py-2 text-sm font-medium text-b4-ink-2 hover:bg-b4-surface-2"
           >Cancelar</button>
           <button
             onClick={save}
-            className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark"
+            className="rounded-xl bg-b4-navy px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-b4-navy-deep"
           >Salvar</button>
         </div>
       </div>

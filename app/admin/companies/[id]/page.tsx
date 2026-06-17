@@ -144,11 +144,11 @@ function CompanyDetailInner({ companyId }: { companyId: string }) {
   if (loading) {
     return (
       <div className="space-y-7">
-        <div className="h-5 w-32 animate-pulse rounded-xl bg-gray-100" />
-        <div className="h-36 animate-pulse rounded-2xl border border-gray-200 bg-white shadow-sm" />
+        <div className="h-5 w-32 animate-pulse rounded-xl bg-b4-surface-2" />
+        <div className="h-36 animate-pulse rounded-2xl border border-b4-line bg-b4-surface shadow-sm" />
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="h-28 animate-pulse rounded-2xl border border-gray-200 bg-white shadow-sm" />
+            <div key={i} className="h-28 animate-pulse rounded-2xl border border-b4-line bg-b4-surface shadow-sm" />
           ))}
         </div>
       </div>
@@ -157,9 +157,9 @@ function CompanyDetailInner({ companyId }: { companyId: string }) {
 
   if (!data) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-sm">
-        <p className="text-sm text-gray-500">Empresa não encontrada.</p>
-        <Link href="/admin/companies" className="mt-3 inline-block text-sm font-medium text-primary hover:underline">
+      <div className="b4-card p-12 text-center">
+        <p className="text-sm text-b4-ink-2">Empresa não encontrada.</p>
+        <Link href="/admin/companies" className="mt-3 inline-block text-sm font-medium text-b4-navy hover:underline">
           Voltar para lista
         </Link>
       </div>
@@ -180,36 +180,39 @@ function CompanyDetailInner({ companyId }: { companyId: string }) {
       {/* Back link */}
       <Link
         href="/admin/companies"
-        className="inline-flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-primary"
+        className="inline-flex items-center gap-1.5 text-sm text-b4-ink-2 transition-colors hover:text-b4-navy"
       >
         <HiOutlineArrowLeft /> Voltar para empresas
       </Link>
 
       {/* Header da empresa */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <div className="flex items-start gap-4">
-          <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <HiOutlineOfficeBuilding className="text-3xl" />
+      <div>
+        <span className="b4-eyebrow">CRM · Empresa</span>
+        <div className="b4-card mt-2 p-6">
+          <div className="flex items-start gap-4">
+            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-b4-navy/10 text-b4-navy">
+              <HiOutlineOfficeBuilding className="text-3xl" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2
+                className="truncate text-xl font-bold text-b4-ink"
+                style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif", letterSpacing: "-0.02em" }}
+              >
+                {company.name}
+              </h2>
+              <p className="mt-0.5 font-mono text-sm text-b4-ink-2">{company.cnpj_formatted}</p>
+              {(company.city || company.state) && (
+                <p className="mt-0.5 text-sm text-b4-ink-3">
+                  {[company.city, company.state].filter(Boolean).join(" · ")}
+                </p>
+              )}
+            </div>
+            <span className="b4-chip hidden shrink-0 text-b4-ink-2 sm:inline-flex">
+              Desde {fmtDate(company.created_at)}
+            </span>
           </div>
-          <div className="min-w-0 flex-1">
-            <h2
-              className="truncate text-xl font-bold text-secondary"
-              style={{ fontFamily: "var(--font-display), system-ui", letterSpacing: "-0.02em" }}
-            >
-              {company.name}
-            </h2>
-            <p className="mt-0.5 font-mono text-sm text-gray-500">{company.cnpj_formatted}</p>
-            {(company.city || company.state) && (
-              <p className="mt-0.5 text-sm text-gray-400">
-                {[company.city, company.state].filter(Boolean).join(" · ")}
-              </p>
-            )}
-          </div>
-          <span className="hidden shrink-0 rounded-xl bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-500 sm:block">
-            Desde {fmtDate(company.created_at)}
-          </span>
+          <StressInviteRow companyId={company.id} />
         </div>
-        <StressInviteRow companyId={company.id} />
       </div>
 
       {/* KPIs dos módulos */}
@@ -237,16 +240,17 @@ function CompanyDetailInner({ companyId }: { companyId: string }) {
         )}
       </div>
 
-      {/* Link Custo Previsível */}
+      {/* Link Custo Previsível · painel navy de destaque */}
       <Link
         href={`/admin/esocial/custo-previsivel/${company.id}`}
-        className="group flex items-center justify-between rounded-2xl border border-dashed border-primary/40 bg-primary/5 p-5 transition-all hover:border-primary hover:bg-primary/10"
+        className="b4-feature group flex items-center justify-between p-5 transition-all"
       >
-        <div>
-          <p className="text-sm font-semibold text-primary">Painel Custo Previsível (FAIXAS)</p>
-          <p className="mt-0.5 text-xs text-gray-600">Previdenciário · Trabalhista · Operacional · Integridade SST</p>
+        <div className="relative">
+          <span className="b4-eyebrow text-white/70">Painel financeiro</span>
+          <p className="mt-1.5 text-sm font-semibold text-white" style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif" }}>Painel Custo Previsível (FAIXAS)</p>
+          <p className="mt-0.5 text-xs text-white/70">Previdenciário · Trabalhista · Operacional · Integridade SST</p>
         </div>
-        <HiOutlineChevronRight className="text-primary/50 transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
+        <HiOutlineChevronRight className="relative text-white/60 transition-all group-hover:translate-x-0.5 group-hover:text-white" />
       </Link>
 
       {/* Sugestoes de mesclagem */}
@@ -258,17 +262,17 @@ function CompanyDetailInner({ companyId }: { companyId: string }) {
           </p>
           <div className="mt-4 space-y-2">
             {suggestions.map((s) => (
-              <div key={s.id} className="flex items-center justify-between gap-3 rounded-xl bg-white p-3 shadow-sm">
+              <div key={s.id} className="flex items-center justify-between gap-3 rounded-xl bg-b4-surface p-3 shadow-sm">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-gray-900">{s.name}</p>
-                  <p className="font-mono text-xs text-gray-500">
+                  <p className="truncate text-sm font-medium text-b4-ink">{s.name}</p>
+                  <p className="font-mono text-xs text-b4-ink-2">
                     {s.cnpj_formatted} · {Math.round(s.score * 100)}% similar
                   </p>
                 </div>
                 <div className="flex gap-2">
                   <Link
                     href={`/admin/companies/${s.id}`}
-                    className="rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                    className="rounded-xl border border-b4-line bg-b4-surface px-3 py-1.5 text-xs font-medium text-b4-ink-2 hover:bg-b4-surface-2"
                   >
                     Ver
                   </Link>
@@ -286,27 +290,27 @@ function CompanyDetailInner({ companyId }: { companyId: string }) {
       )}
 
       {/* Submissions / Leads */}
-      <div id="leads" className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-          <h3 className="text-sm font-bold text-gray-900">Leads do formulário</h3>
+      <div id="leads" className="b4-card overflow-hidden">
+        <div className="flex items-center justify-between border-b border-b4-line px-5 py-4">
+          <h3 className="text-sm font-bold text-b4-ink">Leads do formulário</h3>
           {submissions.length > 0 && (
-            <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-500">
+            <span className="rounded-md bg-b4-surface-2 px-2 py-0.5 text-xs font-semibold text-b4-ink-2">
               {submissions.length}
             </span>
           )}
         </div>
         {submissions.length === 0 ? (
           <div className="px-6 py-12 text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-b4-navy/10 text-b4-navy">
               <HiOutlineClipboardList className="text-2xl" />
             </div>
-            <p className="mt-4 text-sm font-semibold text-gray-800">Nenhum lead registrado ainda</p>
-            <p className="mt-1 text-xs text-gray-500">Leads enviados pelo formulário do site aparecerão aqui.</p>
+            <p className="mt-4 text-sm font-semibold text-b4-ink">Nenhum lead registrado ainda</p>
+            <p className="mt-1 text-xs text-b4-ink-2">Leads enviados pelo formulário do site aparecerão aqui.</p>
           </div>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-100 text-left text-[11px] uppercase tracking-wider text-gray-400">
+              <tr className="border-b border-b4-line text-left text-[11px] uppercase tracking-wider text-b4-ink-3">
                 <th className="px-5 py-3 font-semibold">Contato</th>
                 <th className="hidden px-5 py-3 font-semibold md:table-cell">Telefone</th>
                 <th className="hidden px-5 py-3 font-semibold md:table-cell">Funcionários</th>
@@ -319,25 +323,25 @@ function CompanyDetailInner({ companyId }: { companyId: string }) {
               {submissions.map((s) => (
                 <tr
                   key={s.id}
-                  className="border-b border-gray-50 transition-colors last:border-0 hover:bg-primary/[0.03]"
+                  className="border-b border-b4-line transition-colors last:border-0 hover:bg-b4-surface-2"
                 >
                   <td className="px-5 py-3.5">
                     <span className="flex items-center gap-2">
-                      <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
+                      <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-b4-navy/10 text-[10px] font-bold text-b4-navy">
                         {initials(s.nome)}
                       </span>
-                      <span className="font-semibold text-gray-900">{s.nome}</span>
+                      <span className="font-semibold text-b4-ink">{s.nome}</span>
                     </span>
                   </td>
-                  <td className="hidden px-5 py-3.5 text-gray-600 md:table-cell">
+                  <td className="hidden px-5 py-3.5 text-b4-ink-2 md:table-cell">
                     <span className="inline-flex items-center gap-1">
-                      <HiOutlinePhone className="text-gray-400" /> {s.telefone}
+                      <HiOutlinePhone className="text-b4-ink-3" /> {s.telefone}
                     </span>
                   </td>
-                  <td className="hidden px-5 py-3.5 text-gray-600 md:table-cell">{s.funcionarios}</td>
-                  <td className="hidden px-5 py-3.5 text-gray-600 lg:table-cell">{s.regiao}</td>
-                  <td className="px-5 py-3.5 text-xs text-gray-600">{s.necessidade}</td>
-                  <td className="hidden px-5 py-3.5 text-xs text-gray-400 lg:table-cell">
+                  <td className="hidden px-5 py-3.5 text-b4-ink-2 md:table-cell">{s.funcionarios}</td>
+                  <td className="hidden px-5 py-3.5 text-b4-ink-2 lg:table-cell">{s.regiao}</td>
+                  <td className="px-5 py-3.5 text-xs text-b4-ink-2">{s.necessidade}</td>
+                  <td className="hidden px-5 py-3.5 text-xs text-b4-ink-3 lg:table-cell">
                     {new Date(s.criado_em).toLocaleDateString("pt-BR")}
                   </td>
                 </tr>
@@ -350,34 +354,34 @@ function CompanyDetailInner({ companyId }: { companyId: string }) {
       {/* Merge dialog */}
       {mergeOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-secondary">Mesclar empresas</h3>
-            <p className="mt-2 text-sm text-gray-600">
-              Você vai mesclar <strong>{mergeOpen.targetName}</strong> em <strong>{company.name}</strong>.
+          <div className="w-full max-w-md rounded-2xl bg-b4-surface p-6 shadow-xl">
+            <h3 className="text-lg font-bold text-b4-ink" style={{ fontFamily: "var(--font-admin-display), system-ui, sans-serif" }}>Mesclar empresas</h3>
+            <p className="mt-2 text-sm text-b4-ink-2">
+              Você vai mesclar <strong className="text-b4-ink">{mergeOpen.targetName}</strong> em <strong className="text-b4-ink">{company.name}</strong>.
               Todos os leads e dados da empresa antiga passarão a aparecer aqui. Essa ação não pode ser desfeita facilmente.
             </p>
-            <label className="mt-4 block text-sm font-medium text-gray-700">
+            <label className="mt-4 block text-sm font-medium text-b4-ink-2">
               Confirme sua senha para prosseguir
             </label>
             <input
               type="password"
               value={mergePassword}
               onChange={(e) => setMergePassword(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+              className="mt-1.5 w-full rounded-xl border border-b4-line bg-b4-surface px-3 py-2.5 text-sm text-b4-ink outline-none focus:border-b4-navy/40 focus:ring-4 focus:ring-b4-navy/10"
               autoFocus
             />
-            {mergeError && <p className="mt-2 text-xs text-red-600">{mergeError}</p>}
+            {mergeError && <p className="mt-2 text-xs text-rose-600">{mergeError}</p>}
             <div className="mt-5 flex justify-end gap-2">
               <button
                 onClick={() => { setMergeOpen(null); setMergePassword(""); setMergeError(""); }}
-                className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="rounded-xl border border-b4-line bg-b4-surface px-4 py-2 text-sm font-medium text-b4-ink-2 hover:bg-b4-surface-2"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleMerge}
                 disabled={!mergePassword || mergeBusy}
-                className="rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark disabled:opacity-50"
+                className="rounded-xl bg-b4-navy px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-b4-navy-deep disabled:opacity-50"
               >
                 {mergeBusy ? "Mesclando..." : "Mesclar"}
               </button>
@@ -416,20 +420,20 @@ function StressInviteRow({ companyId }: { companyId: string }) {
   };
 
   return (
-    <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-4">
+    <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-b4-line pt-4">
       <button
         onClick={generate}
         disabled={busy}
-        className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-primary-dark disabled:opacity-60"
+        className="inline-flex items-center gap-1.5 rounded-xl bg-b4-navy px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-b4-navy-deep disabled:opacity-60"
       >
         <HiOutlineLink /> {busy ? "Gerando..." : "Gerar link Stress Test (cliente preenche)"}
       </button>
       {link && (
-        <div className="flex flex-1 min-w-[200px] items-center gap-1 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2">
-          <input readOnly value={link} className="flex-1 min-w-0 bg-transparent font-mono text-xs outline-none" />
+        <div className="flex flex-1 min-w-[200px] items-center gap-1 rounded-xl border border-b4-line bg-b4-surface-2 px-3 py-2">
+          <input readOnly value={link} className="flex-1 min-w-0 bg-transparent font-mono text-xs text-b4-ink outline-none" />
           <button
             onClick={() => { navigator.clipboard.writeText(link); }}
-            className="rounded-xl p-1 text-gray-500 hover:bg-white hover:text-primary"
+            className="rounded-xl p-1 text-b4-ink-2 hover:bg-b4-surface hover:text-b4-navy"
             title="Copiar link"
           >
             <HiOutlineClipboardCopy />
