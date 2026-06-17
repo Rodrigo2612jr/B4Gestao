@@ -155,11 +155,15 @@ function Inner() {
   }, [tecnicoCursor, following, step]);
 
   // Supervisor seguindo: rola até a pergunta onde o técnico está
+  const lastScrollRef = useRef<string | null>(null);
   useEffect(() => {
-    if (isAvaliadorRef.current || !following || !tecnicoCursor?.focus) return;
-    const el = document.getElementById(`aepq-${tecnicoCursor.focus}`);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, [tecnicoCursor?.focus, following, step, version]);
+    if (isAvaliadorRef.current || !following) { lastScrollRef.current = null; return; }
+    const focus = tecnicoCursor?.focus ?? null;
+    // Só rola quando o técnico MUDA de pergunta — nunca prende a rolagem manual do supervisor
+    if (!focus || focus === lastScrollRef.current) return;
+    const el = document.getElementById(`aepq-${focus}`);
+    if (el) { el.scrollIntoView({ behavior: "smooth", block: "center" }); lastScrollRef.current = focus; }
+  }, [tecnicoCursor?.focus, following, step]);
 
   const patch = useCallback(
     async (body: Record<string, unknown>) => {
@@ -801,9 +805,9 @@ function FunctionCard({
 
       <div className="mt-3 grid grid-cols-1 gap-3">
         <Field label="Posto de trabalho" defaultValue={fn.posto_trabalho} readOnly={readOnly} onSave={(v) => save({ postoTrabalho: v })} />
-        <Field label="Descrição do ambiente de trabalho" textarea rows={3} defaultValue={fn.descricao_ambiente} readOnly={readOnly} onSave={(v) => save({ descricaoAmbiente: v })} />
-        <Field label="Descrição da atividade" textarea rows={3} defaultValue={fn.descricao_atividade} readOnly={readOnly} onSave={(v) => save({ descricaoAtividade: v })} />
-        <Field label="Característica do modo operatório" textarea rows={3} defaultValue={fn.modo_operatorio} readOnly={readOnly} onSave={(v) => save({ modoOperatorio: v })} />
+        <Field label="Descrição do ambiente de trabalho" hint="Descreva o local físico onde a função é exercida: layout e dimensões do posto, piso e circulação, iluminação, ruído, temperatura/ventilação e o mobiliário/equipamentos presentes — destacando o que impacta a postura e o conforto do trabalhador." textarea rows={3} defaultValue={fn.descricao_ambiente} readOnly={readOnly} onSave={(v) => save({ descricaoAmbiente: v })} />
+        <Field label="Descrição da atividade" hint="O que o trabalhador faz na prática: principais tarefas, ferramentas e cargas manuseadas, repetitividade e ritmo/exigências da função." textarea rows={3} defaultValue={fn.descricao_atividade} readOnly={readOnly} onSave={(v) => save({ descricaoAtividade: v })} />
+        <Field label="Característica do modo operatório" hint="Como a tarefa é executada: posturas adotadas (em pé/sentado), movimentos repetitivos, força aplicada, alcances e pausas durante a jornada." textarea rows={3} defaultValue={fn.modo_operatorio} readOnly={readOnly} onSave={(v) => save({ modoOperatorio: v })} />
         <Field label="Mobiliário e equipamentos" textarea rows={3} defaultValue={fn.mobiliario_equipamentos} readOnly={readOnly} onSave={(v) => save({ mobiliarioEquipamentos: v })} />
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <Field label="Conforto acústico" defaultValue={fn.conforto_acustico} readOnly={readOnly} onSave={(v) => save({ confortoAcustico: v })} />
@@ -1054,6 +1058,7 @@ function Field({
   rows = 2,
   type = "text",
   list,
+  hint,
 }: {
   label: string;
   defaultValue?: string | null;
@@ -1064,6 +1069,7 @@ function Field({
   rows?: number;
   type?: string;
   list?: string[];
+  hint?: string;
 }) {
   if (readOnly || !onSave) {
     return <ReadField label={label} value={value ?? defaultValue ?? null} />;
@@ -1072,6 +1078,7 @@ function Field({
   return (
     <div>
       <label className="text-xs font-medium text-b4-ink-2">{label}</label>
+      {hint && <p className="mb-1.5 mt-0.5 rounded-md bg-b4-navy/5 px-2 py-1 text-[11px] leading-snug text-b4-ink-2">💡 {hint}</p>}
       {textarea ? (
         <textarea
           defaultValue={defaultValue ?? ""}
