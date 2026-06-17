@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { logAudit, getUserRoleById } from "@/lib/db";
-import { requireAep, canView, canEditContent, canDecide, actorRoleFor } from "@/lib/aep/guard";
+import { requireAep, canView, canEditContent, canSubmit, canDecide, actorRoleFor } from "@/lib/aep/guard";
 import { isEditable } from "@/lib/aep/scoring";
 import {
   getAssessmentAccess,
@@ -34,6 +34,7 @@ export async function GET(
     isAvaliador: auth.user.id === access.avaliador_user_id,
     isSupervisor: auth.user.id === access.supervisor_user_id,
     canEdit: canEditContent(auth.user, access),
+    canSubmit: canSubmit(auth.user, access),
     canDecide: canDecide(auth.user, access),
   };
   return NextResponse.json({ ...full, viewer });

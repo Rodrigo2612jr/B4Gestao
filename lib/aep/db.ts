@@ -372,10 +372,19 @@ export async function softDeleteAssessment(id: string): Promise<boolean> {
 }
 
 /** Marca presença (heartbeat) do técnico ou supervisor. */
-export async function touchPresence(id: string, who: "tecnico" | "supervisor"): Promise<void> {
+export async function touchPresence(
+  id: string,
+  who: "tecnico" | "supervisor",
+  cursor?: { step: string; focus: string | null } | null
+): Promise<void> {
   if (!sql) return;
   if (who === "tecnico") {
-    await sql`UPDATE aep_assessments SET tecnico_seen_at = NOW() WHERE id = ${id}`;
+    const cur = cursor ? JSON.stringify(cursor) : null;
+    // COALESCE: heartbeat sem cursor nao apaga o ultimo cursor conhecido
+    await sql`UPDATE aep_assessments
+              SET tecnico_seen_at = NOW(),
+                  tecnico_cursor = COALESCE(${cur}::jsonb, tecnico_cursor)
+              WHERE id = ${id}`;
   } else {
     await sql`UPDATE aep_assessments SET supervisor_seen_at = NOW() WHERE id = ${id}`;
   }
@@ -387,6 +396,7 @@ export interface AepState {
   rejection_reason: string | null;
   tecnico_seen_at: string | null;
   supervisor_seen_at: string | null;
+  tecnico_cursor: { step: string; focus: string | null } | null;
   last_chat_id: string | null;
   last_chat_at: string | null;
   chat_count: number;
@@ -400,6 +410,7 @@ export async function getState(id: string): Promise<AepState | null> {
            to_char(a.updated_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS updated_at,
            to_char(a.tecnico_seen_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS tecnico_seen_at,
            to_char(a.supervisor_seen_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS supervisor_seen_at,
+           a.tecnico_cursor,
            (SELECT id::text FROM aep_chat_messages WHERE assessment_id = a.id ORDER BY created_at DESC LIMIT 1) AS last_chat_id,
            (SELECT to_char(created_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') FROM aep_chat_messages WHERE assessment_id = a.id ORDER BY created_at DESC LIMIT 1) AS last_chat_at,
            (SELECT COUNT(*)::int FROM aep_chat_messages WHERE assessment_id = a.id) AS chat_count

@@ -58,7 +58,7 @@ export interface AdminUser {
 let initPromise: Promise<void> | null = null;
 // Versão do schema. BUMP ao alterar a DDL do initDb → as migrações rodam uma vez no
 // próximo cold start; cold starts seguintes pulam toda a DDL (1 query só, não ~40).
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 export async function initDb(): Promise<void> {
   if (!sql) return;
   if (initPromise) return initPromise;
@@ -478,6 +478,7 @@ export async function initDb(): Promise<void> {
         rejection_reason TEXT,
         tecnico_seen_at TIMESTAMPTZ,
         supervisor_seen_at TIMESTAMPTZ,
+        tecnico_cursor JSONB,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         submitted_at TIMESTAMPTZ,
@@ -491,6 +492,8 @@ export async function initDb(): Promise<void> {
     await sql`CREATE INDEX IF NOT EXISTS idx_aep_created ON aep_assessments(created_at DESC)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_aep_avaliador ON aep_assessments(avaliador_user_id)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_aep_supervisor ON aep_assessments(supervisor_user_id)`;
+    // v2: cursor de presença do técnico (passo + pergunta atual) p/ supervisão ao vivo
+    await sql`ALTER TABLE aep_assessments ADD COLUMN IF NOT EXISTS tecnico_cursor JSONB`;
 
     // Setores (loop ADD SETOR)
     await sql`

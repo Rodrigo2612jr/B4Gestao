@@ -27,6 +27,7 @@ interface Viewer {
   isAvaliador: boolean;
   isSupervisor: boolean;
   canEdit: boolean;
+  canSubmit: boolean;
   canDecide: boolean;
 }
 type FullData = AepFull & { viewer: Viewer };
@@ -74,6 +75,16 @@ function Inner() {
   const canEditRef = useRef<boolean>(false);
   const [presence, setPresence] = useState<{ tecnico: boolean; supervisor: boolean }>({ tecnico: false, supervisor: false });
 
+  // Supervisão ao vivo: cursor do técnico (passo + pergunta atual) + modo "seguir"
+  const [tecnicoCursor, setTecnicoCursor] = useState<{ step: string; focus: string | null } | null>(null);
+  const [following, setFollowing] = useState(true);
+  const isAvaliadorRef = useRef(false);
+  const cursorRef = useRef<{ step: string; focus: string | null }>({ step: "geral", focus: null });
+
+  const reportFocus = useCallback((qid: string) => {
+    cursorRef.current = { ...cursorRef.current, focus: qid };
+  }, []);
+
   const load = useCallback(async () => {
     try {
       const res = await fetch(`/api/aep/${id}`);
@@ -86,6 +97,7 @@ function Inner() {
       statusRef.current = full.status;
       updatedRef.current = full.updated_at;
       canEditRef.current = full.viewer.canEdit;
+      isAvaliadorRef.current = full.viewer.isAvaliador;
       setVersion((v) => v + 1);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro");
@@ -103,11 +115,16 @@ function Inner() {
     let alive = true;
     const tick = async () => {
       try {
-        await fetch(`/api/aep/${id}/heartbeat`, { method: "POST" });
+        // Técnico publica seu cursor (passo + pergunta); supervisor só pulsa presença
+        const hb: RequestInit = isAvaliadorRef.current
+          ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cursorRef.current) }
+          : { method: "POST" };
+        await fetch(`/api/aep/${id}/heartbeat`, hb);
         const res = await fetch(`/api/aep/${id}/state`);
         if (!res.ok || !alive) return;
         const s = await res.json();
         setPresence({ tecnico: isRecent(s.tecnico_seen_at), supervisor: isRecent(s.supervisor_seen_at) });
+        if (!isAvaliadorRef.current) setTecnicoCursor(s.tecnico_cursor ?? null);
         const statusChanged = s.status !== statusRef.current;
         const contentChanged = s.updated_at !== updatedRef.current;
         // Técnico (editor): só recarrega quando o STATUS muda (ex.: supervisor aprovou/reprovou)
@@ -119,12 +136,30 @@ function Inner() {
         /* silencioso */
       }
     };
-    const t = setInterval(tick, 4000);
+    const t = setInterval(tick, 3000);
     return () => {
       alive = false;
       clearInterval(t);
     };
   }, [id, load]);
+
+  // Cursor do técnico acompanha o passo atual (p/ broadcast); reseta foco ao trocar de passo
+  useEffect(() => {
+    cursorRef.current = { step, focus: null };
+  }, [step]);
+
+  // Supervisor seguindo: navega automaticamente p/ o passo onde o técnico está
+  useEffect(() => {
+    if (isAvaliadorRef.current || !following || !tecnicoCursor?.step) return;
+    if (tecnicoCursor.step !== step) setStep(tecnicoCursor.step as Step);
+  }, [tecnicoCursor, following, step]);
+
+  // Supervisor seguindo: rola até a pergunta onde o técnico está
+  useEffect(() => {
+    if (isAvaliadorRef.current || !following || !tecnicoCursor?.focus) return;
+    const el = document.getElementById(`aepq-${tecnicoCursor.focus}`);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [tecnicoCursor?.focus, following, step, version]);
 
   const patch = useCallback(
     async (body: Record<string, unknown>) => {
@@ -214,7 +249,7 @@ function Inner() {
 
         {/* Ações */}
         <div className="flex flex-col items-end gap-2">
-          {canEdit && (
+          {data.viewer.canSubmit && (
             <button
               onClick={submit}
               disabled={busy}
@@ -254,6 +289,32 @@ function Inner() {
         </div>
       )}
 
+      {/* Supervisão ao vivo: barra de acompanhamento do técnico */}
+      {!data.viewer.isAvaliador && (presence.tecnico || tecnicoCursor) && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-b4-navy/20 bg-b4-navy/5 px-4 py-2.5 text-sm">
+          <span className="inline-flex items-center gap-2 text-b4-navy">
+            <span className="relative flex h-2.5 w-2.5">
+              {presence.tecnico && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />}
+              <span className={`relative inline-flex h-2.5 w-2.5 rounded-full ${presence.tecnico ? "bg-emerald-500" : "bg-b4-ink-3"}`} />
+            </span>
+            {presence.tecnico ? (
+              <span><b className="text-b4-ink">{data.avaliador_name}</b> está preenchendo ao vivo</span>
+            ) : (
+              <span>Última posição de <b className="text-b4-ink">{data.avaliador_name}</b></span>
+            )}
+            {tecnicoCursor?.step && (
+              <span className="text-b4-ink-3">· {STEPS.find((x) => x.id === tecnicoCursor.step)?.label ?? tecnicoCursor.step}</span>
+            )}
+          </span>
+          <button
+            onClick={() => setFollowing((f) => !f)}
+            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors active:scale-95 ${following ? "bg-b4-navy text-white" : "border border-b4-line text-b4-ink-2 hover:bg-b4-surface-2"}`}
+          >
+            {following ? "Seguindo o técnico ✓" : "Seguir o técnico"}
+          </button>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_360px]">
         {/* Coluna principal */}
         <div className="space-y-5">
@@ -262,7 +323,7 @@ function Inner() {
             {STEPS.map((s) => (
               <button
                 key={s.id}
-                onClick={() => setStep(s.id)}
+                onClick={() => { setStep(s.id); if (!isAvaliadorRef.current) setFollowing(false); }}
                 className={`rounded-lg px-3 py-2 text-xs font-semibold transition-colors active:scale-95 ${
                   step === s.id ? "bg-b4-navy text-white shadow-[var(--b4-shadow-xs)]" : "text-b4-ink-2 hover:bg-b4-surface-2"
                 }`}
@@ -274,7 +335,16 @@ function Inner() {
 
           <div key={version}>
             {step === "geral" && <GeralStep data={data} readOnly={!canEdit} onPatch={patch} />}
-            {step === "checklist" && <ChecklistStep data={data} readOnly={!canEdit} onPatch={patch} />}
+            {step === "checklist" && (
+              <ChecklistStep
+                data={data}
+                readOnly={!canEdit}
+                onPatch={patch}
+                onFocusItem={data.viewer.isAvaliador ? reportFocus : undefined}
+                liveFocus={!data.viewer.isAvaliador ? (tecnicoCursor?.focus ?? null) : null}
+                liveName={data.avaliador_name}
+              />
+            )}
             {step === "estrutura" && <EstruturaStep data={data} readOnly={!canEdit} reload={load} push={push} />}
             {step === "riscos" && <RiscosStep data={data} readOnly={!canEdit} reload={load} push={push} />}
           </div>
@@ -366,7 +436,7 @@ const CAT_COLORS: Record<string, { band: string; text: string; bar: string; ring
   psicossociais: { band: "bg-violet-50", text: "text-violet-700", bar: "bg-violet-500", ring: "ring-violet-100" },
 };
 
-function ChecklistStep({ data, readOnly, onPatch }: { data: FullData; readOnly: boolean; onPatch: (b: Record<string, unknown>) => void }) {
+function ChecklistStep({ data, readOnly, onPatch, onFocusItem, liveFocus, liveName }: { data: FullData; readOnly: boolean; onPatch: (b: Record<string, unknown>) => void; onFocusItem?: (qid: string) => void; liveFocus?: string | null; liveName?: string | null }) {
   const [answers, setAnswers] = useState<ChecklistAnswers>(data.checklist || {});
   const [notesOpen, setNotesOpen] = useState<Set<string>>(
     () => new Set(Object.entries(data.checklist || {}).filter(([, v]) => (v as ChecklistAnswer)?.nota).map(([k]) => k))
@@ -467,8 +537,20 @@ function ChecklistStep({ data, readOnly, onPatch }: { data: FullData; readOnly: 
                   : a.resp === "NA" ? "border-l-b4-line-strong bg-b4-surface-2"
                   : "border-l-transparent";
                 const noteOpen = notesOpen.has(q.id);
+                const isLive = liveFocus === q.id;
                 return (
-                  <div key={q.id} className={`border-l-[3px] px-4 py-3.5 transition-colors ${accent}`}>
+                  <div
+                    key={q.id}
+                    id={`aepq-${q.id}`}
+                    onFocusCapture={() => onFocusItem?.(q.id)}
+                    onClickCapture={() => onFocusItem?.(q.id)}
+                    className={`relative border-l-[3px] px-4 py-3.5 transition-colors ${accent} ${isLive ? "rounded-lg ring-2 ring-b4-navy ring-offset-2" : ""}`}
+                  >
+                    {isLive && (
+                      <span className="pointer-events-none absolute -top-2.5 left-3 z-10 inline-flex items-center gap-1 rounded-full bg-b4-navy px-2 py-0.5 text-[10px] font-semibold text-white shadow">
+                        👁 {liveName ?? "Técnico"} está aqui
+                      </span>
+                    )}
                     <div className="flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                       <p className="text-sm leading-snug text-b4-ink sm:flex-1">{q.label}</p>
                       <div className="inline-flex flex-shrink-0 overflow-hidden rounded-lg border border-b4-line bg-b4-surface-2">

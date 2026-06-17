@@ -17,6 +17,20 @@ export async function POST(
   if (!canView(auth.user, access)) return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
 
   const who = auth.user.id === access.avaliador_user_id ? "tecnico" : "supervisor";
-  await touchPresence(id, who);
+
+  // O técnico publica seu cursor (passo + pergunta atual) p/ o supervisor acompanhar ao vivo.
+  let cursor: { step: string; focus: string | null } | null = null;
+  if (who === "tecnico") {
+    try {
+      const body = await request.json();
+      if (body && typeof body.step === "string") {
+        cursor = { step: body.step, focus: typeof body.focus === "string" ? body.focus : null };
+      }
+    } catch {
+      /* heartbeat pode vir sem corpo */
+    }
+  }
+
+  await touchPresence(id, who, cursor);
   return NextResponse.json({ ok: true, who });
 }
