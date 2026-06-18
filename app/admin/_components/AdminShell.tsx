@@ -11,6 +11,7 @@ import {
   HiOutlineMenu,
   HiOutlineX,
   HiOutlineClipboardList,
+  HiOutlineClipboardCheck,
   HiOutlineOfficeBuilding,
   HiOutlineChartBar,
   HiOutlineExclamationCircle,
@@ -51,6 +52,7 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
     items: [
       { href: "/admin/pulse", label: "Pulse", Icon: HiOutlineChartBar, module: "pulse" },
       { href: "/admin/stress-test", label: "Stress Test", Icon: HiOutlineExclamationCircle, module: "stress" },
+      { href: "/admin/aep", label: "AEP (Ergonomia)", Icon: HiOutlineClipboardCheck, module: "aep" },
     ],
   },
   {
@@ -67,10 +69,11 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
   },
 ];
 
-// AEP vive no portal próprio (aep.b4gestao.com.br). Técnico/Supervisor não acessam o painel.
+// Técnico/Supervisor preenchem no portal próprio (aep.b4gestao.com.br); admin/SST
+// observam tudo (read-only) pelo painel em /admin/aep.
 const ROLE_PERMS: Record<string, string[]> = {
-  ADMIN: ["dashboard", "companies", "leads", "pulse", "stress", "esocial", "users"],
-  SST: ["dashboard", "companies", "leads", "pulse", "stress", "esocial"],
+  ADMIN: ["dashboard", "companies", "leads", "pulse", "stress", "esocial", "users", "aep"],
+  SST: ["dashboard", "companies", "leads", "pulse", "stress", "esocial", "aep"],
   RH: ["dashboard", "companies", "pulse", "stress"],
   JURIDICO: ["dashboard", "companies", "esocial"],
   TECNICO: [],

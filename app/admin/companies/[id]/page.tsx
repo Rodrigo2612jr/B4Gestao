@@ -12,6 +12,7 @@ import {
   HiOutlinePhone,
   HiOutlineUser,
   HiOutlineClipboardCopy,
+  HiOutlineClipboardCheck,
   HiOutlineLink,
   HiOutlineChevronRight,
 } from "react-icons/hi";
@@ -52,7 +53,7 @@ interface Suggestion {
 interface Aggregate {
   company: Company;
   submissions: Submission[];
-  counts: { leads: number; pulse: number; stress: number; esocial: number };
+  counts: { leads: number; pulse: number; stress: number; esocial: number; aep: number };
   suggestions: Suggestion[];
 }
 
@@ -173,6 +174,7 @@ function CompanyDetailInner({ companyId }: { companyId: string }) {
     { key: "pulse", label: "Pulse NR-1", count: counts.pulse, Icon: HiOutlineChartBar, href: "/admin/pulse", tone: "emerald" as const },
     { key: "stress", label: "Stress Test", count: counts.stress, Icon: HiOutlineExclamationCircle, href: "/admin/stress-test", tone: "violet" as const },
     { key: "esocial", label: "eSocial alertas", count: counts.esocial, Icon: HiOutlineDocumentReport, href: "/admin/esocial", tone: "rose" as const },
+    { key: "aep", label: "AEP (Ergonomia)", count: counts.aep, Icon: HiOutlineClipboardCheck, href: "/admin/aep", tone: "amber" as const },
   ];
 
   return (
