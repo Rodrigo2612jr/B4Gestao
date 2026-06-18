@@ -19,12 +19,19 @@ export async function POST(
   const who = auth.user.id === access.avaliador_user_id ? "tecnico" : "supervisor";
 
   // O técnico publica seu cursor (passo + pergunta atual) p/ o supervisor acompanhar ao vivo.
-  let cursor: { step: string; focus: string | null } | null = null;
+  let cursor:
+    | { step: string; fn: string | null; sub: string | null; focus: string | null }
+    | null = null;
   if (who === "tecnico") {
     try {
       const body = await request.json();
       if (body && typeof body.step === "string") {
-        cursor = { step: body.step, focus: typeof body.focus === "string" ? body.focus : null };
+        cursor = {
+          step: body.step,
+          fn: typeof body.fn === "string" ? body.fn : null,
+          sub: typeof body.sub === "string" ? body.sub : null,
+          focus: typeof body.focus === "string" ? body.focus : null,
+        };
       }
     } catch {
       /* heartbeat pode vir sem corpo */

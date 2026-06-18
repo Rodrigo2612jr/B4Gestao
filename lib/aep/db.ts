@@ -50,6 +50,7 @@ export interface AepFunction {
   conforto_acustico: string | null;
   temperatura: string | null;
   iluminacao: string | null;
+  checklist: ChecklistAnswers;
   ordem: number;
   photos: AepPhoto[];
   risks: AepRiskItem[];
@@ -217,7 +218,7 @@ export async function getAssessmentFull(id: string): Promise<AepFull | null> {
   const functions = (await sql`
     SELECT id, assessment_id, sector_id, ghe, funcao_paradigma, posto_trabalho,
            descricao_ambiente, descricao_atividade, modo_operatorio,
-           mobiliario_equipamentos, conforto_acustico, temperatura, iluminacao, ordem
+           mobiliario_equipamentos, conforto_acustico, temperatura, iluminacao, checklist, ordem
     FROM aep_functions WHERE assessment_id = ${id} ORDER BY ordem ASC, created_at ASC
   `) as unknown as AepFunction[];
 
@@ -375,7 +376,7 @@ export async function softDeleteAssessment(id: string): Promise<boolean> {
 export async function touchPresence(
   id: string,
   who: "tecnico" | "supervisor",
-  cursor?: { step: string; focus: string | null } | null
+  cursor?: { step: string; fn: string | null; sub: string | null; focus: string | null } | null
 ): Promise<void> {
   if (!sql) return;
   if (who === "tecnico") {
@@ -396,7 +397,7 @@ export interface AepState {
   rejection_reason: string | null;
   tecnico_seen_at: string | null;
   supervisor_seen_at: string | null;
-  tecnico_cursor: { step: string; focus: string | null } | null;
+  tecnico_cursor: { step: string; fn: string | null; sub: string | null; focus: string | null } | null;
   last_chat_id: string | null;
   last_chat_at: string | null;
   chat_count: number;
@@ -546,6 +547,7 @@ export interface FunctionFields {
   confortoAcustico?: string | null;
   temperatura?: string | null;
   iluminacao?: string | null;
+  checklist?: ChecklistAnswers;
 }
 
 export async function addFunction(
@@ -583,18 +585,22 @@ export async function assessmentIdOfFunction(functionId: string): Promise<string
 
 export async function updateFunction(functionId: string, data: FunctionFields): Promise<void> {
   if (!sql) return;
+  const checklistJson = data.checklist !== undefined ? JSON.stringify(data.checklist) : null;
+  // COALESCE em tudo: PATCH parcial (ex.: só o checklist) NÃO zera os outros campos.
+  // "" (string vazia enviada p/ limpar) não é null, então limpar segue funcionando.
   await sql`
     UPDATE aep_functions SET
-      ghe = ${data.ghe ?? null},
+      ghe = COALESCE(${data.ghe ?? null}, ghe),
       funcao_paradigma = COALESCE(${data.funcaoParadigma ?? null}, funcao_paradigma),
-      posto_trabalho = ${data.postoTrabalho ?? null},
-      descricao_ambiente = ${data.descricaoAmbiente ?? null},
-      descricao_atividade = ${data.descricaoAtividade ?? null},
-      modo_operatorio = ${data.modoOperatorio ?? null},
-      mobiliario_equipamentos = ${data.mobiliarioEquipamentos ?? null},
-      conforto_acustico = ${data.confortoAcustico ?? null},
-      temperatura = ${data.temperatura ?? null},
-      iluminacao = ${data.iluminacao ?? null}
+      posto_trabalho = COALESCE(${data.postoTrabalho ?? null}, posto_trabalho),
+      descricao_ambiente = COALESCE(${data.descricaoAmbiente ?? null}, descricao_ambiente),
+      descricao_atividade = COALESCE(${data.descricaoAtividade ?? null}, descricao_atividade),
+      modo_operatorio = COALESCE(${data.modoOperatorio ?? null}, modo_operatorio),
+      mobiliario_equipamentos = COALESCE(${data.mobiliarioEquipamentos ?? null}, mobiliario_equipamentos),
+      conforto_acustico = COALESCE(${data.confortoAcustico ?? null}, conforto_acustico),
+      temperatura = COALESCE(${data.temperatura ?? null}, temperatura),
+      iluminacao = COALESCE(${data.iluminacao ?? null}, iluminacao),
+      checklist = COALESCE(${checklistJson}::jsonb, checklist)
     WHERE id = ${functionId}
   `;
   await sql`UPDATE aep_assessments SET updated_at = NOW() WHERE id = (SELECT assessment_id FROM aep_functions WHERE id = ${functionId})`;

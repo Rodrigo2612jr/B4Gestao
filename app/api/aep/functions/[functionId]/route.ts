@@ -35,6 +35,7 @@ const schema = z.object({
   confortoAcustico: z.string().max(2000).optional().nullable(),
   temperatura: z.string().max(2000).optional().nullable(),
   iluminacao: z.string().max(2000).optional().nullable(),
+  checklist: z.record(z.string(), z.any()).optional(),
 });
 
 export async function PATCH(

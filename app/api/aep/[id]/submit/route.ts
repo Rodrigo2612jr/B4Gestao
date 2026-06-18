@@ -27,7 +27,14 @@ export async function POST(
   if (full.sectors.length === 0) missing.push("Adicione pelo menos um setor.");
   const totalFunctions = full.sectors.reduce((acc, s) => acc + s.functions.length, 0);
   if (totalFunctions === 0) missing.push("Adicione pelo menos uma função.");
-  if (!isChecklistComplete(full.checklist)) missing.push("Responda todas as perguntas do checklist.");
+  // Checklist agora é POR FUNÇÃO: cada função precisa do seu checklist completo.
+  for (const s of full.sectors) {
+    for (const fn of s.functions) {
+      if (!isChecklistComplete(fn.checklist)) {
+        missing.push(`Complete o checklist da função "${fn.funcao_paradigma}" (setor ${s.nome}).`);
+      }
+    }
+  }
   if (missing.length > 0) {
     return NextResponse.json({ error: "Avaliação incompleta", missing }, { status: 422 });
   }

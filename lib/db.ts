@@ -58,7 +58,7 @@ export interface AdminUser {
 let initPromise: Promise<void> | null = null;
 // Versão do schema. BUMP ao alterar a DDL do initDb → as migrações rodam uma vez no
 // próximo cold start; cold starts seguintes pulam toda a DDL (1 query só, não ~40).
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 3;
 export async function initDb(): Promise<void> {
   if (!sql) return;
   if (initPromise) return initPromise;
@@ -525,12 +525,15 @@ export async function initDb(): Promise<void> {
         conforto_acustico TEXT,
         temperatura TEXT,
         iluminacao TEXT,
+        checklist JSONB NOT NULL DEFAULT '{}'::jsonb,
         ordem INTEGER NOT NULL DEFAULT 0,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
     await sql`CREATE INDEX IF NOT EXISTS idx_aep_functions_assessment ON aep_functions(assessment_id)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_aep_functions_sector ON aep_functions(sector_id)`;
+    // v3: checklist FO-SST.013 agora é POR FUNÇÃO (era global na avaliação)
+    await sql`ALTER TABLE aep_functions ADD COLUMN IF NOT EXISTS checklist JSONB NOT NULL DEFAULT '{}'::jsonb`;
 
     // Fotos do posto de trabalho (Vercel Blob)
     await sql`
