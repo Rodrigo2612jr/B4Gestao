@@ -87,7 +87,7 @@ function Inner() {
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch(`/api/aep/${id}`);
+      const res = await fetch(`/api/aep/${id}`, { cache: "no-store" });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
         throw new Error(d.error || "Erro ao carregar");
@@ -117,10 +117,10 @@ function Inner() {
       try {
         // Técnico publica seu cursor (passo + pergunta); supervisor só pulsa presença
         const hb: RequestInit = isAvaliadorRef.current
-          ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cursorRef.current) }
-          : { method: "POST" };
+          ? { method: "POST", cache: "no-store", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cursorRef.current) }
+          : { method: "POST", cache: "no-store" };
         await fetch(`/api/aep/${id}/heartbeat`, hb);
-        const res = await fetch(`/api/aep/${id}/state`);
+        const res = await fetch(`/api/aep/${id}/state`, { cache: "no-store" });
         if (!res.ok || !alive) return;
         const s = await res.json();
         setPresence({ tecnico: isRecent(s.tecnico_seen_at), supervisor: isRecent(s.supervisor_seen_at) });
@@ -129,14 +129,20 @@ function Inner() {
         const contentChanged = s.updated_at !== updatedRef.current;
         // Técnico (editor): só recarrega quando o STATUS muda (ex.: supervisor aprovou/reprovou)
         // Supervisor (leitura): recarrega quando o CONTEÚDO muda (vê o técnico preenchendo)
-        if (statusChanged || (!canEditRef.current && contentChanged)) {
+        // "Observador" = quem NAO e o tecnico-avaliador (supervisor/admin), OU o tecnico
+        // ja travado (pos-envio). O avaliador enquanto preenche NAO recarrega (nao atrapalha
+        // o que ele digita). Guarda 'typing' evita recarregar por cima de quem esta editando.
+        const activeEl = document.activeElement;
+        const typing = !!activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA" || activeEl.tagName === "SELECT");
+        const watcher = !isAvaliadorRef.current || !canEditRef.current;
+        if (statusChanged || (contentChanged && watcher && !typing)) {
           await load();
         }
       } catch {
         /* silencioso */
       }
     };
-    const t = setInterval(tick, 3000);
+    const t = setInterval(tick, 2000);
     return () => {
       alive = false;
       clearInterval(t);
