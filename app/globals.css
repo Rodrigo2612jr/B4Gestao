@@ -464,7 +464,10 @@ h1, h2, h3, h4 {
     radial-gradient(1100px 560px at 100% -8%, rgba(14, 66, 123, 0.06), transparent 60%),
     radial-gradient(820px 460px at -8% 112%, rgba(22, 163, 74, 0.05), transparent 55%);
 }
-.admin-root > * { position: relative; z-index: 1; }
+/* position:relative põe os filhos acima da camada decorativa ::before (ordem de árvore).
+   NÃO forçar z-index aqui: senão header e main empatam em z-1 e o main (depois no DOM)
+   cobre o dropdown da conta no header. Sem z-index, o z-30 do header volta a valer. */
+.admin-root > * { position: relative; }
 
 .admin-root h1, .admin-root h2, .admin-root h3, .admin-root h4, .admin-root h5 {
   font-family: var(--font-admin-display), system-ui, sans-serif;
